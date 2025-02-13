@@ -28,15 +28,14 @@
         }
 
         .ad-wrapper {
-            width: 468px; /*  Fixed width, as per your ad code */
-            height: 60px; /* Fixed height */
+            width: 320px; /*  Fixed width, as per your NEW ad code */
+            height: 50px; /* Fixed height, as per your NEW ad code */
             position: relative;
             overflow: hidden;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         }
-
 
         .ad-wrapper::before {
             content: '';
@@ -88,9 +87,17 @@
     </div>
 
     <script>
-      // Ad code (repeated for simplicity, you could also generate this)
-      const adCode = `<script async="async" data-cfasync="false" src="//pl25859096.effectiveratecpm.com/bece942f9fde0f687e78a96e8274f879/invoke.js"></script>
-          <div id="container-bece942f9fde0f687e78a96e8274f879"></div>`;
+      // Ad code (using the new code you provided)
+      const adCode = `<script type="text/javascript">
+	atOptions = {
+		'key' : 'da478d22f90970a31fdaa28f1fc71e9e',
+		'format' : 'iframe',
+		'height' : 50,
+		'width' : 320,
+		'params' : {}
+	};
+<\/script>
+<script type="text/javascript" src="//www.highperformanceformat.com/da478d22f90970a31fdaa28f1fc71e9e/invoke.js"></script>`;
 
       // Function to create an ad wrapper element
       function createAdWrapper(id) {
@@ -111,7 +118,7 @@
               adContainer.appendChild(adWrapper);
 
               // Find the script tag within the ad wrapper
-              const script = adWrapper.querySelector('script');
+              const invokeScript = adWrapper.querySelector('script[src*="invoke.js"]');
 
               // Set a timeout (10 seconds)
                 const timeoutId = setTimeout(() => {
@@ -121,12 +128,12 @@
                 }, 10000);
 
 
-              if (script) {
-                  script.onload = () => {
+              if (invokeScript) {
+                  invokeScript.onload = () => {
                       clearTimeout(timeoutId);
                       adWrapper.classList.remove('loading');
                   };
-                  script.onerror = () => {
+                  invokeScript.onerror = () => {
                       clearTimeout(timeoutId);
                       adWrapper.classList.remove('loading');
                       console.error(`Ad script failed to load: ${adWrapper.id}`);
