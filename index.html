@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Truly Inescapable Void</title>
+    <title>The Absolutely, Positively, Utterly Inescapable Void</title>
     <style>
-        /* --- (Same styles as before, plus additions below) --- */
+        /* --- (Previous styles, plus additions) --- */
         body,
         html {
             margin: 0;
@@ -56,11 +56,12 @@
             transform-style: preserve-3d;
             will-change: transform, opacity;
         }
-          .floater img {
+
+        .floater img {
             max-width: 100%;
             height: auto;
-            display: block; /* Prevents extra spacing below images*/
-             border-radius: 10px; /*  Match parent */
+            display: block;
+            border-radius: 10px;
         }
 
         #close-button {
@@ -76,12 +77,15 @@
             z-index: 1000;
             animation: jiggle 0.5s infinite alternate;
             pointer-events: auto;
-              transition: transform 0.2s, box-shadow 0.2s; /* Smooth transitions */
+            transition: transform 0.2s, box-shadow 0.2s;
+            /* Initial transform - scale down slightly */
+            transform: scale(0.9);
+
         }
 
         #close-button:hover {
-              transform: scale(1.1) rotate(5deg);  /*  Slight rotation on hover */
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.9); /*  Brighter glow */
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.9);
         }
 
         .fake-ad {
@@ -103,7 +107,7 @@
         }
 
         /* --- Animations (Same as before) --- */
-         @keyframes pulse {
+        @keyframes pulse {
             from {
                 transform: scale(1);
             }
@@ -114,10 +118,11 @@
         }
 
 
-          @keyframes rotate {
+        @keyframes rotate {
             from {
                 transform: rotateY(0deg);
             }
+
             to {
                 transform: rotateY(360deg);
             }
@@ -132,20 +137,31 @@
                 transform: translate(0, 0) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
                 opacity: 0;
             }
-            10% { opacity: 1; } /* Fade in quickly */
+
+            10% {
+                opacity: 1;
+            }
+
+            /* Fade in quickly */
             30% {
                 transform: translate(var(--x), var(--y)) rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(var(--rz));
             }
+
             60% {
-                transform: translate(calc(var(--x) * 0.8), calc(var(--y) * 1.2)) rotateX(calc(var(--rx) * 1.2)) rotateY(calc(var(--ry) * 0.8)) rotateZ(calc(var(--rz) * 1.1));
+                transform: translate(calc(var(--x) * 0.8), calc(var(--y) * 1.2))
+                    rotateX(calc(var(--rx) * 1.2)) rotateY(calc(var(--ry) * 0.8)) rotateZ(calc(var(--rz) * 1.1));
             }
+
             90% {
-                  transform: translate(calc(var(--x) * 0.5), calc(var(--y) * 0.7)) rotateX(calc(var(--rx) * 0.9)) rotateY(calc(var(--ry) * 1.1)) rotateZ(calc(var(--rz) * 0.8));
+                transform: translate(calc(var(--x) * 0.5), calc(var(--y) * 0.7))
+                    rotateX(calc(var(--rx) * 0.9)) rotateY(calc(var(--ry) * 1.1)) rotateZ(calc(var(--rz) * 0.8));
 
             }
+
             100% {
                 transform: translate(0, 0) rotateX(0) rotateY(0deg) rotateZ(0deg);
-                 opacity: 0; /*  Fade out at the end */
+                opacity: 0;
+                /*  Fade out at the end */
             }
         }
 
@@ -180,7 +196,7 @@
             /* Hidden by default */
             opacity: 0;
             transition: opacity 0.5s ease;
-             /* Add a grid for a "broken screen" effect */
+            /* Add a grid for a "broken screen" effect */
             background-image:
                 linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
@@ -188,37 +204,62 @@
 
         }
 
-          #distraction-overlay.active {
+        #distraction-overlay.active {
             display: block;
             opacity: 1;
-              animation: flicker 0.1s infinite alternate; /* Quick flicker */
+            animation: flicker 0.1s infinite alternate;
+            /* Quick flicker */
         }
-          @keyframes flicker {
-            from { opacity: 0.8; }
-            to { opacity: 1; }
-         }
+
+        @keyframes flicker {
+            from {
+                opacity: 0.8;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
 
 
         /* --- NEW: Fake Buttons --- */
         .fake-button {
-             position: absolute; /*  Absolutely positioned */
+            position: absolute;
+            /*  Absolutely positioned */
             padding: 10px 15px;
-            background-color: rgba(0, 128, 255, 0.7); /*  A different color */
+            background-color: rgba(0, 128, 255, 0.7);
+            /*  A different color */
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            z-index: 600; /*  Above the distraction overlay */
-            animation:  moveAround 5s linear infinite; /*  Make them move */
+            z-index: 600;
+            /*  Above the distraction overlay */
+            animation: moveAround 5s linear infinite;
+            /*  Make them move */
         }
 
-          @keyframes moveAround {
-                0%   { transform: translate(0, 0); }
-                25%  { transform: translate(var(--move-x), var(--move-y)); }
-                50%  { transform: translate(calc(var(--move-x) * 0.5), calc(var(--move-y) * -0.5)); }
-                75%  { transform: translate(calc(var(--move-x) * -0.5), calc(var(--move-y) * 0.5)); }
-                100% { transform: translate(0, 0); }
+        @keyframes moveAround {
+            0% {
+                transform: translate(0, 0);
             }
+
+            25% {
+                transform: translate(var(--move-x), var(--move-y));
+            }
+
+            50% {
+                transform: translate(calc(var(--move-x) * 0.5), calc(var(--move-y) * -0.5));
+            }
+
+            75% {
+                transform: translate(calc(var(--move-x) * -0.5), calc(var(--move-y) * 0.5));
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
+        }
 
         /* --- NEW: Fullscreen Message --- */
         #fullscreen-message {
@@ -227,19 +268,45 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 0, 0, 0.9); /*  Intense red */
+            background: rgba(255, 0, 0, 0.9);
+            /*  Intense red */
             color: white;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 4em;
-            z-index: 2000; /*  Very high, above everything else */
-            display: none; /* Hidden initially */
+            z-index: 2000;
+            /*  Very high, above everything else */
+            display: none;
+            /* Hidden initially */
             text-align: center;
             padding: 20px;
         }
 
-         /* --- Media Queries (Responsiveness) --- */
+        /* --- NEW: Mouse Trail --- */
+        .mouse-trail {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            /*  Don't interfere with clicks */
+            z-index: 1500;
+            /*  Above most things */
+            transition: opacity 0.2s, transform 0.2s;
+            /* Smooth fade-out */
+            opacity: 0;
+             /* Initially hidden */
+        }
+
+        /* --- NEW: Audio --- */
+        #background-audio {
+            display: none;
+            /* Hidden by default */
+        }
+
+        /* --- Media Queries (Responsiveness) --- */
 
         /*  Smaller screens:  Reduce font size, simplify */
         @media (max-width: 768px) {
@@ -252,20 +319,21 @@
             }
         }
 
-         /* Very small screens:  Make things even smaller, less animation */
+        /* Very small screens:  Make things even smaller, less animation */
         @media (max-width: 480px) {
-              #message {
+            #message {
                 font-size: 1.5em;
             }
+
             .fake-ad {
                 padding: 10px;
             }
 
-             .floater {
-                animation-duration: 20s !important;  /* Slower animation */
+            .floater {
+                animation-duration: 20s !important;
+                /* Slower animation */
             }
         }
-
     </style>
 </head>
 
@@ -274,7 +342,12 @@
         <div id="message">You have met your inevitable end. <br> There is no escape... or is there?</div>
         <button id="close-button">Close (Maybe?)</button>
         <div id="distraction-overlay"></div>
-         <div id="fullscreen-message">ARE YOU SURE YOU WANT TO LEAVE?</div>
+        <div id="fullscreen-message">ARE YOU SURE YOU WANT TO LEAVE?</div>
+        <audio id="background-audio" loop>
+            <source src="https://www.freesound.org/data/previews/514/514857_11158877-lq.mp3" type="audio/mpeg">
+            <!-- Add other audio formats (ogg, etc.) for cross-browser compatibility -->
+            Your browser does not support the audio element.
+        </audio>
     </div>
 
     <script>
@@ -282,6 +355,7 @@
         const closeButton = document.getElementById('close-button');
         const distractionOverlay = document.getElementById('distraction-overlay');
         const fullscreenMessage = document.getElementById('fullscreen-message');
+        const backgroundAudio = document.getElementById('background-audio');
         let floaterCount = 0;
         let maxFloaters = 30;
         let closeAttempt = 0;
@@ -290,18 +364,18 @@
 
         // --- Function to create a floating element ---
         function createFloater() {
-              if (floaterCount >= maxFloaters) return; // Stop if we've made too many
-                floaterCount++;
+            if (floaterCount >= maxFloaters) return; // Stop if we've made too many
+            floaterCount++;
 
             const floater = document.createElement('div');
             floater.classList.add('floater');
 
             // --- Randomize position, size, and rotation ---
-             const x = (Math.random() * 200) - 100; // -100 to 100
-             const y = (Math.random() * 200) - 100;
-             const rx = (Math.random() * 60) - 30;  // +/- 30 degrees
-             const ry = (Math.random() * 60) - 30;
-             const rz = (Math.random() * 60) - 30;
+            const x = (Math.random() * 200) - 100; // -100 to 100
+            const y = (Math.random() * 200) - 100;
+            const rx = (Math.random() * 60) - 30;  // +/- 30 degrees
+            const ry = (Math.random() * 60) - 30;
+            const rz = (Math.random() * 60) - 30;
             const size = Math.random() * 150 + 50; // 50 to 200px
 
             floater.style.setProperty('--x', `${x}px`);
@@ -314,41 +388,40 @@
 
 
             // ---  50/50 chance of an image or a fake ad  ---
-             if (Math.random() < 0.5) {
+            if (Math.random() < 0.5) {
                 const img = document.createElement('img');
                 //  Placeholder image source (replace with your friend's images!)
                 img.src = `https://picsum.photos/id/${Math.floor(Math.random() * 1000)}/${Math.floor(size)}`;  //Random image
                 floater.appendChild(img);
 
-             } else {
-                 floater.classList.add('fake-ad');
+            } else {
+                floater.classList.add('fake-ad');
                 //  Add some silly text
-                 const adTexts = [
+                const adTexts = [
                     "Buy more RAM! Your computer is dying!",
                     "Click here to win a free toaster!",
                     "Your soul is now ours! (Terms and Conditions apply)",
                     "Congratulations! You are the 1,000,000th visitor to the void!",
                     "One weird trick to escape death! (Doctors hate this!)"
                 ];
-                 floater.textContent = adTexts[Math.floor(Math.random() * adTexts.length)];
-             }
+                floater.textContent = adTexts[Math.floor(Math.random() * adTexts.length)];
+            }
 
 
             // ---  Animation timing ---
             const duration = (Math.random() * 10 + 5) + 's'; // 5 to 15 seconds
             floater.style.animation = `floatAndRotate ${duration} linear forwards`;
 
-             // ---  Add to the container ---
+            // ---  Add to the container ---
             container.appendChild(floater);
 
 
-             // --- Remove after animation completes (cleanup) ---
+            // --- Remove after animation completes (cleanup) ---
             floater.addEventListener('animationend', () => {
                 container.removeChild(floater);
                 floaterCount--;
             });
         }
-
 
         // --- Function to create fake buttons ---
         function createFakeButton() {
@@ -356,7 +429,7 @@
             button.classList.add('fake-button');
             button.textContent = "Don't Click";
 
-             // Random position, but keep it within the viewport
+            // Random position, but keep it within the viewport
             const x = Math.random() * (window.innerWidth - 100);
             const y = Math.random() * (window.innerHeight - 50);
             button.style.left = `${x}px`;
@@ -364,116 +437,145 @@
 
 
             // --- Movement variables for animation ---
-             const moveX = (Math.random() * 200) - 100; // -100 to 100
-             const moveY = (Math.random() * 200) - 100;
-              button.style.setProperty('--move-x', `${moveX}px`);
+            const moveX = (Math.random() * 200) - 100; // -100 to 100
+            const moveY = (Math.random() * 200) - 100;
+            button.style.setProperty('--move-x', `${moveX}px`);
             button.style.setProperty('--move-y', `${moveY}px`);
 
 
             // Add click handler (they do nothing!)
             button.addEventListener('click', (event) => {
                 event.stopPropagation(); // Prevent clicks from reaching the container
-                 createFloater(); // Spawn a floater as "punishment"
+                createFloater(); // Spawn a floater as "punishment"
                 //Maybe move the button after click
                 button.style.left = Math.random() * (window.innerWidth - 100) + 'px';
-                button.style.top =  Math.random() * (window.innerHeight - 50) + 'px';
+                button.style.top = Math.random() * (window.innerHeight - 50) + 'px';
             });
 
             container.appendChild(button);
             fakeButtons.push(button); // Add to the array
         }
 
+        // --- Remove Fake Buttons (cleanup) ---
+        function removeFakeButtons() {
+            for (const button of fakeButtons) {
+                container.removeChild(button);
+            }
+            fakeButtons = []; // Clear the array
+        }
 
-          // --- Remove Fake Buttons (cleanup) ---
-         function removeFakeButtons() {
-             for (const button of fakeButtons) {
-                 container.removeChild(button);
-             }
-              fakeButtons = []; // Clear the array
-         }
+        // --- Mouse Trail Function ---
+        function createMouseTrail(x, y) {
+            const trail = document.createElement('div');
+            trail.classList.add('mouse-trail');
+            trail.style.left = `${x}px`;
+            trail.style.top = `${y}px`;
+            document.body.appendChild(trail); // Append to body, not container
 
-          // ---  Initial Floaters ---
+            // Fade out and remove after a short delay
+            setTimeout(() => {
+                trail.style.opacity = 0;
+                trail.style.transform = 'scale(2)'; // Optional: grow before fading
+                setTimeout(() => {
+                    document.body.removeChild(trail);
+                }, 300); // Remove after fade-out
+            }, 50);
+        }
+
+        // ---  Initial Floaters ---
         for (let i = 0; i < 10; i++) {
             createFloater();
         }
 
-        // --- Close Button Logic ---
-        closeButton.addEventListener('click', (event) => {
-            event.stopPropagation(); // Prevent click from reaching elements below
-            closeAttempt++;
+        // --- Event Listeners ---
 
-            if (closeAttempt < 3) {
-                closeButton.style.top = Math.random() * (window.innerHeight - 100) + 'px';
-                closeButton.style.left = Math.random() * (window.innerWidth - 100) + 'px';
-                for (let i = 0; i < 5; i++) {
-                    createFloater();
-                }
-            } else if (closeAttempt < 6) {
-                  document.getElementById("message").style.filter = "blur(" + (closeAttempt - 2) + "px)";
-                for (let i = 0; i < 10; i++) {
-                    createFloater();
-                }
-                 // Activate distraction overlay
-                distractionOverlay.classList.add('active');
-                 // Create fake buttons
-                for (let i = 0; i < 3; i++) {
-                    createFakeButton();
-                }
+        // --- Mouse Move (for trail) ---
+        document.addEventListener('mousemove', (event) => {
+            createMouseTrail(event.clientX, event.clientY);
 
-            } else if(closeAttempt < 8) {
-               // Remove fake buttons and distraction
-                removeFakeButtons();
-                 distractionOverlay.classList.remove('active');
-
-                // Show fullscreen message
-                fullscreenMessage.style.display = 'flex';
-
-                // Hide the message after a few seconds
-                setTimeout(() => {
-                    fullscreenMessage.style.display = 'none';
-                 }, 3000);
-
-            }else {
-                alert("Okay, okay, I get it. You're persistent.  You can leave... maybe.");
-                // window.close();  // Or actually close the window
+            // Start playing audio on first mouse movement (user interaction required)
+            if (backgroundAudio.paused) {
+                backgroundAudio.play().catch(error => {
+                    // Handle potential autoplay policy errors
+                    console.warn("Audio autoplay failed:", error);
+                    // You might show a message to the user asking them to click to enable audio
+                });
             }
         });
 
+        // --- Close Button ---
+        closeButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            closeAttempt++;
 
-        // --- Create new floaters periodically ---
-        setInterval(createFloater, 2000);
+            if (closeAttempt < 3) {
+                // Move more aggressively
+                closeButton.style.top = Math.random() * (window.innerHeight - closeButton.offsetHeight) + 'px';
+                closeButton.style.left = Math.random() * (window.innerWidth - closeButton.offsetWidth) + 'px';
+                for (let i = 0; i < 5; i++) {
+                    createFloater();
+                }
+                // Change the button text!
+                closeButton.textContent = "Really?";
 
-
-        // --- Prevent Default Actions (More inescapable!) ---
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.addEventListener('keydown', event => event.preventDefault());  // Disable all keys
-        // document.addEventListener('click', event => event.preventDefault());  // Disable all clicks (except on the close button)
-
-        // --- Prevent Accidental Closing ---
-        // window.addEventListener('beforeunload', (event) => {
-        //     event.preventDefault();
-        //     event.returnValue = ''; // Required for modern browsers
-        // });
-
-          // Prevent selecting text (makes it feel less like a webpage)
-         document.body.style.userSelect = 'none';
-         document.body.style.webkitUserSelect = 'none'; // For Safari
-
-           // --- Handle window resize ---
-        window.addEventListener('resize', () => {
-             // Reposition the close button (optional)
-            closeButton.style.top = '20px';
-            closeButton.style.right = '20px';
-              removeFakeButtons(); // Remove and recreate fake buttons to keep them in bounds
-
-             // Recreate fake buttons
-             if (distractionOverlay.classList.contains('active')) {
-                 for (let i = 0; i < 3; i++) {
+            } else if (closeAttempt < 6) {
+                document.getElementById("message").style.filter = "blur(" + (closeAttempt - 2) + "px)";
+                for (let i = 0; i < 10; i++) {
+                    createFloater();
+                }
+                distractionOverlay.classList.add('active');
+                for (let i = 0; i < 3; i++) {
                     createFakeButton();
-                 }
-             }
+                }
+                closeButton.textContent = "Give up!"; // More taunting
+
+            } else if (closeAttempt < 8) {
+                removeFakeButtons();
+                distractionOverlay.classList.remove('active');
+                fullscreenMessage.style.display = 'flex';
+                setTimeout(() => {
+                    fullscreenMessage.style.display = 'none';
+                }, 3000);
+                closeButton.textContent = "Seriously?";
+
+            } else if (closeAttempt < 11) {
+                // Start messing with the close button's animation
+                closeButton.style.animation = "jiggle 0.2s infinite alternate"; // Faster jiggle
+                closeButton.style.backgroundColor = "rgba(0, 255, 0, 0.7)"; // Change color
+                closeButton.textContent = "You can't leave!";
+
+            } else {
+                // Final, desperate attempt...
+                alert("Fine! You win.  I'm impressed by your sheer stubbornness.  You may now leave... or can you?");
+                // window.close(); // Or, finally, close the window.
+                closeButton.textContent = "Click to Close"; // Final button text
+            }
         });
 
+        setInterval(createFloater, 2000);
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', event => event.preventDefault());
+
+        document.body.style.userSelect = 'none';
+        document.body.style.webkitUserSelect = 'none';
+
+        window.addEventListener('resize', () => {
+            closeButton.style.top = '20px';
+            closeButton.style.right = '20px';
+            removeFakeButtons();
+            if (distractionOverlay.classList.contains('active')) {
+                for (let i = 0; i < 3; i++) {
+                    createFakeButton();
+                }
+            }
+        });
+
+        // --- Initial close button "pulse" to draw attention ---
+        closeButton.style.animation = "pulse 1.5s infinite alternate";
+        // Remove the pulse after a short time, so it doesn't keep going forever
+        setTimeout(() => {
+            closeButton.style.animation = "jiggle 0.5s infinite alternate";
+        }, 5000);  // 5 seconds
     </script>
 </body>
 
