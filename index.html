@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Ultimate Descent into Madness</title>
+    <title>The Descent into Utter Madness</title>
     <style>
         /* --- (Previous styles, PLUS these additions) --- */
-        body, html {
+        body,
+        html {
             margin: 0;
             padding: 0;
             height: 100%;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #111, #333, #111);
             color: #eee;
-            overflow: hidden; /* Initially hide scrollbars */
+            overflow: hidden;
+            /* Initially hide scrollbars */
         }
 
-       /* --- Main Container --- */
+        /* --- Main Container --- */
         #game-container {
             position: relative;
             /*  Needed for absolute positioning of game elements */
@@ -26,7 +29,8 @@
             /*  Prevent scrollbars caused by moving elements */
             display: none;
             /* Hidden initially, shown after "winning" */
-            cursor: crosshair; /* More game-like cursor */
+            cursor: crosshair;
+            /* More game-like cursor */
         }
 
         /* --- Player Character --- */
@@ -42,7 +46,8 @@
             /* Smooth movement */
             z-index: 100;
             /*  Above obstacles */
-             box-shadow: 0 0 10px 2px rgba(0, 255, 0, 0.8); /*  Glow */
+            box-shadow: 0 0 10px 2px rgba(0, 255, 0, 0.8);
+            /*  Glow */
         }
 
         /* --- Obstacles --- */
@@ -63,15 +68,22 @@
             /* Yellow to orange */
             border-radius: 50%;
             z-index: 50;
-             /* Below player, above obstacles */
-             animation: rotate 2s linear infinite;  /*  Subtle rotation */
-             box-shadow: 0 0 15px 5px rgba(255, 255, 0, 0.7); /*  Glowing effect */
+            /* Below player, above obstacles */
+            animation: rotate 2s linear infinite;
+            /*  Subtle rotation */
+            box-shadow: 0 0 15px 5px rgba(255, 255, 0, 0.7);
+            /*  Glowing effect */
         }
 
-          @keyframes rotate {
-             from { transform: rotate(0deg); }
-             to { transform: rotate(360deg); }
-          }
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
 
         /* --- Hidden Areas --- */
@@ -82,7 +94,7 @@
             cursor: pointer;
             /* Indicate interactivity */
             z-index: 75;
-           /*  Below player, above goal/obstacles */
+            /*  Below player, above goal/obstacles */
         }
 
         /* --- Hidden Messages --- */
@@ -94,57 +106,70 @@
             border-radius: 5px;
             display: none;
             /* Hidden by default */
-            z-index: 200; /*  Above everything else */
-             pointer-events: none; /*  Don't interfere with clicks */
-             font-size: 0.9em; /*  Slightly smaller text */
+            z-index: 200;
+            /*  Above everything else */
+            pointer-events: none;
+            /*  Don't interfere with clicks */
+            font-size: 0.9em;
+            /*  Slightly smaller text */
             text-align: center;
         }
 
 
-          /* --- Game Over Screen --- */
-          #game-over {
+        /* --- Game Over Screen --- */
+        #game-over {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 0, 0, 0.8); /* Red overlay */
+            background: rgba(255, 0, 0, 0.8);
+            /* Red overlay */
             color: white;
             display: flex;
-            flex-direction: column; /* Stack elements vertically */
+            flex-direction: column;
+            /* Stack elements vertically */
             justify-content: center;
             align-items: center;
             font-size: 3em;
-            z-index: 3000; /*  Highest z-index */
-            display: none; /* Hidden initially */
-             text-align: center; /* Center text horizontally */
+            z-index: 3000;
+            /*  Highest z-index */
+            display: none;
+            /* Hidden initially */
+            text-align: center;
+            /* Center text horizontally */
 
-          }
+        }
 
         #retry-button {
             padding: 15px 30px;
-            background-color: #007bff; /* Blue button */
+            background-color: #007bff;
+            /* Blue button */
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 1.2em; /* Larger font */
-            margin-top: 20px; /* Space above the button */
+            font-size: 1.2em;
+            /* Larger font */
+            margin-top: 20px;
+            /* Space above the button */
             transition: background-color 0.3s;
-         }
+        }
 
         #retry-button:hover {
-           background-color: #0056b3; /* Darker blue on hover */
-         }
+            background-color: #0056b3;
+            /* Darker blue on hover */
+        }
 
         /* --- "You Win" Screen --- */
-           #you-win {
+        #you-win {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 255, 0, 0.8); /* Green overlay */
+            background: rgba(0, 255, 0, 0.8);
+            /* Green overlay */
             color: white;
             display: flex;
             justify-content: center;
@@ -154,9 +179,9 @@
             display: none;
             text-align: center;
             padding: 20px;
-           }
+        }
 
-            /* ---  Styles from the previous "inescapable" page --- */
+        /* ---  Styles from the previous "inescapable" page --- */
         /*   (Include *all* the CSS from the previous version here.  I'm omitting it for brevity,
             but in your *actual* code, you need to paste it in.  This ensures consistency.)  */
         /* START PREVIOUS STYLES */
@@ -182,10 +207,10 @@
             transform-style: preserve-3d;
             padding: 20px;
             border-radius: 15px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
             backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             max-width: 80%;
         }
 
@@ -678,47 +703,201 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #000; /* Black background */
-            z-index: 5500; /*  Very high, but below final win */
-            display: none; /* Hidden initially */
-            overflow: hidden; /*  Prevent scrollbars */
+            background-color: #000;
+            /* Black background */
+            z-index: 5500;
+            /*  Very high, but below final win */
+            display: none;
+            /* Hidden initially */
+            overflow: hidden;
+            /*  Prevent scrollbars */
         }
 
         .mind-rot-element {
             position: absolute;
             /* All elements absolutely positioned */
-            display: flex; /* Use flexbox for centering */
+            display: flex;
+            /* Use flexbox for centering */
             justify-content: center;
             align-items: center;
             color: white;
             font-size: 2em;
             text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
-             pointer-events: none;  /*  Don't block clicks */
+            pointer-events: none;
+            /*  Don't block clicks */
 
         }
 
         /* ---  Animations for Mind Rot  --- */
         @keyframes pulsate {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
         }
+
         @keyframes flash {
-            0%, 100% {  background-color: rgba(255, 0, 0, 0.8); } /* Red */
-            25% { background-color: rgba(0, 255, 0, 0.8); }    /* Green */
-            50% {  background-color: rgba(0, 0, 255, 0.8); } /* Blue */
-            75% { background-color: rgba(255, 255, 0, 0.8); }  /* Yellow */
+
+            0%,
+            100% {
+                background-color: rgba(255, 0, 0, 0.8);
+            }
+
+            /* Red */
+            25% {
+                background-color: rgba(0, 255, 0, 0.8);
+            }
+
+            /* Green */
+            50% {
+                background-color: rgba(0, 0, 255, 0.8);
+            }
+
+            /* Blue */
+            75% {
+                background-color: rgba(255, 255, 0, 0.8);
+            }
+
+            /* Yellow */
         }
 
         @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
         }
+
+        /* --- NEW: Laggy Game Styles --- */
+        #laggy-game-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #111;
+            /* Dark background */
+            z-index: 5700;
+            /*  Above mind rot, below final win */
+            display: none;
+            /* Hidden initially */
+            overflow: hidden;
+            /*  Prevent scrollbars */
+        }
+
+        #laggy-player {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #0ff;
+            /*  Cyan player */
+            border-radius: 50%;
+        }
+
+        #laggy-goal {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: #f0f;
+            /* Magenta goal */
+            border-radius: 50%;
+        }
+
+        .laggy-obstacle {
+            position: absolute;
+            background-color: #f00;
+            /* Red obstacles */
+        }
+
+        .laggy-ad {
+            position: absolute;
+            width: 200px;
+            /* Adjust as needed */
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.9);
+            /*  Mostly white, slightly transparent */
+            color: #000;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            z-index: 5800;
+            /*  Above the laggy game elements */
+            pointer-events: none;
+            /*  Don't let them be clicked */
+             text-align: center; /*  Center the text */
+            animation:  adShake 0.8s infinite; /*  Add a shaking animation */
+        }
+
+          @keyframes adShake {
+            0%, 100% { transform: translateX(0) rotate(0); }
+            20% { transform: translateX(-5px) rotate(-3deg); }
+            40% { transform: translateX(5px) rotate(3deg); }
+             60% { transform: translateX(-3px) rotate(-2deg); }
+            80% { transform: translateX(3px) rotate(2deg); }
+          }
+
+        .laggy-ad img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* --- NEW: Fake Download Styles --- */
+
+        #fake-download-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            z-index: 7000; /* Very high */
+            display: none;  /* Hidden at the start */
+            text-align: center;
+        }
+
+        #fake-download-progress {
+            width: 100%;
+            height: 30px;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-top: 15px;
+            overflow: hidden; /* Ensure the progress bar stays within bounds */
+        }
+          #fake-download-bar {
+             width: 2%; /* Initial width - very small */
+             height: 100%;
+            background-color: #4CAF50;
+            border-radius: 5px;
+             transition: width 0.5s ease; /* Smooth width changes (though it won't get far) */
+          }
+         #fake-download-container p {
+           margin-top: 10px;
+           font-size: 0.9em;
+          color: #555;
+         }
     </style>
 </head>
+
 <body>
     <!-- "Inescapable" Page Elements (Keep these) -->
-      <div id="container">
+    <div id="container">
         <div id="message">You have met your inevitable end. <br> There is no escape... or is there?</div>
         <button id="close-button">Close (Maybe?)</button>
         <div id="distraction-overlay"></div>
@@ -742,12 +921,12 @@
             data-message="Hint: Go around the long way."></div>
         <div class="hidden-area" style="width: 100px; height: 30px; top: 550px; left: 200px;"
             data-message="There's always a way."></div>
-         <div class="hidden-message"></div>
-         <div id="game-over">
-              Game Over!
-              <button id="retry-button">Retry</button>
+        <div class="hidden-message"></div>
+        <div id="game-over">
+            Game Over!
+            <button id="retry-button">Retry</button>
         </div>
-         <div id="you-win">You Escaped... This Time!</div>
+        <div id="you-win">You Escaped... This Time!</div>
         <!-- More hidden areas -->
     </div>
 
@@ -764,26 +943,43 @@
     <div id="sketchy-page">
         <h1>Download TotallyLegitFix.exe</h1>
         <p>This file is 100% safe and definitely not a virus. Trust us.</p>
-         <button id="sketchy-download-button">Download Now</button>
+        <button id="sketchy-download-button">Download Now</button>
     </div>
 
-      <!--  Simulated Chrome Warning -->
+    <!--  Simulated Chrome Warning -->
     <div id="chrome-warning">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Chrome_icon_%28September_2014%29.svg/1200px-Google_Chrome_icon_%28September_2014%29.svg.png" alt="Chrome Icon">
-        <span>This type of file can harm your computer.  Do you want to keep TotallyLegitFix.exe anyway?</span>
+        <img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Chrome_icon_%28September_2014%29.svg/1200px-Google_Chrome_icon_%28September_2014%29.svg.png"
+            alt="Chrome Icon">
+        <span>This type of file can harm your computer. Do you want to keep TotallyLegitFix.exe anyway?</span>
     </div>
 
-     <!--  Final "You Win" Screen -->
+    <!--  Final "You Win" Screen -->
     <div id="final-win">
         You REALLY Escaped!
-         <p>Congratulations, you beat the entire game!</p>
+        <p>Congratulations, you beat the entire game!</p>
     </div>
 
     <!-- NEW: Mind Rot Container -->
     <div id="mind-rot-container"></div>
 
+    <!-- NEW: Laggy Game Container -->
+    <div id="laggy-game-container">
+        <div id="laggy-player"></div>
+        <div id="laggy-goal"></div>
+        <!-- Obstacles will be added dynamically -->
+    </div>
+    <!-- NEW: Fake Download -->
+    <div id="fake-download-container">
+        <h2>Downloading FinalEscape.exe...</h2>
+        <div id="fake-download-progress">
+            <div id="fake-download-bar"></div>
+        </div>
+         <p>2% complete</p>
+    </div>
+
     <script>
- // --- Variables from the "inescapable" page ---
+        // --- Variables from the "inescapable" page ---
         const container = document.getElementById('container');
         const closeButton = document.getElementById('close-button');
         const distractionOverlay = document.getElementById('distraction-overlay');
@@ -807,17 +1003,17 @@
         const sketchyPage = document.getElementById('sketchy-page');
         const sketchyDownloadButton = document.getElementById('sketchy-download-button');
         const chromeWarning = document.getElementById('chrome-warning');
-        const finalWinScreen = document.getElementById('final-win');
+        const finalWinScreen = document.getElementById('final-win');  // Corrected variable name
         let playerX = 50;
         let playerY = 50;
         let gameRunning = false; // Flag to control game state
         let keys = {}; // Object to track pressed keys
         let virusAdInterval; //  Store the interval ID for the virus ad
 
-      // --- NEW: Mind Rot Variables ---
+        // --- NEW: Mind Rot Variables ---
         const mindRotContainer = document.getElementById('mind-rot-container');
         const mindRotTexts = [
-             "YOUR MIND IS MINE!",
+            "YOUR MIND IS MINE!",
             "HAHAHAHA!",
             "GIVE UP!",
             "YOU CAN'T ESCAPE!",
@@ -825,6 +1021,21 @@
             "BRAIN = MELTED!",
             "ERROR! ERROR! ERROR!",
         ];
+
+        // --- NEW: Laggy Game Variables ---
+        const laggyGameContainer = document.getElementById('laggy-game-container');
+        const laggyPlayer = document.getElementById('laggy-player');
+        const laggyGoal = document.getElementById('laggy-goal');
+        let laggyPlayerX = 50;
+        let laggyPlayerY = 50;
+        let laggyGameRunning = false;
+        let laggyKeys = {};
+        let laggyObstacles = []; // Array to store obstacle elements
+        let adInterval;          // To control the ad spawning
+
+       // --- NEW: Fake Download Variables ---
+       const fakeDownloadContainer = document.getElementById('fake-download-container');
+        const fakeDownloadBar = document.getElementById('fake-download-bar');
 
 
         // --- Function to create a floating element ---
@@ -875,7 +1086,7 @@
 
             // ---  Animation timing ---
             const duration = (Math.random() * 10 + 5) + 's'; // 5 to 15 seconds
-                        floater.style.animation = `floatAndRotate ${duration} linear forwards`;
+            floater.style.animation = `floatAndRotate ${duration} linear forwards`;
 
             // ---  Add to the container ---
             container.appendChild(floater);
@@ -1042,7 +1253,7 @@
             gameRunning = false;
             youWinScreen.style.display = "none"; // Hide the initial win screen
             gameContainer.style.display = "none"; // Hide the game
-             showVirusAd();
+            showVirusAd();
         }
 
 
@@ -1055,27 +1266,27 @@
         // --- NEW: Virus Ad and Download Sequence ---
 
         function showVirusAd() {
-             virusAd.style.display = 'block';
+            virusAd.style.display = 'block';
 
             // Randomly position the ad
             virusAd.style.left = Math.random() * (window.innerWidth - virusAd.offsetWidth) + 'px';
             virusAd.style.top = Math.random() * (window.innerHeight - virusAd.offsetHeight) + 'px';
 
-           // Make the ad reappear periodically and move
+            // Make the ad reappear periodically and move
             virusAdInterval = setInterval(() => {
                 virusAd.style.left = Math.random() * (window.innerWidth - virusAd.offsetWidth) + 'px';
                 virusAd.style.top = Math.random() * (window.innerHeight - virusAd.offsetHeight) + 'px';
-             }, 2000); // Every 2 seconds
+            }, 2000); // Every 2 seconds
         }
 
-          function showSketchyPage() {
-             virusAd.style.display = 'none';
-             clearInterval(virusAdInterval); // Stop the ad from reappearing
+        function showSketchyPage() {
+            virusAd.style.display = 'none';
+            clearInterval(virusAdInterval); // Stop the ad from reappearing
             sketchyPage.style.display = 'flex'; // Show the sketchy download page
         }
 
         function simulateDownload() {
-             sketchyPage.style.display = 'none';
+            sketchyPage.style.display = 'none';
             chromeWarning.style.display = 'block';
 
             // Simulate the warning disappearing and show the final win screen
@@ -1083,33 +1294,33 @@
                 chromeWarning.style.display = 'none';
                 // finalWinScreen.style.display = 'flex'; //Removed to make the new thing
                 startMindRot(); //  <---  Start the mind rot sequence!
-             }, 3000); // After 3 seconds
+            }, 3000); // After 3 seconds
         }
 
         // --- NEW: Mind Rot Functions ---
 
         function createMindRotElement() {
-             const element = document.createElement('div');
+            const element = document.createElement('div');
             element.classList.add('mind-rot-element');
 
             // Random text, position, size, and animation
             element.textContent = mindRotTexts[Math.floor(Math.random() * mindRotTexts.length)];
             element.style.left = Math.random() * window.innerWidth + 'px';
-             element.style.top = Math.random() * window.innerHeight + 'px';
+            element.style.top = Math.random() * window.innerHeight + 'px';
             element.style.fontSize = Math.random() * 3 + 1 + 'em'; // 1em to 4em
 
             //  Apply random animations
             const animations = ['pulsate', 'flash', 'spin'];
             const animation = animations[Math.floor(Math.random() * animations.length)];
-             element.style.animation = `${animation} ${Math.random() * 2 + 1}s infinite`; // 1 to 3 seconds
+            element.style.animation = `${animation} ${Math.random() * 2 + 1}s infinite`; // 1 to 3 seconds
 
-              // ---  Handle colors for the 'flash' animation ---
-             if (animation === 'flash') {
-                 //  Don't set color directly; let the keyframes handle it
-             } else {
-                 const colors = ['red', 'lime', 'cyan', '#f0f', '#ff0']; //  Example colors
-                 element.style.color = colors[Math.floor(Math.random() * colors.length)];
-             }
+            // ---  Handle colors for the 'flash' animation ---
+            if (animation === 'flash') {
+                //  Don't set color directly; let the keyframes handle it
+            } else {
+                const colors = ['red', 'lime', 'cyan', '#f0f', '#ff0']; //  Example colors
+                element.style.color = colors[Math.floor(Math.random() * colors.length)];
+            }
 
 
             mindRotContainer.appendChild(element);
@@ -1117,24 +1328,180 @@
             // Remove the element after a while to prevent performance issues
             setTimeout(() => {
                 mindRotContainer.removeChild(element);
-             }, 8000); // Remove after 8 seconds (adjust as needed)
+            }, 8000); // Remove after 8 seconds (adjust as needed)
         }
 
-          function startMindRot() {
-              mindRotContainer.style.display = 'block';
+        function startMindRot() {
+            mindRotContainer.style.display = 'block';
 
-            // Create elements rapidly
-            const intervalId = setInterval(createMindRotElement, 100); // Every 100ms
+            // Create elements rapidly, but *more* rapidly than before!
+            const intervalId = setInterval(createMindRotElement, 50); // Every 50ms (was 100ms)
 
-              // Stop after a certain duration and show the final win screen
-             setTimeout(() => {
-                 clearInterval(intervalId);
-                  mindRotContainer.style.display = 'none';
-                  finalWinScreen.style.display = 'flex';
-             }, 10000); //  10 seconds of mind rot (adjust as desired)
+            // Stop after a certain duration and show the final win screen
+            setTimeout(() => {
+                clearInterval(intervalId);
+                mindRotContainer.style.display = 'none';
+                //  finalWinScreen.style.display = 'flex'; // Removed for laggy game
+                startLaggyGame();  // <--  Start the laggy game!
+            }, 30000); //  30 seconds of *intense* mind rot (was 10 seconds)
+        }
+
+        // --- NEW: Laggy Game Functions ---
+
+        function createLaggyObstacle() {
+             const obstacle = document.createElement('div');
+            obstacle.classList.add('laggy-obstacle');
+            obstacle.style.width = Math.random() * 100 + 50 + 'px'; // 50-150px wide
+            obstacle.style.height = Math.random() * 50 + 20 + 'px'; // 20-70px high
+             obstacle.style.left = Math.random() * (laggyGameContainer.offsetWidth - obstacle.style.width) + 'px';
+            obstacle.style.top = Math.random() * (laggyGameContainer.offsetHeight - obstacle.style.height) + 'px';
+             laggyGameContainer.appendChild(obstacle);
+              laggyObstacles.push(obstacle); // Add to the array
+
+        }
+
+           function createLaggyAd() {
+               const ad = document.createElement('div');
+               ad.classList.add('laggy-ad');
+
+                //  Could add different ad content here if you want
+               const adTexts = [
+                    "Lose weight fast!",
+                    "Hot singles in your area!",
+                    "Make $$$ working from home!",
+                   "You're our 1,000,000th visitor!",
+                   "Enlarge your... performance!"
+               ];
+               ad.textContent = adTexts[Math.floor(Math.random() * adTexts.length)];
+
+
+               //  Random position, but keep it within the viewport
+               ad.style.left = Math.random() * (laggyGameContainer.offsetWidth - 200) + 'px'; //  Assume 200px width
+               ad.style.top = Math.random() * (laggyGameContainer.offsetHeight - 100) + 'px';  //  Assume ~100px height
+
+                laggyGameContainer.appendChild(ad);
+
+                //  Remove the ad after a few seconds
+               setTimeout(() => {
+                   laggyGameContainer.removeChild(ad);
+               }, 5000); // 5 seconds
+           }
+
+
+        function updateLaggyPlayerPosition() {
+            // Introduce "lag" by only updating the position *sometimes*
+            if (Math.random() < 0.7) { // 70% chance to update (adjust for desired lag)
+                laggyPlayer.style.transform = `translate(${laggyPlayerX}px, ${laggyPlayerY}px)`;
+            }
+        }
+
+           function checkLaggyCollision() {
+            const playerRect = laggyPlayer.getBoundingClientRect();
+               const goalRect = laggyGoal.getBoundingClientRect();
+
+            // Check collision with goal *first*
+            if (playerRect.left < goalRect.right &&
+                playerRect.right > goalRect.left &&
+                playerRect.top < goalRect.bottom &&
+                playerRect.bottom > goalRect.top) {
+                endLaggyGame(true); // Player wins!
+                return; //  Important:  Exit to prevent checking obstacle collisions
+             }
+             for (const obstacle of laggyObstacles) {
+                const obstacleRect = obstacle.getBoundingClientRect();
+                  if (playerRect.left < obstacleRect.right &&
+                     playerRect.right > obstacleRect.left &&
+                    playerRect.top < obstacleRect.bottom &&
+                    playerRect.bottom > obstacleRect.top) {
+                      endLaggyGame(false); // Player loses (collided with obstacle)
+                       return;  //  Exit on collision
+                }
+              }
         }
 
 
+        function laggyGameLoop() {
+             if (!laggyGameRunning) return;
+
+              // --- Movement (with added lag) ---
+               let moveX = 0;
+             let moveY = 0;
+
+            if (laggyKeys['ArrowUp'] || laggyKeys['w']) moveY -= 3; // Slower movement
+            if (laggyKeys['ArrowDown'] || laggyKeys['s']) moveY += 3;
+            if (laggyKeys['ArrowLeft'] || laggyKeys['a']) moveX -= 3;
+            if (laggyKeys['ArrowRight'] || laggyKeys['d']) moveX += 3;
+
+            // Apply "lag" - only update position sometimes
+             if (Math.random() < 0.7) { //  70% chance of moving (adjust for desired lag)
+                laggyPlayerX += moveX;
+                laggyPlayerY += moveY;
+             }
+
+              // --- Keep player within bounds ---
+             laggyPlayerX = Math.max(0, Math.min(laggyPlayerX, laggyGameContainer.offsetWidth - laggyPlayer.offsetWidth));
+            laggyPlayerY = Math.max(0, Math.min(laggyPlayerY, laggyGameContainer.offsetHeight - laggyPlayer.offsetHeight));
+
+             updateLaggyPlayerPosition();
+            checkLaggyCollision();
+             requestAnimationFrame(laggyGameLoop);
+        }
+
+        function startLaggyGame() {
+            laggyGameContainer.style.display = 'block';
+            laggyPlayerX = 50;
+            laggyPlayerY = 50;
+            updateLaggyPlayerPosition();
+
+              //  Position the goal (randomly)
+             laggyGoal.style.left = Math.random() * (laggyGameContainer.offsetWidth - laggyGoal.offsetWidth) + 'px';
+           laggyGoal.style.top = Math.random() * (laggyGameContainer.offsetHeight - laggyGoal.offsetHeight) + 'px';
+
+              // ---  Create initial obstacles ---
+            for (let i = 0; i < 10; i++) {  //  Start with 10 obstacles
+                createLaggyObstacle();
+             }
+
+             // --- Start spawning ads ---
+            adInterval = setInterval(createLaggyAd, 2000); //  Every 2 seconds
+
+            laggyGameRunning = true;
+            laggyGameLoop();
+        }
+
+         function endLaggyGame(didWin) {
+            laggyGameRunning = false;
+            clearInterval(adInterval); // Stop spawning ads
+             laggyGameContainer.style.display = 'none';
+
+              //  Clear existing obstacles
+             for (const obstacle of laggyObstacles) {
+                  laggyGameContainer.removeChild(obstacle);
+             }
+             laggyObstacles = []; // Reset the array
+
+              if (didWin) {
+                //  Show fake download
+                  showFakeDownload(); //  <---  Show the fake download screen!
+
+               } else {
+                 //  If the player lost (hit an obstacle), show game over (optional)
+                  //  gameOverScreen.style.display = 'flex'; //  Could show a game over screen here
+                  showFakeDownload(); // Go to download anyway... MUAHAHAHA!
+               }
+        }
+
+           // --- NEW: Fake Download Function ---
+         function showFakeDownload() {
+              fakeDownloadContainer.style.display = 'block';
+                // The download bar *doesn't* progress.  It stays at 2%.
+                // You could add a very slow, fake progression if you wanted, but
+                // the intention here is that it *never* finishes.
+
+                //  Optionally, after a very long time, you could trigger something else
+                //  (but the point is to be frustratingly unwinnable).
+                // setTimeout(() => { /*  ... do something else ... */ }, 60000); //  After 60 seconds
+         }
 
         // --- Event Listeners ---
 
@@ -1147,11 +1514,22 @@
             if (event.key === 'Escape' && gameRunning) { //  Allow "Escape" key to pause/exit the game
                 endGame();
             }
+
+            //  --- Laggy Game Key Handling ---
+            if (laggyGameRunning) {
+                laggyKeys[event.key] = true;
+                 event.preventDefault();  //  Prevent scrolling
+            }
         });
 
         // --- Key Up ---
         document.addEventListener('keyup', (event) => {
             keys[event.key] = false;
+
+             // ---  Laggy Game Key Handling ---
+           if (laggyGameRunning) {
+             laggyKeys[event.key] = false;
+            }
         });
 
 
@@ -1253,6 +1631,12 @@
                 playerY = Math.max(0, Math.min(playerY, gameContainer.offsetHeight - player.offsetHeight));
                 updatePlayerPosition();
             }
+            // --- Laggy Game Resize Handling ---
+             if (laggyGameRunning) {
+                  laggyPlayerX = Math.max(0, Math.min(laggyPlayerX, laggyGameContainer.offsetWidth - laggyPlayer.offsetWidth));
+                laggyPlayerY = Math.max(0, Math.min(laggyPlayerY, laggyGameContainer.offsetHeight - laggyPlayer.offsetHeight));
+                updateLaggyPlayerPosition(); //  Update position (with lag)
+            }
 
             closeButton.style.top = '20px';
             closeButton.style.right = '20px';
@@ -1270,4 +1654,5 @@
 
     </script>
 </body>
+
 </html>
