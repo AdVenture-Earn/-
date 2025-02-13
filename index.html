@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdVenture</title>
+    <style>
+        /* --- (Same CSS as before, plus additions below) --- */
+
+        body {
+            font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+            background-color: #f0f2f5; /* Light gray background */
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px; /* Limit maximum width */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7)); /* Subtle gradient */
+            backdrop-filter: blur(10px); /* macOS-like blur */
+            border-radius: 20px; /* Rounded corners */
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* Glassmorphism shadow */
+            padding: 30px;
+            overflow: hidden; /*  Ensure content doesn't overflow rounded corners */
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        /* --- Header --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #4285f4;  /*  Google Blue  */
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #555;
+            margin-left: 20px;
+            padding: 8px 15px;
+            border-radius: 15px; /* Rounded links */
+            transition: background-color 0.3s, color 0.3s;
+            font-weight: 500;
+        }
+        nav a:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: #222;
+        }
+        nav a.active {
+            background-color: rgba(66, 133, 244, 0.2); /* Light blue for active */
+            color: #4285f4;
+            font-weight: bold;
+        }
+
+        /* --- Ad Section --- */
+        .ad-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .ad-container {
+            width: 100%;
+            height: auto; /* Adjust as needed for your ads */
+            min-height: 250px; /*  Minimum height for the ad  */
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+              margin-bottom: 20px;
+              position: relative; /* For loader positioning */
+        }
+
+        .ad-container-banner { /*Specific for banners*/
+            width: 100%;
+            height: auto; /* Adjust as needed for your ads */
+            min-height: 100px; /*Smaller*/
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+              margin-bottom: 20px;
+              position: relative; /* For loader positioning */
+        }
+
+      /*  Video Styles  */
+        .ad-video {
+            width: 100%; /*  Take up full container width  */
+            height: auto; /* Maintain aspect ratio */
+            border-radius: 10px; /*  Round video corners  */
+            display: none; /* Hide by default */
+        }
+
+        .lds-ring {
+          display: inline-block;
+          position: relative;
+          width: 80px;
+          height: 80px;
+        }
+        .lds-ring div {
+          box-sizing: border-box;
+          display: block;
+          position: absolute;
+          width: 64px;
+          height: 64px;
+          margin: 8px;
+          border: 8px solid #4285f4;
+          border-radius: 50%;
+          animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+          border-color: #4285f4 transparent transparent transparent;
+        }
+        .lds-ring div:nth-child(1) {
+          animation-delay: -0.45s;
+        }
+        .lds-ring div:nth-child(2) {
+          animation-delay: -0.3s;
+        }
+        .lds-ring div:nth-child(3) {
+          animation-delay: -0.15s;
+        }
+        @keyframes lds-ring {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+
+        .timer-bar {
+            height: 8px;
+            background-color: #ddd;
+            border-radius: 4px;
+            overflow: hidden;  /*  Ensure progress bar stays within bounds  */
+             margin-bottom: 20px;
+
+        }
+
+        .timer-progress {
+            height: 100%;
+            width: 0;
+            background-color: #4CAF50;  /*  Green progress  */
+            border-radius: 4px;
+            transition: width 1s linear;
+        }
+
+        .watch-button {
+            background: linear-gradient(135deg, #4285f4, #34a853); /* Google colors gradient */
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px; /* Pill-shaped button */
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            outline: none;  /*  Remove default outline  */
+            display: flex; /* Use flexbox for centering */
+            align-items: center;
+             justify-content: center;
+             width: 200px;
+            margin: 0 auto;
+             display: none; /*Hidden*/
+        }
+        .watch-button:hover {
+            transform: translateY(-2px); /* Slight lift on hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .watch-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #ccc;
+            box-shadow: none;
+        }
+
+        .loading-dots {
+            margin-left: 5px;
+        }
+
+        /* --- Balance Section --- */
+
+        .balance-section {
+            text-align: center;
+        }
+
+        .balance-card {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: inline-block; /*  Fit content  */
+        }
+
+        .balance-amount {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4CAF50;  /* Green for balance */
+            margin-top: 10px;
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            color: #666;
+        }
+
+        /*  Keyframes for animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px); /* Start slightly below */
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Dashboard Specific --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .dashboard-card {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .dashboard-card h3 {
+            margin-bottom: 10px;
+            color: #4285f4;
+        }
+
+        /* --- Withdraw Page --- */
+        .withdraw-form {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .withdraw-form label,
+        .withdraw-form input,
+        .withdraw-form button {
+            margin-bottom: 15px;
+            width: 100%;
+            max-width: 300px; /* Limit width of inputs */
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 1em;
+        }
+        .withdraw-form button {
+            background-color: #4CAF50; /* Green button */
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .withdraw-form button:hover {
+            background-color: #388e3c;
+        }
+
+        /* Hide all main sections by default except the active one */
+        main > section {
+             display: none;
+        }
+        main > section.active {
+            display: block;
+        }
+
+        /* ---Cooldwon text--- */
+
+        .cooldown-message {
+            color: #888;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+         /* Ad Blocker Message */
+        .ad-blocker-message {
+            background-color: rgba(255, 0, 0, 0.1); /* Light red */
+            color: #8b0000; /* Dark red */
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            border: 1px solid #8b0000;
+            display: none; /* Hidden by default */
+        }
+         /* High Earnings Message */
+        .high-earnings-message {
+            background-color: rgba(255, 215, 0, 0.1); /* Light gold */
+            color: #8B4513; /* SaddleBrown */
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            border: 1px solid #DAA520; /* Goldenrod */
+            display: none;  /* Hidden by default */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">AdVenture</div>
+            <nav>
+                <a href="#" class="nav-link active" data-target="dashboard">Dashboard</a>
+                <a href="#" class="nav-link" data-target="ad-section">Watch Ads</a>
+                <a href="#" class="nav-link" data-target="withdraw">Withdraw</a>
+            </nav>
+        </header>
+
+        <main>
+            <section id="dashboard" class="dashboard-section active">
+                <h2>Dashboard</h2>
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h3>Total Earnings</h3>
+                        <p id="totalEarnings">$0.00</p>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3>Ads Watched</h3>
+                        <p id="adsWatched">0</p>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3>Account Status</h3>
+                        <p>Active</p>
+                    </div>
+                </div>
+                 <div class="high-earnings-message" id="highEarningsMessage">
+                    High earnings detected. Your earnings from the past week have been reset.
+                </div>
+            </section>
+
+           <section class="ad-section" id="ad-section">
+              <!-- Banner Ad 1 -->
+              <div class="ad-container-banner" id="adContainerBanner1">
+                  <p id="loadingTextBanner1" style="display: none;">
+                    Contacting the servers to load AdSense..
+                  </p>
+              </div>
+              <!-- Banner Ad 2 -->
+              <div class="ad-container-banner" id="adContainerBanner2">
+                <p id="loadingTextBanner2" style="display: none;">
+                  Contacting the servers to load AdSense..
+                </p>
+              </div>
+
+                <!-- Video ad container-->
+                <div class="ad-container" id="adContainerVideo">
+                    <!--  Video Ad Element  -->
+                     <video id="adVideo" class="ad-video" controls>
+                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                        <!-- Add more source elements for different formats (WebM, Ogg) if needed -->
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+                     <p id="loadingTextVideo" style="display: none;">
+                      Contacting the servers to load AdSense..
+                    </p>
+                </div>
+                <div class="timer-bar">
+                    <div class="timer-progress" id="timerProgress"></div>
+                </div>
+                 <p class="cooldown-message" id="cooldownMessage"></p> <!-- Cooldown message -->
+                <button class="watch-button" id="watchButton">
+                    <span class="button-text">Watch Ad</span>
+                    <span class="loading-dots" style="display: none;">...</span>
+                </button>
+                 <!-- Ad Blocker Message -->
+                <div class="ad-blocker-message" id="adBlockerMessage">
+                    Please disable your ad blocker to continue earning.
+                </div>
+            </section>
+
+            <section id="withdraw" class="withdraw-section">
+                <h2>Withdraw Funds</h2>
+                <form class="withdraw-form" id="withdrawForm">
+                    <label for="amount">Amount:</label>
+                    <input type="number" id="amount" name="amount" min="1" step="0.01" required>
+                    <label for="paymentMethod">Payment Method:</label>
+                    <input type="text" id="paymentMethod" name="paymentMethod" placeholder="e.g., PayPal, Bank Account" required>
+                    <button type="submit">Withdraw</button>
+                </form>
+            </section>
+        </main>
+
+        <footer>
+            <p>© 2023 AdVenture. All rights reserved.</p>
+        </footer>
+    </div>
+     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+
+    <script>
+let adDuration = 30;  // Default duration for the video.
+let timerInterval;
+let earningsInterval; // Interval for earning money per minute
+// User data (Simulated - Replace with real backend data)
+let userData = {
+    balance: 0,
+    totalEarnings: 0,
+    adsWatched: 0,
+    lastAdWatched: null, // Timestamp of the last ad watch.  null means never watched.
+    watchingAd: false, //Flag if the user is watching or not.
+    earningsHistory: [] // Array to store weekly earnings
+};
+
+//Get all ad containers
+const adContainerBanner1 = document.getElementById('adContainerBanner1');
+const adContainerBanner2 = document.getElementById('adContainerBanner2');
+const adContainerVideo = document.getElementById('adContainerVideo');
+
+//All loading texts
+const loadingTextBanner1 = document.getElementById("loadingTextBanner1");
+const loadingTextBanner2 = document.getElementById("loadingTextBanner2");
+const loadingTextVideo = document.getElementById("loadingTextVideo");
+
+const adVideo = document.getElementById('adVideo'); // Get the video element
+
+const timerProgress = document.getElementById('timerProgress');
+const watchButton = document.getElementById('watchButton');
+const balanceAmount = document.getElementById('balanceAmount');
+
+const totalEarningsDisplay = document.getElementById('totalEarnings');
+const adsWatchedDisplay = document.getElementById('adsWatched');
+const withdrawForm = document.getElementById('withdrawForm');
+const cooldownMessage = document.getElementById('cooldownMessage'); // Cooldown message element
+const adBlockerMessage = document.getElementById('adBlockerMessage'); // Ad blocker message
+const highEarningsMessage = document.getElementById('highEarningsMessage');
+
+// Navigation
+const navLinks = document.querySelectorAll('.nav-link');
+const mainSections = document.querySelectorAll('main > section');
+
+navLinks.forEach(link => {
+    link.addEventListener('click', (event) => {
+        event.preventDefault();
+        const targetId = link.dataset.target;
+        mainSections.forEach(section => section.classList.remove('active'));
+        navLinks.forEach(l => l.classList.remove('active'));
+        document.getElementById(targetId).classList.add('active');
+        link.classList.add('active');
+
+        if (targetId === 'ad-section') {
+             //Stop video and reset
+             adVideo.pause();
+             adVideo.currentTime = 0;
+             adVideo.style.display = 'none'; //Hide it
+            loadAds();  // Load *all* ads (banners and video)
+        } else {
+           //Stop video and reset
+            adVideo.pause();
+            adVideo.currentTime = 0;
+            adVideo.style.display = 'none'; //Hide it
+        }
+    });
+});
+
+// --- Ad Loading Functions ---
+
+function loadAd(adContainer, loadingText, adType, adSlot) {
+    loadingText.style.display = 'block';
+
+    //Remove any previous ad.
+    let ins = adContainer.querySelector('ins');
+    if(ins) ins.remove();
+
+    // Create new ins element
+    let newIns = document.createElement('ins');
+    newIns.classList.add('adsbygoogle');
+    newIns.style.display = 'block';
+    newIns.dataset.adClient = 'ca-pub-XXXXXXXXXXXXXXXX'; // YOUR PUBLISHER ID - KEEP THE SAME
+    newIns.dataset.adSlot = adSlot;  // Use the passed adSlot
+    newIns.dataset.adFormat = (adType === 'video') ? 'auto' : 'auto'; //You can customize
+    newIns.dataset.fullWidthResponsive = 'true';
+
+
+     // Add it to the container.
+    adContainer.insertBefore(newIns, loadingText); //Add before the loading text.
+
+    // Push to AdSense.
+    (adsbygoogle = window.adsbygoogle || []).push({});
+
+    // Detect when the ad has been filled (or failed to fill).
+    const observer = new MutationObserver((mutations) => {
+        let adLoaded = false; // Flag to track if any ad loaded
+        mutations.forEach((mutation) => {
+            //Check if the mutation added nodes.
+            if (mutation.addedNodes.length) {
+                //Check if the added node is an iframe (usually ads load in iframes)
+                for (let i = 0; i < mutation.addedNodes.length; i++) {
+                    if (mutation.addedNodes[i].nodeName === 'IFRAME') {
+                        loadingText.style.display = 'none';
+                        observer.disconnect(); // Stop observing once ad is loaded
+                        adLoaded = true; // Set flag
+
+                        if(adType === 'video') { //If loaded ad is video type, and everything is ok.
+                            adVideo.style.display = 'block';
+                            startAdTimer();
+                        }
+
+                    }
+                }
+            }
+        });
+          // If no iframe was added, and the adblock message is not already visible.
+        if (!adLoaded && adBlockerMessage.style.display !== 'block') {
+            loadingText.style.display = 'none'; //Hide it
+            //Check after mutations
+             setTimeout(() => {
+                if (!adContainer.querySelector('iframe')) { //Double check
+                    // Ad blocker detected
+                   if(adType === 'video'){ //Only the video ad has a button.
+                      watchButton.style.display = 'none'; //Hide it
+                      adContainerVideo.style.display = 'none'; //Hide it.
+                   }
+                   adBlockerMessage.style.display = 'block';
+                }
+            }, 500);  // Small delay
+
+        }
+
+    });
+
+
+    // Start observing the ad container for changes.
+    observer.observe(adContainer, {
+      childList: true, // Watch for changes to the children of adContainer
+      subtree: true    // Watch for changes within those children
+    });
+
+
+    // Fallback timeout (in case the ad doesn't load for some reason)
+    setTimeout(() => {
+        //If not loaded (no iframe)
+        if(!adContainer.querySelector('iframe')){
+             loadingText.style.display = 'none'; //Hide it
+
+             if(adType === 'video'){ //Only the video ad has a button.
+                watchButton.style.display = 'none';//Hide it
+                adContainerVideo.style.display = 'none'; //Hide it.
+             }
+
+            // Ad blocker detected. Show message even on timeout.
+            adBlockerMessage.style.display = 'block';
+            observer.disconnect(); //Prevent memory leaks.
+        }
+
+    }, 15000); // 15 seconds
+}
+
+//Loads all ads
+function loadAds() {
+     adBlockerMessage.style.display = 'none';//Hide by default
+    //Check cooldown, disable video if still cooling down.
+    if(!checkCooldown()){ //If returns false, there is a cooldown
+      loadAd(adContainerBanner1, loadingTextBanner1, 'banner', 'YYYYYYYYYY'); // Banner 1 - REPLACE YYYYYYYYYY
+      loadAd(adContainerBanner2, loadingTextBanner2, 'banner', 'ZZZZZZZZZZ'); // Banner 2 - REPLACE ZZZZZZZZZZ
+    }
+    loadAd(adContainerVideo, loadingTextVideo, 'video', 'XXXXXXXXXX');   // Video - REPLACE XXXXXXXXXX
+}
+
+
+// --- Timer and Earning Logic ---
+function startAdTimer() {
+     //Only for video ads
+     adDuration = Math.round(adVideo.duration);
+     timerProgress.style.width = '0%';
+     timerProgress.style.transition = 'none';
+     void timerProgress.offsetWidth;
+     timerProgress.style.transition = `width ${adDuration}s linear`;
+     timerProgress.style.width = '100%';
+
+     //Start video when clicking.
+    adVideo.play();
+}
+
+// --- Backend Simulation (Replace with a Real Backend) ---
+function simulateBackendAdWatched(durationWatched) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Cooldown check (should happen before starting the ad)
+      const now = Date.now();
+      if (userData.lastAdWatched && now - userData.lastAdWatched < 3 * 60 * 60 * 1000) {
+        resolve({ success: false, message: "Please wait for the cooldown period to end." });
+        return;
+      }
+
+      // Calculate earnings based on duration (in minutes)
+      const minutesWatched = durationWatched / 60;
+      const earnings = minutesWatched * 0.01;
+
+      // Update user data
+      userData.balance += earnings;
+      userData.totalEarnings += earnings;
+      userData.adsWatched++;  // You might want to track "minutes watched" instead
+      userData.lastAdWatched = now;
+      userData.watchingAd = false;
+       // Add earnings to history
+      addEarningsToHistory(earnings);
+
+      saveUserData();
+      resolve({ success: true });
+    }, 500); // Simulate delay
+  });
+}
+// --- Cooldown ---
+function checkCooldown() {
+    const now = Date.now();
+    if (userData.lastAdWatched && now - userData.lastAdWatched < 3 * 60 * 60 * 1000) {
+        const timeLeft = userData.lastAdWatched + 3 * 60 * 60 * 1000 - now;
+        const hours = Math.floor(timeLeft / (60 * 60 * 1000));
+        const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+        const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
+
+        //Don't show video ad container
+        adContainerVideo.style.display = 'none'; //Hide if still in cooldown.
+
+        cooldownMessage.textContent = `Next video ad available in: ${hours}h ${minutes}m ${seconds}s`;
+
+        // Update the cooldown timer every second
+        const cooldownInterval = setInterval(() => {
+            const timeLeft = userData.lastAdWatched + 3 * 60 * 60 * 1000 - Date.now();
+            if (timeLeft <= 0) {
+                clearInterval(cooldownInterval);
+                cooldownMessage.textContent = ''; // Clear message
+                 //Show video ad container
+                adContainerVideo.style.display = 'flex'; //Show again when cooldown is over
+                loadAds(); //Reload ads to refresh.
+            } else {
+                const hours = Math.floor(timeLeft / (60 * 60 * 1000));
+                const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+                const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
+                cooldownMessage.textContent = `Next video ad available in: ${hours}h ${minutes}m ${seconds}s`;
+            }
+        }, 1000);
+        return false; //Still on cooldown
+    }
+    return true; //No cooldown
+
+}
+
+// --- Withdrawal (Simulated Backend) ---
+withdrawForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const amount = parseFloat(document.getElementById('amount').value);
+    const paymentMethod = document.getElementById('paymentMethod').value;
+
+    simulateBackendWithdrawal(amount, paymentMethod)
+        .then(response => {
+            if (response.success) {
+                updateDisplay();
+                sendWithdrawalEmail(amount, paymentMethod); //Simulate
+                alert(`Withdrawal of $${amount.toFixed(2)} via ${paymentMethod} processed (simulated).`);
+                document.getElementById('amount').value = '';
+                document.getElementById('paymentMethod').value = '';
+            } else {
+                alert("Withdrawal failed: " + response.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error during withdrawal simulation:", error);
+            alert("An unexpected error occurred during withdrawal.");
+        });
+});
+
+function simulateBackendWithdrawal(amount, paymentMethod) {
+    return new Promise((resolve) => {
+    setTimeout(() => {
+        if (amount > userData.balance) {
+            resolve({ success: false, message: "Insufficient funds." });
+            return;
+        }
+
+        userData.balance -= amount;
+        saveUserData();
+        resolve({ success: true });
+    }, 500); // Simulate delay
+    });
+}
+
+//Local storage load and save
+function loadUserData() {
+  const storedData = localStorage.getItem('adVentureUserData');
+  if (storedData) {
+    userData = JSON.parse(storedData);
+  }
+}
+
+function saveUserData() {
+  localStorage.setItem('adVentureUserData', JSON.stringify(userData));
+}
+
+function updateDisplay(){
+   if (balanceAmount) balanceAmount.textContent = `$${userData.balance.toFixed(2)}`; //Update if element exists
+    totalEarningsDisplay.textContent = `$${userData.totalEarnings.toFixed(2)}`;
+    adsWatchedDisplay.textContent = userData.adsWatched;
+}
+
+// --- User Activity Detection and Earnings ---
+
+function startEarningInterval() {
+  if (!earningsInterval) { // Only start if it's not already running
+    earningsInterval = setInterval(() => {
+      if (userData.watchingAd) { //Only if flag is true.
+        // Simulate backend interaction (in a real app, do this in the backend)
+        simulateBackendAdWatched(60) //Adds money per minute
+          .then(response => {
+            if (response.success) {
+                 updateDisplay();
+            }
+          });
+      }
+    }, 60000); // Every 60 seconds (1 minute)
+  }
+}
+
+function stopEarningInterval() {
+    clearInterval(earningsInterval);
+    earningsInterval = null; //Reset
+}
+
+//Event listeners for activity.
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        userData.watchingAd = true;
+        startEarningInterval();
+        //If the user reloads while in the ads section, check again.
+        if (document.querySelector('.nav-link.active').dataset.target === 'ad-section') {
+             loadAds(); //Check if ads are present.
+         }
+    } else {
+        userData.watchingAd = false;
+        stopEarningInterval();
+    }
+});
+
+//Add listeners to video, for a better control.
+adVideo.onplay = () => {
+    userData.watchingAd = true;
+    startEarningInterval();
+}
+
+adVideo.onpause = () => {
+    userData.watchingAd = false;
+    stopEarningInterval();
+}
+
+adVideo.onended = () => {
+    userData.watchingAd = false;
+    stopEarningInterval();
+     // Simulate calling the backend with the *actual* duration watched
+    simulateBackendAdWatched(adDuration)
+    .then(response => {
+        if (response.success) {
+          updateDisplay(); //Update interface
+        } else {
+            alert("An error occurred: " + response.message); //If backend declined
+        }
+    })
+    .catch(error => {
+        console.error("Error during ad watched simulation:", error);
+        alert("An unexpected error occurred.");
+    });
+}
+
+function sendWithdrawalEmail(amount, paymentMethod){
+  const emailBody = `Withdrawal Request:\nAmount: $${amount.toFixed(2)}\nPayment Method: ${paymentMethod}\nUser Balance: $${userData.balance.toFixed(2)}\nTotal Earnings: $${userData.totalEarnings.toFixed(2)}\nAds Watched: ${userData.adsWatched}`;
+  const mailtoLink = `mailto:suprcorporations@gmail.com?subject=AdVenture Withdrawal Request&body=${encodeURIComponent(emailBody)}`;
+  window.location.href = mailtoLink; //Open mail client.
+}
+
+// --- High Earnings Check and Reset ---
+function addEarningsToHistory(earnings) {
+    const now = new Date();
+    const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay()); // Start of current week (Sunday)
+
+    // Find or create the entry for the current week
+    let weekEntry = userData.earningsHistory.find(entry => entry.weekStart === startOfWeek.getTime());
+    if (!weekEntry) {
+        weekEntry = { weekStart: startOfWeek.getTime(), earnings: 0 };
+        userData.earningsHistory.push(weekEntry);
+    }
+    weekEntry.earnings += earnings;
+
+      // Check if it's a new week and reset if necessary
+     checkWeeklyEarnings();
+}
+
+function checkWeeklyEarnings() {
+    const now = new Date();
+    const startOfCurrentWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+
+    // Get the last week's earnings entry
+    const lastWeekEntry = userData.earningsHistory.find(entry => entry.weekStart === startOfCurrentWeek.getTime());
+
+    if (lastWeekEntry && lastWeekEntry.earnings > 5) { // Threshold: $5
+        // Reset last week's earnings
+        userData.totalEarnings -= lastWeekEntry.earnings;
+        userData.balance -= lastWeekEntry.earnings;
+        if (userData.balance < 0) userData.balance = 0; //Prevent negative balance.
+
+        lastWeekEntry.earnings = 0;
+        // Show the message
+        highEarningsMessage.style.display = 'block';
+         setTimeout(() => {
+              highEarningsMessage.style.display = 'none'; //Hide after a few seconds
+                  }, 10000); // Hide after 10 seconds
+
+        updateDisplay();
+        saveUserData(); // Save changes
+    }
+}
+
+
+// --- Initialization ---
+loadUserData();
+updateDisplay();
+checkCooldown(); // Initial cooldown check
+loadAds(); // Load initial ads
+startEarningInterval(); // Start earning if the page is visible initially
+// Check for weekly earnings on load.
+checkWeeklyEarnings();
+
+
+</script>
+</body>
+</html>
