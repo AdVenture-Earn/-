@@ -3,37 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimalist Ad Display</title>
+    <title>Ad Display</title>
     <style>
         body {
             font-family: sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-wrap: wrap; /* Allow ads to wrap to the next line */
+            justify-content: center; /* Center horizontally */
+            align-items: flex-start; /* Align to the top */
             min-height: 100vh;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        }
-
-        .ad-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            padding: 20px;
-            width: 80%;
-            max-width: 800px;
+            overflow-x: hidden; /* Prevent horizontal scrollbar */
         }
 
         .ad-wrapper {
-            width: 100%;
-            max-width: 728px; /* Adjust as needed */
-            position: relative;
+            width: 468px;  /* Set the ad width, as specified in your code */
+            height: 60px; /* Set the ad height */
+            margin: 10px; /* Add some margin around each ad */
+            position: relative; /* For absolute positioning of loader */
             overflow: hidden;
-            border-radius: 12px;
+            border-radius: 12px; /*  Slightly rounded corners */
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+
+        }
+
+        .ad-wrapper:hover{
+          transform: scale(1.02);
         }
 
         .ad-wrapper::before {
@@ -48,17 +46,8 @@
             pointer-events: none;
         }
 
-        .ad-wrapper > * {
-            position: relative;
-            z-index: 2;
-        }
 
-        .ad-wrapper:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Loading indicator */
+         /* Loading indicator */
         .ad-wrapper.loading::after {
             content: '';
             position: absolute;
@@ -71,7 +60,7 @@
             border-top: 4px solid #3498db;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            z-index: 3;
+            z-index: 3; /* Above gradient */
         }
 
         @keyframes spin {
@@ -81,69 +70,67 @@
     </style>
 </head>
 <body>
-    <div class="ad-container">
-        <div class="ad-wrapper" id="ad1"></div>
-        <div class="ad-wrapper" id="ad2"></div>
-        <div class="ad-wrapper" id="ad3"></div>
-        <div class="ad-wrapper" id="ad4"></div>
-        <div class="ad-wrapper" id="ad5"></div>
-    </div>
 
     <script>
-      // Ad codes
-      const adCodes = [
-          `<script async="async" data-cfasync="false" src="//pl25859096.effectiveratecpm.com/bece942f9fde0f687e78a96e8274f879/invoke.js"></script>
-          <div id="container-bece942f9fde0f687e78a96e8274f879"></div>`,
-          `<script async="async" data-cfasync="false" src="//pl25859096.effectiveratecpm.com/bece942f9fde0f687e78a96e8274f879/invoke.js"></script>
-          <div id="container-bece942f9fde0f687e78a96e8274f879"></div>`,
-          `<script async="async" data-cfasync="false" src="//pl25859096.effectiveratecpm.com/bece942f9fde0f687e78a96e8274f879/invoke.js"></script>
-          <div id="container-bece942f9fde0f687e78a96e8274f879"></div>`,
-          `<script async="async" data-cfasync="false" src="//pl25859096.effectiveratecpm.com/bece942f9fde0f687e78a96e8274f879/invoke.js"></script>
-          <div id="container-bece942f9fde0f687e78a96e8274f879"></div>`,
-          `<script async="async" data-cfasync="false" src="//pl25859096.effectiveratecpm.com/bece942f9fde0f687e78a96e8274f879/invoke.js"></script>
-          <div id="container-bece942f9fde0f687e78a96e8274f879"></div>`,
-      ];
+        const adWrapper = document.createElement("div");
+        adWrapper.id = "ad-container"
+        document.body.appendChild(adWrapper);
 
-      // Function to inject the ads
-      function injectAd(adContainerId, adCode) {
-          const adContainer = document.getElementById(adContainerId);
-          if (!adContainer) {
-              console.error(`Ad container not found: ${adContainerId}`);
-              return;
-          }
+        function createAd(id) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'ad-wrapper loading'; // Start with loading class
+            wrapper.id = `ad-${id}`;
+            wrapper.innerHTML = `
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : '1d89d30626d1823047103d75d9b870e7',
+                        'format' : 'iframe',
+                        'height' : 60,
+                        'width' : 468,
+                        'params' : {}
+                    };
+                <\/script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/1d89d30626d1823047103d75d9b870e7/invoke.js"><\/script>
+            `;
+            return wrapper;
 
-          adContainer.classList.add('loading'); // Show loading indicator
-          adContainer.innerHTML = adCode;  // Inject the ad code
+        }
+        const adContainer = document.getElementById("ad-container");
 
-          const script = adContainer.querySelector("script");
+        function injectAds(numAds) {
+          adContainer.innerHTML = ""; //Clear old ads!
+            for (let i = 0; i < numAds; i++) {
+                const adElement = createAd(i);
+                adContainer.appendChild(adElement);
 
-          // Set a timeout
-          const timeoutId = setTimeout(() => {
-                console.warn(`Ad ${adContainerId} timed out.`);
-                adContainer.classList.remove('loading');
-                adContainer.innerHTML = `<p>Ad failed to load.</p>`; // Error message
-            }, 10000); // 10 seconds
-
-          if(script) {
-                script.onload = () => {
-                    clearTimeout(timeoutId);
-                    adContainer.classList.remove('loading');
-
+              //Find the invoke script.
+              const invokeScript = adElement.querySelector('script[src*="invoke.js"]');
+                if(invokeScript) {
+                    invokeScript.onload = () => {
+                        adElement.classList.remove('loading');
+                    };
+                    invokeScript.onerror = () => {
+                      adElement.classList.remove('loading');
+                      adElement.innerHTML = `<p>Ad failed to load.</p>`
+                    }
+                } else{
+                    //Remove loading instantly
+                    adElement.classList.remove('loading');
                 }
-                script.onerror = () => {
-                  clearTimeout(timeoutId);
-                  adContainer.classList.remove('loading');
-                  console.error(`Ad script failed to load: ${adContainerId}`);
-                }
-          } else {
-                adContainer.classList.remove("loading");
-          }
-      }
+            }
 
-      // Loop and inject
-      adCodes.forEach((adCode, index) => {
-          injectAd(`ad${index + 1}`, adCode);
-      });
+
+        }
+
+
+        injectAds(10); // Initial injection
+
+        // Set up the refresh interval
+        setInterval(() => {
+            injectAds(10); //Re-inject ads
+        }, 30000); // 30 seconds
+
+
     </script>
 </body>
 </html>
