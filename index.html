@@ -128,17 +128,20 @@
                 }, 10000);
 
 
-              if (invokeScript) { //Check if it exists
-                  invokeScript.onload = () => {
-                      clearTimeout(timeoutId); //Clear timeout on load
-                      adWrapper.classList.remove('loading'); //Remove loading
-                  };
-                  invokeScript.onerror = () => { //If the ad has an error loading
-                      clearTimeout(timeoutId); // Clear timeout on error
-                      adWrapper.classList.remove('loading'); //Remove loading
-                      console.error(`Ad script failed to load: ${adWrapper.id}`); //Log it
-                       adWrapper.innerHTML = `<p>Ad failed to load.</p>`; //Add error text
-                  };
+              if (invokeScript) {
+                // Use addEventListener for better compatibility
+                invokeScript.addEventListener('load', () => {
+                    clearTimeout(timeoutId);
+                    adWrapper.classList.remove('loading');
+                });
+
+                invokeScript.addEventListener('error', () => {
+                    clearTimeout(timeoutId);
+                    adWrapper.classList.remove('loading');
+                    console.error(`Ad script failed to load: ${adWrapper.id}`);
+                    adWrapper.innerHTML = `<p>Ad failed to load.</p>`;
+                });
+
               } else {
                 //If no script was found, remove loading
                 adWrapper.classList.remove("loading");
