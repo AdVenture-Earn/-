@@ -3,162 +3,1105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimalist Ad Display</title>
+    <title>FluentOS</title>
     <style>
-        body {
-            font-family: sans-serif;
+        /* Reset and Basic Styles */
+        *, *::before, *::after {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-wrap: wrap; /* Allow ads to wrap */
-            justify-content: center;
-            align-items: flex-start; /* Align to top */
-            min-height: 100vh;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Windows 11 Font */
+            user-select: none; /* Prevent text selection */
+            -webkit-user-select: none;  /* For Safari */
+            -moz-user-select: none;     /* For Firefox */
+            -ms-user-select: none;      /* For IE/Edge */
+
         }
 
-        .ad-container {
+        body {
+            background: url('https://wallpapercave.com/wp/wp9492777.jpg') no-repeat center center fixed;  /* Replace with a high-res Windows 11-like wallpaper */
+            background-size: cover;
+            overflow: hidden; /* Hide scrollbars initially */
+            height: 100vh;
+            width: 100vw;
             display: flex;
-            flex-wrap: wrap; /* Allow ads to wrap within the container */
-            justify-content: center; /* Center ads horizontally */
-            gap: 20px; /* Spacing between ads */
-            padding: 20px;
-            width: 80%;  /* Take up most of the viewport width */
-            max-width: 1200px; /* Limit the maximum width */
+            flex-direction: column; /* Stack taskbar below content */
         }
 
-        .ad-wrapper {
-            width: 320px; /*  Fixed width, as per your ad code */
-            height: 50px; /* Fixed height */
-            position: relative;
+
+        /* Taskbar */
+        #taskbar {
+            background-color: rgba(245, 245, 245, 0.8); /* Semi-transparent light background */
+            backdrop-filter: blur(10px);  /* Modern blur effect */
+            -webkit-backdrop-filter: blur(10px); /* For Safari support */
+            border-top: 1px solid rgba(200, 200, 200, 0.2);  /* Subtle border */
+            padding: 5px 10px;
+            display: flex;
+            justify-content: space-between; /* Space out items */
+            align-items: center;
+            height: 48px; /* Standard taskbar height */
+            position: fixed;
+            bottom:0;
+            left:0;
+            width:100vw;
+            z-index: 1000; /* Ensure taskbar is on top */
+        }
+
+        #taskbar-left, #taskbar-center, #taskbar-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .taskbar-icon {
+            width: 32px;
+            height: 32px;
+            margin: 0 5px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            transition: transform 0.1s ease;  /* Smooth scaling */
+            position: relative; /* For tooltip positioning */
+            border-radius:8px;
+        }
+        .taskbar-icon:hover{
+            background-color: rgba(0,0,0, 0.1);
+
+        }
+
+
+        .taskbar-icon:active {
+            transform: scale(0.9); /* Slightly shrink on click */
+        }
+
+        /* Start Menu */
+        #start-menu {
+            position: absolute;
+            bottom: 53px; /* Just above the taskbar */
+            left: 5px;
+            width: 350px;
+            height: 450px;
+             /* Semi-transparent light */
+            background-color: rgba(245, 245, 245, 0.9);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+            overflow: hidden;  /* Hide scrollbars */
+            display: none; /* Initially hidden */
+            flex-direction: column;
+             z-index: 999;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            opacity: 0;
+            transform-origin: bottom left; /* Animation from bottom-left */
+            transform: translateY(20px);
+            border: 1px solid rgba(0,0,0,0.1)
+
+        }
+
+
+       #start-menu.open {
+            display: flex; /* Use flexbox for layout */
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+
+
+        #start-menu-header {
+            padding: 10px;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(200, 200, 200, 0.5);
+        }
+
+        #start-menu-content {
+            flex-grow: 1; /* Take up remaining space */
+            overflow-y: auto; /* Allow scrolling if content overflows */
+            padding: 10px;
+
+              /* Styling for scrollbar (Webkit/Blink) */
+            &::-webkit-scrollbar {
+                width: 8px; /* Thin scrollbar */
+            }
+
+            &::-webkit-scrollbar-track {
+                background: transparent; /* No track background */
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background-color: rgba(150, 150, 150, 0.5); /* Semi-transparent grey */
+                border-radius: 4px;
+            }
+        }
+
+        .start-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+
+        .start-menu-item:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .start-menu-item img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+
+        /* System Tray (Right Side) */
+        #system-tray {
+            display: flex;
+            align-items: center;
+        }
+
+        .system-tray-icon {
+            /*  Same styles as .taskbar-icon, but maybe slightly smaller */
+            width: 24px;
+            height: 24px;
+            margin: 0 3px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+             transition: transform 0.1s ease;  /* Smooth scaling */
+            position: relative; /* For tooltip positioning */
+              border-radius:6px;
+        }
+        .system-tray-icon:hover{
+              background-color: rgba(0,0,0, 0.1);
+        }
+
+        /* Clock */
+        #clock {
+            font-size: 14px;
+            margin-left: 10px;
+            color: #333; /* Darker text for better contrast */
+            font-weight: 500;
+             cursor: pointer;
+             transition: transform 0.1s ease;  /* Smooth scaling */
+            position: relative; /* For tooltip positioning */
+              border-radius:6px;
+               padding: 5px;
+        }
+
+        #clock:hover{
+           background-color: rgba(0,0,0, 0.1);
+        }
+
+
+        /* Desktop */
+        #desktop {
+            flex-grow: 1; /* Take up remaining space */
+            position: relative;  /* For absolute positioning of windows */
             overflow: hidden;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-        }
-
-        .ad-wrapper::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 100%);
-            z-index: 1;
-            pointer-events: none;
+            height: calc(100% - 48px);
         }
 
-        .ad-wrapper > * {
-            position: relative;
-            z-index: 2;
-        }
 
-        .ad-wrapper:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Loading indicator (Initially Hidden) */
-        .ad-wrapper::after {
-            content: '';
+        /* Window */
+        .window {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            z-index: 3;
-            display: none; /*  Initially hidden */
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+            resize: both; /* Enable resizing */
+            min-width: 200px;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
         }
 
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        .window.active {
+            z-index: 100;
         }
-       .ad-wrapper.loading::after {
-            display: block; /* Only show when loading */
+
+        .window-titlebar {
+            background-color: #f0f0f0;
+            padding: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move; /* Indicate draggability */
+            border-bottom: 1px solid #ccc;
+            user-select: none;
         }
+
+
+        .window-title {
+            font-weight: bold;
+            flex-grow: 1;  /* Take up available space */
+            overflow: hidden; /* Prevent text overflow */
+            white-space: nowrap; /* Keep title on one line */
+            text-overflow: ellipsis; /* Add ellipsis if it overflows */
+            padding-left: 8px;
+        }
+
+        .window-buttons {
+            display: flex;
+            align-items: center;
+        }
+
+
+        .window-button {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-left: 5px;
+            cursor: pointer;
+            display: flex;  /* Center the icons/symbols */
+            justify-content: center;
+            align-items: center;
+             transition: transform 0.1s ease;  /* Smooth scaling */
+            position: relative; /* For tooltip positioning */
+        }
+
+        .window-button:hover {
+           filter: brightness(0.9);
+           
+        }
+
+        .window-button.close {
+            background-color: #e74c3c; /* Red */
+             
+        }
+        .window-button.close:hover::after{
+            color:white;
+        }
+        .window-button.close::after {
+            content: '✕';
+             font-weight: bold;
+
+        }
+        .window-button.minimize {
+            background-color: #f1c40f; /* Yellow */
+        }
+          .window-button.minimize:hover::after{
+            color:white;
+        }
+         .window-button.minimize::after {
+            content: '—';
+            font-weight: bold;
+        }
+
+        .window-button.maximize {
+            background-color: #2ecc71; /* Green */
+        }
+        .window-button.maximize:hover::after, .window-button.restore:hover::after{
+            color:white;
+        }
+        .window-button.maximize::after {
+            content: '□';
+             font-weight: bold;
+
+        }
+        .window-button.restore {
+            background-color: #2ecc71; /* Green */
+             display: none; /* Initially hidden */
+        }
+        .window-button.restore::after {
+            content: '⧉';
+             font-weight: bold;
+              font-size: 12px; /* Slightly smaller for restore */
+        }
+        .window.maximized .window-button.maximize {
+            display: none;
+        }
+
+        .window.maximized .window-button.restore {
+            display: flex; /* Show restore button when maximized */
+        }
+
+
+
+        .window-content {
+           padding: 10px;
+           overflow: auto; /* Add scrollbars if content overflows */
+           flex-grow: 1;  /* Take up remaining space */
+        }
+
+          /* Styling for scrollbar (Webkit/Blink) */
+        .window-content::-webkit-scrollbar {
+            width: 8px;  /* Make scrollbar thinner */
+        }
+
+        .window-content::-webkit-scrollbar-track {
+            background: transparent;  /* Transparent track */
+        }
+
+        .window-content::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent grey */
+            border-radius: 4px;  /* Rounded corners */
+        }
+
+
+    /* Tooltips */
+    .tooltip {
+        position: absolute;
+        bottom: calc(100% + 5px); /* Position above the icon */
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 5px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap; /* Prevent text wrapping */
+        z-index: 1010; /* Higher than taskbar and windows */
+        opacity: 0;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        pointer-events: none; /* Important:  Don't interfere with clicks */
+    }
+
+
+    .taskbar-icon:hover .tooltip, .system-tray-icon:hover .tooltip, #clock:hover .tooltip, .window-button:hover .tooltip{
+        opacity: 1;
+        transform: translateX(-50%) translateY(-5px); /* Slight upward movement */
+    }
+
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes slideDown {
+        from { transform: translateY(0); opacity: 1; }
+        to { transform: translateY(20px); opacity: 0; }
+    }
+     /* Desktop Context Menu */
+        #desktop-context-menu {
+            position: absolute;
+            background-color: rgba(245, 245, 245, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(200, 200, 200, 0.5);
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1010;
+            display: none; /* Hidden by default */
+            min-width: 150px;
+            padding: 5px 0; /* Add some vertical padding */
+        }
+
+        #desktop-context-menu.show {
+            display: block;
+             animation: fadeIn 0.1s ease;
+        }
+
+        .context-menu-item {
+            padding: 8px 15px;
+            cursor: pointer;
+            white-space: nowrap;  /* Prevent text wrapping */
+        }
+        .context-menu-item:hover {
+            background-color: rgba(0,0,0,0.1);
+        }
+        .context-menu-separator{
+            height: 1px;
+            background-color: rgba(0,0,0,0.1);
+            margin: 2px 0;
+
+        }
+        /*File Explorer*/
+        .file-explorer-content {
+          display: flex;
+          height: 100%;
+        }
+        .file-explorer-sidebar {
+            width: 200px;
+            border-right: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .file-explorer-main {
+            flex-grow: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        .file-explorer-sidebar-item{
+             padding: 8px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+        .file-explorer-sidebar-item:hover{
+            background-color: rgba(0,0,0,0.05);
+        }
+        .file-explorer-sidebar-item img {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+         .file-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .file-item:last-child {
+            border-bottom: none; /* Remove border from last item */
+        }
+
+        .file-item img {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+        .file-item:hover{
+            background-color: rgba(0,0,0,0.05)
+        }
+    /* Notepad */
+    .notepad-textarea {
+        width: 100%;
+        height: 100%;
+        border: none;
+        outline: none;
+        resize: none; /* Disable textarea resizing */
+        font-family: 'Consolas', monospace; /* Use a monospace font */
+        font-size: 14px;
+        line-height: 1.5;
+        padding: 10px;
+        background-color: transparent; /* Remove default background */
+        color: black;
+    }
+
+        .word-wrap-checkbox-label {
+        margin-left: 10px; /* Space between menu item and label */
+    }
+
+
+     /* Calculator */
+    .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 5px;
+            padding: 10px;
+        }
+
+        .calculator-button {
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 18px;
+            background-color: #f9f9f9; /* Light background */
+            transition: background-color 0.2s ease; /* Smooth transition */
+        }
+
+        .calculator-button:hover {
+            background-color: #eee; /* Slightly darker on hover */
+        }
+          .calculator-button:active {
+            background-color: #ddd; /* Even darker when clicked */
+            transform: translateY(1px); /* Slight press effect */
+        }
+
+        .calculator-display {
+            grid-column: span 4;
+            text-align: right;
+            padding: 10px;
+            font-size: 24px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+             margin-bottom: 5px;
+            overflow: hidden; /* Prevent overflow */
+            background-color: white;
+        }
+        .operator {
+            background-color: #f0ad4e; /* Orange */
+            color: white;
+        }
+
+        .equal {
+            background-color: #5bc0de; /* Blue */
+            color: white;
+        }
+
+        .clear {
+            background-color: #d9534f; /* Red */
+            color: white;
+        }
+
 
     </style>
 </head>
 <body>
-    <div id="ad-container">
-        <!-- Ads will be injected here -->
+    <div id="desktop">
+        <!-- Windows will be added here -->
+        <div id="desktop-context-menu">
+            <div class="context-menu-item" onclick="createWindow('Notepad')">New Notepad</div>
+            <div class="context-menu-item" onclick="createWindow('File Explorer')">Open File Explorer</div>
+            <div class="context-menu-separator"></div>
+             <div class="context-menu-item" onclick="refreshDesktop()">Refresh</div>
+
+        </div>
     </div>
 
-    <script>
-        // Ad code (using the new code you provided)
-        const adCode = `<script type="text/javascript">
-            atOptions = {
-                'key' : 'da478d22f90970a31fdaa28f1fc71e9e',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-        <\/script>
-        <script type="text/javascript" src="//www.highperformanceformat.com/da478d22f90970a31fdaa28f1fc71e9e/invoke.js"></script>`;
 
-        // Function to create an ad wrapper element
-        function createAdWrapper(id) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'ad-wrapper loading';  // Start with loading class
-            wrapper.id = `ad-${id}`; // Unique ID for each ad
-            return wrapper;
+    <div id="taskbar">
+        <div id="taskbar-left">
+            <div class="taskbar-icon" id="start-button" data-tooltip="Start">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/31/Windows_logo_-_2012_%28dark_blue%29.svg" alt="Start">
+                 <span class="tooltip">Start</span>
+            </div>
+        </div>
+        <div id="taskbar-center">
+              <!-- Pinned Apps / Open Windows -->
+
+        </div>
+        <div id="taskbar-right">
+            <div id="system-tray">
+               <div class="system-tray-icon" data-tooltip="Network">
+                <img src="https://icons.veryicon.com/png/o/miscellaneous/cloud-computing/network-area-connection.png" alt="Network" >
+                 <span class="tooltip">Network</span>
+               </div>
+            </div>
+            <div id="clock"></div>
+        </div>
+    </div>
+
+    <div id="start-menu">
+        <div id="start-menu-header">
+            FluentOS
+        </div>
+        <div id="start-menu-content">
+            <div class="start-menu-item" onclick="createWindow('Notepad')">
+                <img src="https://cdn-icons-png.flaticon.com/512/124/124579.png" alt="Notepad Icon">
+                Notepad
+            </div>
+            <div class="start-menu-item" onclick="createWindow('File Explorer')">
+                 <img src="https://cdn-icons-png.flaticon.com/512/2392/2392034.png" alt="File Explorer">
+                File Explorer
+            </div>
+             <div class="start-menu-item" onclick="createWindow('Calculator')">
+                <img src="https://cdn-icons-png.flaticon.com/512/2705/2705248.png" alt="Calculator Icon">
+                Calculator
+            </div>
+             <div class="start-menu-item" onclick="createWindow('Terminal')">
+                <img src="https://cdn3.iconfinder.com/data/icons/feather-5/24/terminal-512.png" alt="Terminal Icon">
+                Terminal
+            </div>
+            <!-- Add more Start Menu items here -->
+        </div>
+    </div>
+
+
+    <script>
+         let windowCounter = 0;
+        let activeWindow = null;
+        let isDragging = false;
+        let isResizing = false;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+        let currentResizingWindow = null;
+
+        const taskbar = document.getElementById('taskbar-center');
+        const desktop = document.getElementById('desktop');
+
+        document.getElementById('start-button').addEventListener('click', toggleStartMenu);
+        document.getElementById('clock').innerText = updateClock();
+        setInterval(() => document.getElementById('clock').innerText = updateClock(), 1000);
+        document.addEventListener('contextmenu', handleContextMenu); // For desktop context
+        desktop.addEventListener("click", closeContextMenu);
+        document.addEventListener('mousedown', handleWindowFocus);
+
+         function toggleStartMenu() {
+            const startMenu = document.getElementById('start-menu');
+            startMenu.classList.toggle('open');
+            closeContextMenu();
         }
 
-      // Function to inject ads into the container
-      function injectAds(numAds) {
-          const adContainer = document.getElementById('ad-container');
-          adContainer.innerHTML = ''; // Clear existing ads
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
 
-          for (let i = 0; i < numAds; i++) {
-              const adWrapper = createAdWrapper(i);
-              adWrapper.innerHTML = adCode; // Inject the ad code
-              adContainer.appendChild(adWrapper);
 
-              // Find the *second* script tag (invoke.js)
-              const invokeScript = adWrapper.querySelectorAll('script')[1];
+        function createWindow(type, params = {}) {
+            windowCounter++;
+            const windowElement = document.createElement('div');
+            windowElement.classList.add('window');
+            windowElement.id = `window-${windowCounter}`;
+            windowElement.style.left = `${20 + (windowCounter * 20)}px`; // Cascade windows
+            windowElement.style.top = `${20 + (windowCounter * 20)}px`;
+            windowElement.innerHTML = `
+                <div class="window-titlebar">
+                    <div class="window-title">${type} ${windowCounter}</div>
+                    <div class="window-buttons">
+                        <div class="window-button minimize" data-tooltip="Minimize"></div>
+                        <div class="window-button maximize" data-tooltip="Maximize"></div>
+                        <div class="window-button restore" data-tooltip="Restore"></div>
+                        <div class="window-button close" data-tooltip="Close"></div>
+                    </div>
+                </div>
+                <div class="window-content">
+                      ${getWindowContent(type, windowElement, params)}
+                </div>
+            `;
 
-                // Set a timeout
-                const timeoutId = setTimeout(() => {
-                    console.warn(`Ad ${adWrapper.id} timed out.`);
-                    adWrapper.classList.remove('loading');
-                    adWrapper.innerHTML = `<p>Ad failed to load.</p>`; // Show error
-                }, 10000); // 10 seconds, adjust as needed
+            desktop.appendChild(windowElement);
 
-                // --- The Crucial Change:  DOMContentReady ---
-                if (invokeScript) {
-                    // Don't wait for 'load', wait for DOMContentLoaded
-                    invokeScript.addEventListener('load', () => { //Change to add event listener
-                        clearTimeout(timeoutId);
-                        adWrapper.classList.remove('loading');
-                    });
-                  invokeScript.addEventListener('error', () => {
-                      clearTimeout(timeoutId);
-                      adWrapper.classList.remove('loading');
-                      console.error(`Ad script failed to load: ${adWrapper.id}`);
-                       adWrapper.innerHTML = `<p>Ad failed to load.</p>`;
-                  })
+             // Add event listeners *after* appending to the DOM
+            const titleBar = windowElement.querySelector('.window-titlebar');
+            titleBar.addEventListener('mousedown', startDragging);
 
-                } else {
-                  adWrapper.classList.remove('loading');
+            const minimizeButton = windowElement.querySelector('.minimize');
+            minimizeButton.addEventListener('click', minimizeWindow);
+
+            const maximizeButton = windowElement.querySelector('.maximize');
+            const restoreButton = windowElement.querySelector('.restore')
+            maximizeButton.addEventListener('click', () => toggleMaximize(windowElement, maximizeButton, restoreButton));
+            restoreButton.addEventListener('click', () => toggleMaximize(windowElement, maximizeButton, restoreButton));
+
+            const closeButton = windowElement.querySelector('.close');
+            closeButton.addEventListener('click', () => closeWindow(windowElement.id));
+
+            windowElement.addEventListener('mousedown', bringToFront);
+            windowElement.addEventListener('mousedown', startResizing);
+
+            windowElement.style.animation = 'fadeIn 0.3s ease';
+
+            addToTaskbar(windowElement.id, type); // Add to taskbar *after* creating the window
+            bringToFront({target: windowElement});
+            return windowElement; // Return the created element
+        }
+
+
+       function getWindowContent(type, windowElement, params) {
+            switch (type) {
+                case 'Notepad':
+                    return `
+                       <textarea class="notepad-textarea" placeholder="Type here..."></textarea>
+                    `;
+
+                case 'File Explorer':
+                 return `
+                    <div class="file-explorer-content">
+                        <div class="file-explorer-sidebar">
+                            <div class="file-explorer-sidebar-item" onclick="showFolderContent('Desktop', '${windowElement.id}')">
+                                <img src="https://cdn-icons-png.flaticon.com/512/1158/1158893.png" alt="Folder"> Desktop
+                            </div>
+                            <div class="file-explorer-sidebar-item" onclick="showFolderContent('Documents', '${windowElement.id}')">
+                                 <img src="https://cdn-icons-png.flaticon.com/512/263/263103.png" alt="Folder"> Documents
+                            </div>
+                            <div class="file-explorer-sidebar-item" onclick="showFolderContent('Downloads', '${windowElement.id}')">
+                                 <img src="https://cdn-icons-png.flaticon.com/512/892/892647.png" alt="Folder"> Downloads
+                            </div>
+                            <!-- Add more sidebar items as needed -->
+                        </div>
+                        <div class="file-explorer-main" id="file-explorer-main-${windowElement.id}">
+                            <!-- File content will be displayed here -->
+                        </div>
+                    </div>
+                `;
+                case 'Calculator':
+                    return `
+                    <div class="calculator-grid">
+                        <div class="calculator-display" id="calc-display-${windowElement.id}">0</div>
+                        <button class="calculator-button" onclick="appendToDisplay('${windowElement.id}', '7')">7</button>
+                        <button class="calculator-button" onclick="appendToDisplay('${windowElement.id}', '8')">8</button>
+                        <button class="calculator-button" onclick="appendToDisplay('${windowElement.id}', '9')">9</button>
+                        <button class="calculator-button operator" onclick="appendToDisplay('${windowElement.id}', '/')">/</button>
+
+                        <button class="calculator-button" onclick="appendToDisplay('${windowElement.id}', '4')">4</button>
+                        <button class="calculator-button" onclick="appendToDisplay('${windowElement.id}', '5')">5</button>
+                        <button class="calculator-button" onclick="appendToDisplay('${windowElement.id}', '6')">6</button>
+                        <button class="calculator-button operator" onclick="appendToDisplay('${windowElement.id}', '*')">*</button>
+
+                        <button class="calculator-button" onclick="appendToDisplay('${windowElement.id}', '1')">1</button>
+                        <button class="calculator-button" onclick="appendToDisplay('${windowElement.id}', '2')">2</button>
+                        <button class="calculator-button" onclick="appendToDisplay('${windowElement.id}', '3')">3</button>
+                        <button class="calculator-button operator" onclick="appendToDisplay('${windowElement.id}', '-')">-</button>
+
+                        <button class="calculator-button" onclick="appendToDisplay('${windowElement.id}', '0')">0</button>
+                        <button class="calculator-button" onclick="appendToDisplay('${windowElement.id}', '.')">.</button>
+                        <button class="calculator-button equal" onclick="calculateResult('${windowElement.id}')">=</button>
+                        <button class="calculator-button operator" onclick="appendToDisplay('${windowElement.id}', '+')">+</button>
+
+                        <button class="calculator-button clear" onclick="clearDisplay('${windowElement.id}')">C</button>
+                    </div>
+                `;
+                  case 'Terminal':
+                    return `
+                        <div id="terminal-output-${windowElement.id}" style="background-color: black; color: white; font-family: monospace; height: 200px; overflow-y: scroll; padding: 5px;"></div>
+                        <input type="text" id="terminal-input-${windowElement.id}" style="width: 100%; border: none; background-color: black; color: white; font-family: monospace; padding: 5px;" onkeydown="handleTerminalInput(event, '${windowElement.id}')">
+                    `;
+                // Add more cases for other window types
+                default:
+                    return 'Default Content';
+            }
+        }
+
+
+        function handleWindowFocus(event){
+            let targetWindow = event.target.closest('.window');
+              if (targetWindow) {
+                bringToFront({ target: targetWindow }); // Pass as an object
+            }
+            else{
+
+                if (!event.target.closest('#start-menu') && !event.target.closest('#start-button')) {
+                    const startMenu = document.getElementById('start-menu');
+                    startMenu.classList.remove('open');
                 }
-          }
-      }
+                closeContextMenu(); //click anywhere will close the context menu
+            }
+        }
 
-      // Initial injection of 10 ads
-      injectAds(10);
 
-      // Refresh ads every 30 seconds
-      setInterval(() => {
-          injectAds(10);
-      }, 30000);
+        function startDragging(event) {
+            isDragging = true;
+            currentResizingWindow = this.closest('.window'); // Use closest()
+            bringToFront({ target: currentResizingWindow }); // Pass as an object
+
+             // Calculate the offset *within* the title bar
+            const rect = currentResizingWindow.getBoundingClientRect(); // Get window position
+            dragOffsetX = event.clientX - rect.left;
+            dragOffsetY = event.clientY - rect.top;
+
+            document.addEventListener('mousemove', dragWindow);
+            document.addEventListener('mouseup', stopDragging);
+        }
+
+
+       function dragWindow(event) {
+            if (isDragging) {
+                // Calculate the new position based on the *mouse* position and the *offset*
+                let newX = event.clientX - dragOffsetX;
+                let newY = event.clientY - dragOffsetY;
+
+                // Boundary checking
+                const desktopRect = desktop.getBoundingClientRect();
+                newX = Math.max(0, Math.min(newX, desktopRect.width - currentResizingWindow.offsetWidth)); // Limit X
+                newY = Math.max(0, Math.min(newY, desktopRect.height - currentResizingWindow.offsetHeight));  // Limit Y
+                currentResizingWindow.style.left = `${newX}px`;
+                currentResizingWindow.style.top = `${newY}px`;
+            }
+        }
+
+        function stopDragging() {
+            isDragging = false;
+            document.removeEventListener('mousemove', dragWindow);
+            document.removeEventListener('mouseup', stopDragging);
+        }
+
+        function startResizing(event) {
+            currentResizingWindow = this;
+            isResizing = true;
+            bringToFront({target: this}); // Corrected this line
+
+            document.addEventListener('mousemove', resizeWindow);
+            document.addEventListener('mouseup', stopResizing);
+            event.stopPropagation(); // Prevent dragging when resizing
+        }
+
+
+       function resizeWindow(event){
+            if(isResizing){
+                 const width = event.clientX - currentResizingWindow.offsetLeft;
+                const height = event.clientY - currentResizingWindow.offsetTop;
+                currentResizingWindow.style.width = `${width}px`;
+                currentResizingWindow.style.height = `${height}px`;
+
+            }
+
+        }
+        function stopResizing() {
+            isResizing = false;
+            document.removeEventListener('mousemove', resizeWindow);
+            document.removeEventListener('mouseup', stopResizing);
+        }
+
+        function minimizeWindow() {
+            const windowElement = this.closest('.window');
+            windowElement.style.display = 'none';  // Hide the window
+             const taskbarIcon = document.querySelector(`.taskbar-icon[data-window-id="${windowElement.id}"]`);
+              if (taskbarIcon) {
+                taskbarIcon.classList.remove('active');
+                taskbarIcon.style.backgroundColor = ''; //remove the active color.
+            }
+
+        }
+
+        function toggleMaximize(windowElement, maximizeButton, restoreButton) {
+            windowElement.classList.toggle('maximized');
+            if (windowElement.classList.contains('maximized')) {
+                // Store original dimensions and position
+                windowElement.dataset.originalWidth = windowElement.style.width;
+                windowElement.dataset.originalHeight = windowElement.style.height;
+                windowElement.dataset.originalLeft = windowElement.style.left;
+                windowElement.dataset.originalTop = windowElement.style.top;
+
+                windowElement.style.width = '100%';
+                                windowElement.style.height = 'calc(100% - 48px)';
+                windowElement.style.left = '0';
+                windowElement.style.top = '0';
+                windowElement.style.resize = 'none'; // Disable resizing when maximized
+
+            } else {
+                // Restore original dimensions and position
+                windowElement.style.width = windowElement.dataset.originalWidth;
+                windowElement.style.height = windowElement.dataset.originalHeight;
+                windowElement.style.left = windowElement.dataset.originalLeft;
+                windowElement.style.top = windowElement.dataset.originalTop;
+                windowElement.style.resize = 'both'; // Re-enable resizing
+            }
+             bringToFront({target: windowElement}); // Ensure maximized window is on top.
+        }
+
+
+
+        function closeWindow(windowId) {
+            const windowElement = document.getElementById(windowId);
+             // Fade out animation
+            windowElement.style.animation = 'fadeOut 0.3s ease';
+            windowElement.addEventListener('animationend', () => {
+                 windowElement.remove();
+                 removeFromTaskbar(windowId);
+            });
+
+        }
+
+       function bringToFront(event) {
+            const clickedWindow = event.target;
+
+            // If there's an active window, and it's NOT the clicked window, lower its z-index
+            if (activeWindow && activeWindow !== clickedWindow) {
+                activeWindow.classList.remove('active');
+                activeWindow.style.zIndex = '10'; // Reset z-index
+
+                 const previousActiveTaskbarIcon = document.querySelector(`.taskbar-icon.active`);
+                if (previousActiveTaskbarIcon) {
+                    previousActiveTaskbarIcon.classList.remove('active');
+                    previousActiveTaskbarIcon.style.backgroundColor = ''; // Reset color
+                }
+            }
+
+            // Bring the clicked window to the front
+            clickedWindow.style.zIndex = '100';
+            clickedWindow.classList.add('active');
+            activeWindow = clickedWindow;
+
+              // Highlight the corresponding taskbar icon
+            const taskbarIcon = document.querySelector(`.taskbar-icon[data-window-id="${clickedWindow.id}"]`);
+            if (taskbarIcon) {
+                taskbarIcon.classList.add('active');
+                taskbarIcon.style.backgroundColor = 'rgba(0, 0, 0, 0.2)'; // Highlight color
+            }
+        }
+
+
+        function addToTaskbar(windowId, type) {
+            const taskbarIcon = document.createElement('div');
+            taskbarIcon.classList.add('taskbar-icon');
+            taskbarIcon.dataset.windowId = windowId;  // Store window ID
+            taskbarIcon.dataset.tooltip = type;
+            taskbarIcon.innerHTML = `<img src="${getIconForType(type)}" alt="${type}">
+                                     <span class="tooltip">${type}</span>`;
+            taskbarIcon.addEventListener('click', () => toggleWindowFromTaskbar(windowId));
+            taskbar.appendChild(taskbarIcon);
+
+             // Initial highlight if this is the first window created
+            if (windowCounter === 1) {
+                taskbarIcon.classList.add('active');
+            }
+        }
+
+
+        function getIconForType(type) {
+            switch (type) {
+                case 'Notepad':
+                    return 'https://cdn-icons-png.flaticon.com/512/124/124579.png'; // Notepad icon
+                case 'File Explorer':
+                    return 'https://cdn-icons-png.flaticon.com/512/2392/2392034.png'; //File Explorer
+                case 'Calculator':
+                    return 'https://cdn-icons-png.flaticon.com/512/2705/2705248.png'; //Calculator
+                 case 'Terminal':
+                    return 'https://cdn3.iconfinder.com/data/icons/feather-5/24/terminal-512.png';
+                default:
+                    return 'https://via.placeholder.com/32'; // Default icon
+            }
+        }
+
+       function toggleWindowFromTaskbar(windowId) {
+            const windowElement = document.getElementById(windowId);
+            if (!windowElement) return; // Safety check: window might have been closed
+
+            const taskbarIcon = document.querySelector(`.taskbar-icon[data-window-id="${windowId}"]`);
+
+            if (windowElement.style.display === 'none') {
+                // Show the window (if minimized)
+                windowElement.style.display = 'flex';
+                 bringToFront({ target: windowElement }); // Bring to front (important!)
+                taskbarIcon.classList.add('active');
+                taskbarIcon.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+
+
+            } else if (activeWindow === windowElement) {
+                // Minimize if it's the active window
+                windowElement.style.display = 'none';
+                 activeWindow = null; // Clear active window
+                taskbarIcon.classList.remove('active');
+                 taskbarIcon.style.backgroundColor = '';
+            } else {
+                // Bring to front if it's not the active window
+               bringToFront({ target: windowElement });
+            }
+        }
+
+        function removeFromTaskbar(windowId) {
+            const taskbarIcon = document.querySelector(`.taskbar-icon[data-window-id="${windowId}"]`);
+            if (taskbarIcon) {
+                taskbarIcon.remove();
+            }
+        }
+
+
+        function handleContextMenu(event) {
+            event.preventDefault(); // Prevent default browser context menu
+             if (event.target === desktop || event.target.closest('#desktop')) {
+                const menu = document.getElementById('desktop-context-menu');
+                menu.style.left = `${event.clientX}px`;
+                menu.style.top = `${event.clientY}px`;
+                menu.classList.add('show');
+            }
+            else{
+                closeContextMenu(); //close when not click on the desktop area.
+            }
+
+        }
+
+
+        function closeContextMenu() {
+            const menu = document.getElementById('desktop-context-menu');
+             if (menu) {
+                menu.classList.remove('show');
+            }
+        }
+       //Refresh the desktop function, just reload the page for now (can be improved with AJAX later)
+        function refreshDesktop(){
+            location.reload();
+        }
+
+        function showFolderContent(folderName, windowId) {
+            const fileExplorerMain = document.getElementById(`file-explorer-main-${windowId}`);
+            if (!fileExplorerMain) return; // Safety check
+
+            let contentHTML = `<h3>${folderName}</h3>`;
+             contentHTML += '<ul>'; //use ul and li for better semantics
+
+            if (folderName === 'Desktop') {
+                contentHTML += `<li class="file-item"><img src="https://cdn-icons-png.flaticon.com/512/471/471664.png" alt="File">File1.txt</li>`;
+                contentHTML += `<li class="file-item"><img src="https://cdn-icons-png.flaticon.com/512/471/471664.png" alt="File">File2.txt</li>`;
+            } else if (folderName === 'Documents') {
+                contentHTML += `<li class="file-item"><img src="https://cdn-icons-png.flaticon.com/512/471/471664.png" alt="File">Document1.docx</li>`;
+                contentHTML += `<li class="file-item"><img src="https://cdn-icons-png.flaticon.com/512/471/471664.png" alt="File">Document2.pdf</li>`;
+
+            } else if (folderName === 'Downloads') {
+                 contentHTML += `<li class="file-item"><img src="https://cdn-icons-png.flaticon.com/512/471/471664.png" alt="File">Installer.exe</li>`;
+            }
+            // Add more file examples as needed
+
+            contentHTML += '</ul>'
+            fileExplorerMain.innerHTML = contentHTML;
+        }
+         //Calculator
+         function appendToDisplay(windowId, value) {
+            const display = document.getElementById(`calc-display-${windowId}`);
+            if (display.innerText === '0' && value !== '.') {
+                display.innerText = value;
+            }
+            else if(value === '.' && display.innerText.includes('.')){ //prevent multiple decimal
+                return;
+            }
+            else {
+                display.innerText += value;
+            }
+        }
+
+        function calculateResult(windowId) {
+            const display = document.getElementById(`calc-display-${windowId}`);
+            try {
+                display.innerText = eval(display.innerText);
+            } catch (error) {
+                display.innerText = 'Error';
+            }
+        }
+
+        function clearDisplay(windowId) {
+            const display = document.getElementById(`calc-display-${windowId}`);
+            display.innerText = '0';
+        }
+          //Terminal functions
+        function handleTerminalInput(event, windowId){
+             if (event.key === 'Enter') {
+                const input = document.getElementById(`terminal-input-${windowId}`);
+                const output = document.getElementById(`terminal-output-${windowId}`);
+                const command = input.value;
+
+                // Display the command
+                output.innerHTML += `<div>> ${command}</div>`;
+
+                // Process the command (very basic example)
+                let result = '';
+                if (command === 'help') {
+                    result = 'Available commands: help, clear, date, echo [text]';
+                }
+              else if(command === 'date'){
+                    result = new Date().toLocaleString();
+              }
+                else if (command.startsWith('echo ')) {
+                    result = command.substring(5); // Everything after "echo "
+                }
+                else if(command === 'clear'){
+                    output.innerHTML = ''; //clear output
+                    result = '';
+                }
+                else {
+                    result = 'Command not found';
+                }
+
+                // Display the result
+                if(result !== ''){ //avoid print empty result
+                    output.innerHTML += `<div>${result}</div>`;
+                }
+
+                input.value = ''; // Clear the input
+                output.scrollTop = output.scrollHeight; // Scroll to bottom
+            }
+        }
+
+
+
     </script>
 </body>
 </html>
