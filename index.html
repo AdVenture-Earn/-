@@ -10,26 +10,26 @@
             margin: 0;
             padding: 0;
             display: flex;
-            flex-wrap: wrap; /*  Allow ads to wrap */
+            flex-wrap: wrap; /* Allow ads to wrap */
             justify-content: center;
-            align-items: flex-start; /*  Align to top */
+            align-items: flex-start; /* Align to top */
             min-height: 100vh;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
 
         .ad-container {
             display: flex;
-            flex-wrap: wrap; /*  Allow ads to wrap within the container */
+            flex-wrap: wrap; /* Allow ads to wrap within the container */
             justify-content: center; /* Center ads horizontally */
             gap: 20px; /* Spacing between ads */
             padding: 20px;
             width: 80%;  /* Take up most of the viewport width */
-            max-width: 1200px; /*  Limit the maximum width, adjust as needed */
+            max-width: 1200px; /* Limit the maximum width */
         }
 
         .ad-wrapper {
-            width: 320px; /*  Fixed width, as per your NEW ad code */
-            height: 50px; /* Fixed height, as per your NEW ad code */
+            width: 320px; /*  Fixed width, as per your ad code */
+            height: 50px; /* Fixed height */
             position: relative;
             overflow: hidden;
             border-radius: 12px;
@@ -117,8 +117,8 @@
               adWrapper.innerHTML = adCode; // Inject the ad code
               adContainer.appendChild(adWrapper);
 
-              // Find the script tag within the ad wrapper
-              const invokeScript = adWrapper.querySelector('script[src*="invoke.js"]');
+              // Find the *second* script tag within the ad wrapper (the invoke.js one)
+              const invokeScript = adWrapper.querySelectorAll('script')[1];
 
               // Set a timeout (10 seconds)
                 const timeoutId = setTimeout(() => {
@@ -128,18 +128,19 @@
                 }, 10000);
 
 
-              if (invokeScript) {
+              if (invokeScript) { //Check if it exists
                   invokeScript.onload = () => {
-                      clearTimeout(timeoutId);
-                      adWrapper.classList.remove('loading');
+                      clearTimeout(timeoutId); //Clear timeout on load
+                      adWrapper.classList.remove('loading'); //Remove loading
                   };
-                  invokeScript.onerror = () => {
-                      clearTimeout(timeoutId);
-                      adWrapper.classList.remove('loading');
-                      console.error(`Ad script failed to load: ${adWrapper.id}`);
-                       adWrapper.innerHTML = `<p>Ad failed to load.</p>`;
+                  invokeScript.onerror = () => { //If the ad has an error loading
+                      clearTimeout(timeoutId); // Clear timeout on error
+                      adWrapper.classList.remove('loading'); //Remove loading
+                      console.error(`Ad script failed to load: ${adWrapper.id}`); //Log it
+                       adWrapper.innerHTML = `<p>Ad failed to load.</p>`; //Add error text
                   };
               } else {
+                //If no script was found, remove loading
                 adWrapper.classList.remove("loading");
               }
           }
@@ -150,7 +151,7 @@
 
       // Refresh ads every 30 seconds
       setInterval(() => {
-          injectAds(10); // Inject 8 ads again, replacing the old ones
+          injectAds(10);
       }, 30000);
 
     </script>
