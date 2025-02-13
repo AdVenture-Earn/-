@@ -1,856 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdVenture</title>
+    <title>Minimalist Ad Display</title>
     <style>
-        /* --- (Same CSS as before, plus additions below) --- */
-
         body {
-            font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-            background-color: #f0f2f5; /* Light gray background */
+            font-family: sans-serif;
             margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            color: #333;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 800px; /* Limit maximum width */
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7)); /* Subtle gradient */
-            backdrop-filter: blur(10px); /* macOS-like blur */
-            border-radius: 20px; /* Rounded corners */
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* Glassmorphism shadow */
-            padding: 30px;
-            overflow: hidden; /*  Ensure content doesn't overflow rounded corners */
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        /* --- Header --- */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-
-        .logo {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #4285f4;  /*  Google Blue  */
-        }
-
-        nav a {
-            text-decoration: none;
-            color: #555;
-            margin-left: 20px;
-            padding: 8px 15px;
-            border-radius: 15px; /* Rounded links */
-            transition: background-color 0.3s, color 0.3s;
-            font-weight: 500;
-        }
-        nav a:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-            color: #222;
-        }
-        nav a.active {
-            background-color: rgba(66, 133, 244, 0.2); /* Light blue for active */
-            color: #4285f4;
-            font-weight: bold;
-        }
-
-        /* --- Ad Section --- */
-        .ad-section {
-            text-align: center;
-            margin-bottom: 40px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
 
         .ad-container {
-            width: 100%;
-            height: auto; /* Adjust as needed for your ads */
-            min-height: 250px; /*  Minimum height for the ad  */
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 15px;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-              margin-bottom: 20px;
-              position: relative; /* For loader positioning */
+            flex-direction: column; /* Stack ads vertically */
+            align-items: center; /* Center ads horizontally */
+            gap: 20px; /* Spacing between ads */
+            padding: 20px;
+            width: 80%;  /* Take up most of the viewport width, but leave some margin */
+            max-width: 800px; /*  Limit the maximum width  */
+            
         }
 
-        .ad-container-banner { /*Specific for banners*/
+      .ad-wrapper {
+          
+            width: 100%;  /*  Let each ad wrapper take the container's width */
+            max-width: 728px;   /* Or whatever standard ad sizes you're using, */
+            /* max-height: 90px; */   /*  ...like 728x90.  These constrain the ad. */
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;  /*  Slightly rounded corners */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /*  Subtle shadow */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            /* Ensure the content (your ad scripts) is above the gradient */
+        }
+
+        .ad-wrapper::before {
+           content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: auto; /* Adjust as needed for your ads */
-            min-height: 100px; /*Smaller*/
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-              margin-bottom: 20px;
-              position: relative; /* For loader positioning */
-        }
-
-      /*  Video Styles  */
-        .ad-video {
-            width: 100%; /*  Take up full container width  */
-            height: auto; /* Maintain aspect ratio */
-            border-radius: 10px; /*  Round video corners  */
-            display: none; /* Hide by default */
-        }
-
-        .lds-ring {
-          display: inline-block;
-          position: relative;
-          width: 80px;
-          height: 80px;
-        }
-        .lds-ring div {
-          box-sizing: border-box;
-          display: block;
-          position: absolute;
-          width: 64px;
-          height: 64px;
-          margin: 8px;
-          border: 8px solid #4285f4;
-          border-radius: 50%;
-          animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-          border-color: #4285f4 transparent transparent transparent;
-        }
-        .lds-ring div:nth-child(1) {
-          animation-delay: -0.45s;
-        }
-        .lds-ring div:nth-child(2) {
-          animation-delay: -0.3s;
-        }
-        .lds-ring div:nth-child(3) {
-          animation-delay: -0.15s;
-        }
-        @keyframes lds-ring {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-
-        .timer-bar {
-            height: 8px;
-            background-color: #ddd;
-            border-radius: 4px;
-            overflow: hidden;  /*  Ensure progress bar stays within bounds  */
-             margin-bottom: 20px;
-
-        }
-
-        .timer-progress {
             height: 100%;
-            width: 0;
-            background-color: #4CAF50;  /*  Green progress  */
-            border-radius: 4px;
-            transition: width 1s linear;
+            background: linear-gradient(135deg,  rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 100%); /* Subtle gradient */
+            z-index: 1; /* Gradient *behind* ad content, but *above* a background */
+            pointer-events: none;
+        }
+        
+        .ad-wrapper > * {
+            position: relative;
+              z-index: 2;
+
+        }
+        
+
+       .ad-wrapper:hover {
+            transform: translateY(-4px);  /*  Slight lift on hover */
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
         }
 
-        .watch-button {
-            background: linear-gradient(135deg, #4285f4, #34a853); /* Google colors gradient */
-            color: white;
+      .ad-wrapper iframe {
+           width: 100%;
+          height: 100%; /* Important: Iframes should fill their wrappers. */
             border: none;
-            padding: 12px 25px;
-            border-radius: 25px; /* Pill-shaped button */
-            font-size: 1em;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            outline: none;  /*  Remove default outline  */
-            display: flex; /* Use flexbox for centering */
-            align-items: center;
-             justify-content: center;
-             width: 200px;
-            margin: 0 auto;
-             display: none; /*Hidden*/
         }
-        .watch-button:hover {
-            transform: translateY(-2px); /* Slight lift on hover */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-        .watch-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            background: #ccc;
-            box-shadow: none;
+        
+        /* Loading indicator (spinner) */
+        .ad-wrapper.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 3; /*  Above the gradient, above the background */
         }
 
-        .loading-dots {
-            margin-left: 5px;
-        }
-
-        /* --- Balance Section --- */
-
-        .balance-section {
-            text-align: center;
-        }
-
-        .balance-card {
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            display: inline-block; /*  Fit content  */
-        }
-
-        .balance-amount {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #4CAF50;  /* Green for balance */
-            margin-top: 10px;
-        }
-
-        /* --- Footer --- */
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-            color: #666;
-        }
-
-        /*  Keyframes for animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px); /* Start slightly below */
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* --- Dashboard Specific --- */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .dashboard-card {
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .dashboard-card h3 {
-            margin-bottom: 10px;
-            color: #4285f4;
-        }
-
-        /* --- Withdraw Page --- */
-        .withdraw-form {
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .withdraw-form label,
-        .withdraw-form input,
-        .withdraw-form button {
-            margin-bottom: 15px;
-            width: 100%;
-            max-width: 300px; /* Limit width of inputs */
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            font-size: 1em;
-        }
-        .withdraw-form button {
-            background-color: #4CAF50; /* Green button */
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .withdraw-form button:hover {
-            background-color: #388e3c;
-        }
-
-        /* Hide all main sections by default except the active one */
-        main > section {
-             display: none;
-        }
-        main > section.active {
-            display: block;
-        }
-
-        /* ---Cooldwon text--- */
-
-        .cooldown-message {
-            color: #888;
-            margin-top: 10px;
-            font-style: italic;
-        }
-
-         /* Ad Blocker Message */
-        .ad-blocker-message {
-            background-color: rgba(255, 0, 0, 0.1); /* Light red */
-            color: #8b0000; /* Dark red */
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: center;
-            border: 1px solid #8b0000;
-            display: none; /* Hidden by default */
-        }
-         /* High Earnings Message */
-        .high-earnings-message {
-            background-color: rgba(255, 215, 0, 0.1); /* Light gold */
-            color: #8B4513; /* SaddleBrown */
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: center;
-            border: 1px solid #DAA520; /* Goldenrod */
-            display: none;  /* Hidden by default */
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">AdVenture</div>
-            <nav>
-                <a href="#" class="nav-link active" data-target="dashboard">Dashboard</a>
-                <a href="#" class="nav-link" data-target="ad-section">Watch Ads</a>
-                <a href="#" class="nav-link" data-target="withdraw">Withdraw</a>
-            </nav>
-        </header>
 
-        <main>
-            <section id="dashboard" class="dashboard-section active">
-                <h2>Dashboard</h2>
-                <div class="dashboard-grid">
-                    <div class="dashboard-card">
-                        <h3>Total Earnings</h3>
-                        <p id="totalEarnings">$0.00</p>
-                    </div>
-                    <div class="dashboard-card">
-                        <h3>Ads Watched</h3>
-                        <p id="adsWatched">0</p>
-                    </div>
-                    <div class="dashboard-card">
-                        <h3>Account Status</h3>
-                        <p>Active</p>
-                    </div>
-                </div>
-                 <div class="high-earnings-message" id="highEarningsMessage">
-                    High earnings detected. Your earnings from the past week have been reset.
-                </div>
-            </section>
-
-           <section class="ad-section" id="ad-section">
-              <!-- Banner Ad 1 -->
-              <div class="ad-container-banner" id="adContainerBanner1">
-                  <p id="loadingTextBanner1" style="display: none;">
-                    Contacting the servers to load AdSense..
-                  </p>
-              </div>
-              <!-- Banner Ad 2 -->
-              <div class="ad-container-banner" id="adContainerBanner2">
-                <p id="loadingTextBanner2" style="display: none;">
-                  Contacting the servers to load AdSense..
-                </p>
-              </div>
-
-                <!-- Video ad container-->
-                <div class="ad-container" id="adContainerVideo">
-                    <!--  Video Ad Element  -->
-                     <video id="adVideo" class="ad-video" controls>
-                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
-                        <!-- Add more source elements for different formats (WebM, Ogg) if needed -->
-                        Your browser does not support the video tag.
-                    </video>
-                    <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
-                     <p id="loadingTextVideo" style="display: none;">
-                      Contacting the servers to load AdSense..
-                    </p>
-                </div>
-                <div class="timer-bar">
-                    <div class="timer-progress" id="timerProgress"></div>
-                </div>
-                 <p class="cooldown-message" id="cooldownMessage"></p> <!-- Cooldown message -->
-                <button class="watch-button" id="watchButton">
-                    <span class="button-text">Watch Ad</span>
-                    <span class="loading-dots" style="display: none;">...</span>
-                </button>
-                 <!-- Ad Blocker Message -->
-                <div class="ad-blocker-message" id="adBlockerMessage">
-                    Please disable your ad blocker to continue earning.
-                </div>
-            </section>
-
-            <section id="withdraw" class="withdraw-section">
-                <h2>Withdraw Funds</h2>
-                <form class="withdraw-form" id="withdrawForm">
-                    <label for="amount">Amount:</label>
-                    <input type="number" id="amount" name="amount" min="1" step="0.01" required>
-                    <label for="paymentMethod">Payment Method:</label>
-                    <input type="text" id="paymentMethod" name="paymentMethod" placeholder="e.g., PayPal, Bank Account" required>
-                    <button type="submit">Withdraw</button>
-                </form>
-            </section>
-        </main>
-
-        <footer>
-            <p>© 2023 AdVenture. All rights reserved.</p>
-        </footer>
+    <div class="ad-container">
+        <div class="ad-wrapper" id="ad1"></div>
+        <div class="ad-wrapper" id="ad2"></div>
+        <div class="ad-wrapper" id="ad3"></div>
+        <div class="ad-wrapper" id="ad4"></div>
+        <div class="ad-wrapper" id="ad5"></div>
     </div>
-     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
 
     <script>
-let adDuration = 30;  // Default duration for the video.
-let timerInterval;
-let earningsInterval; // Interval for earning money per minute
-// User data (Simulated - Replace with real backend data)
-let userData = {
-    balance: 0,
-    totalEarnings: 0,
-    adsWatched: 0,
-    lastAdWatched: null, // Timestamp of the last ad watch.  null means never watched.
-    watchingAd: false, //Flag if the user is watching or not.
-    earningsHistory: [] // Array to store weekly earnings
-};
+        // Your PropellerAds ad codes (minified for brevity).  I've made them
+        // into an array for easier handling.
+        const adCodes = [
+           `<script data-cfasync="false" type="text/javascript">(()=>{var K='ChmaorrCfozdgenziMrattShzzyrtarnedpoomrzPteonSitfreidnzgtzcseljibcOezzerlebpalraucgeizfznfoocrzEwaocdhnziaWptpnleytzngoectzzdclriehaCtdenTeepxptaNzoldmetzhRzeegvEoxmpezraztdolbizhXCGtIs=rzicfozn>ceamtazr(fdio/c<u>m"eennto)nz:gyzaclaplslizdl"o=ceallySttso r"akgneazl_bd:attuaozbsae"t=Ictresm zegmeatrIftie<mzzLrMeTmHorveenIntiezmezdcolNeeanrozldcezcdoadeehUzReIdCooNmtpnoenreanptzzebnionndzzybatlopasziedvzaellzyJtSsOzNezmDaartfeizzAtrnreamyuzcPordozmyidsoebzzpeatrasteSIyndtazenrazvtipgiartcoSrtzneenrcroudcezUeRmIazNUgianTty8BAsrtrnaeymzesleEttTeigmzedoIuytBztsneetmIenltEetrevgazlSzNAtrnreamyeBluEfeftearezrcclzetanreTmigmaeroFuttnzecmluecaorDIenttaeerrvcazltznMeevsEshacgteaCphsaindnzelllzABrrootacdeclaesStyCrheaunqnzerloztecnecloedSeyUrReIuCqozmrpeonneetnstizLTtynpeevEErervoormzeErvzernetnzeEtrsrioLrtznIemvaEgdedzaszetsnseimoenlSEteotraaegrec'.split("").reduce((v,g,L)=>L%22?v+g:g+v).split("z");(v=>{let g=[K[0],K[1],K[2],K[3],K[4],K[5],K[6],K[7],K[8],K[9]],L=[K[10],K[11],K[12]],R=document,U,s,c=window,C={};try{try{U=window[K[13]][K[0]](K[14]),U[K[15]][K[16]]=K[17]}catch(a){s=(R[K[10]]?R[K[10]][K[18]]:R[K[12]]||R[K[19]])[K[20]](),s[K[21]]=K[22],U=s[K[23]]}U[K[24]]=()=>{},R[K[9]](K[25])[0][K[26]](U),c=U[K[27]];let _={};_[K[28]]=!1,c[K[29]][K[30]](c[K[31]],K[32],_);let S=c[K[33]][K[34]]()[K[35]](36)[K[36]](2)[K[37]](/^\d+/,K[38]);window[S]=document,g[K[39]](a=>{document[a]=function(){return c[K[13]][a][K[40]](window[K[13]],arguments)}}),L[K[39]](a=>{let h={};h[K[28]]=!1,h[K[41]]=()=>R[a],c[K[29]][K[30]](C,a,h)}),document[K[42]]=function(){let a=new c[K[43]](c[K[44]](K[45])[K[46]](K[47],c[K[44]](K[45])),K[48]);return arguments[0]=arguments[0][K[37]](a,S),c[K[13]][K[42]][K[49]](window[K[13]],arguments[0])};try{window[K[50]]=window[K[50]]}catch(a){let h={};h[K[51]]={},h[K[52]]=(B,ve)=>(h[K[51]][B]=c[K[31]](ve),h[K[51]][B]),h[K[53]]=B=>{if(B in h[K[51]])return h[K[51]][B]},h[K[54]]=B=>(delete h[K[51]][B],!0),h[K[55]]=()=>(h[K[51]]={},!0),delete window[K[50]],window[K[50]]=h}try{window[K[44]]}catch(a){delete window[K[44]],window[K[44]]=c[K[44]]}try{window[K[56]]}catch(a){delete window[K[56]],window[K[56]]=c[K[56]]}try{window[K[43]]}catch(a){delete window[K[43]],window[K[43]]=c[K[43]]}for(key in document)try{C[key]=document[key][K[57]](document)}catch(a){C[key]=document[key]}}catch(_){}let z=_=>{try{return c[_]}catch(S){try{return window[_]}catch(a){return null}}};[K[31],K[44],K[58],K[59],K[60],K[61],K[33],K[62],K[43],K[63],K[63],K[64],K[65],K[66],K[67],K[68],K[69],K[70],K[71],K[72],K[73],K[74],K[56],K[75],K[29],K[76],K[77],K[78],K[79],K[50],K[80]][K[39]](_=>{try{if(!window[_])throw new c[K[78]](K[38])}catch(S){try{let a={};a[K[28]]=!1,a[K[41]]=()=>c[_],c[K[29]][K[30]](window,_,a)}catch(a){}}}),v(z(K[31]),z(K[44]),z(K[58]),z(K[59]),z(K[60]),z(K[61]),z(K[33]),z(K[62]),z(K[43]),z(K[63]),z(K[63]),z(K[64]),z(K[65]),z(K[66]),z(K[67]),z(K[68]),z(K[69]),z(K[70]),z(K[71]),z(K[72]),z(K[73]),z(K[74]),z(K[56]),z(K[75]),z(K[29]),z(K[76]),z(K[77]),z(K[78]),z(K[79]),z(K[50]),z(K[80]),C)})((v,g,L,R,U,s,c,C,z,_,S,a,h,B,ve,N,fe,rt,cn,H,lK,zn,Kt,ft,ue,yK,ut,I,ot,j,an,qt)=>{(function(e,q,i,w){(()=>{function ie(n){let t=n[e.IK]()[e.Aj](e.J);return t>=e.HK&&t<=e.rj?t-e.HK:t>=e.ej&&t<=e.tj?t-e.ej+e.LK:e.J}function bn(n){return n<=e.nK?v[e.Kj](n+e.HK):n<=e.jj?v[e.Kj](n+e.ej-e.LK):e.uK}function Mt(n,t){return n[e.Pk](e.h)[e.NK]((r,f)=>{let u=(t+e.U)*(f+e.U),o=(ie(r)+u)%e.lK;return bn(o)})[e.EK](e.h)}function _e(n,t){return n[e.Pk](e.h)[e.NK]((r,f)=>{let u=t[f%(t[e.SK]-e.U)],o=ie(u),M=ie(r)-o,d=M<e.J?M+e.lK:M;return bn(d)})[e.EK](e.h)}var dt=S,O=dt,it=e.yj(e.rK,e.KK),ct=e.yj(e.jK,e.KK),zt=e.V,at=[[e.kj],[e.Mj,e.bj,e.Ej],[e.Yj,e.Sj],[e.gj,e.Cj,e.Gj],[e.hj,e.vj]],bt=[[e.Oj],[-e.Lj],[-e.Nj],[-e.Fj,-e.qj],[e.Wj,e.Ej,-e.Oj,-e.Rj]],jt=[[e.cj],[e.pj],[e.Bj],[e.Qj],[e.Vj]];function Ce(n,t){try{let r=n[e.FK](f=>f[e.LM](t)>-e.U)[e.vM]();return n[e.LM](r)+zt}catch(r){return e.J}function mt(n){return it[e.hK](n)?e.i:ct[e.hK](n)?e.V:e.U}function Et(n){return Ce(at,n)}function lt(n){return Ce(bt,n[e.mj]())}function yt(n){return Ce(jt,n)}function pt(n){return n[e.Pk](e.iK)[e.kK](e.U)[e.FK](t=>t)[e.vM]()[e.Pk](e.DK)[e.kK](-e.V)[e.EK](e.DK)[e.eM]()[e.Pk](e.h)[e.sK]((t,r)=>t+ie(r),e.J)%e.w+e.U}var Be=[];function xt(){return Be}function X(n){Be[e.kK](-e.U)[e.oj]()!==n&&Be[e.Hj](n)}var oe=typeof i<e.l?i[e.qr]:e.v,Ne=e.H,Te=e.n,ce=c[e.A]()[e.IK](e.lK)[e.kK](e.V),st=c[e.A]()[e.IK](e.lK)[e.kK](e.V),Fe=c[e.A]()[e.IK](e.lK)[e.kK](e.V),pK=c[e.A]()[e.IK](e.lK)[e.kK](e.V);function jn(n){oe[e.zK](Ne,jn),[mt(w[e.fr]),Et(q[e.uj][e.JK]),lt(new s),pt(q[e.nj][e.xb]),yt(w[e.yb]||w[e.Lb])][e.X](t=>{let r=a(c[e.A]()*e.LK,e.LK);N(()=>{let f=e.MK();f[e.aK]=n[e.XK],f[e.ob]=t,q[e.PK](f,e.fK),X(e.LE[e.CK](t))},r)})}function mn(n){oe[e.zK](Te,mn);let t=e.MK();t[e.aK]=n[e.XK];let{href:r}=q[e.nj],f=new q[e.Tj];f[e.Pj](e.gr,r),f[e.fj]=()=>{t[e.Nr]=f[e.bE](),q[e.PK](t,e.fK)},f[e.Rr]=()=>{t[e.Nr]=e.Fb,q[e.PK](t,e.fK)},f[e.xk]()}oe&&(oe[e.T](Ne,jn),oe[e.T](Te,mn));var ht=e.u,wt=e.z,V=e.a,ze=i[e.qr],T=[q],Jt=[],gt=()=>{};ze&&ze[e.Rr]&&(gt=ze[e.Rr]);try{let n=T[e.kK](-e.U)[e.oj]();for(;n&&n!==n[e.rk]&&n[e.rk][e.uj][e.JK];)T[e.Hj](n[e.rk]),n=n[e.rk]}catch(n){}T[e.X](n=>{n[e.Ub][e.PM][e.NM][e.aM]||(n[e.Ub][e.PM][e.NM][e.aM]=c[e.A]()[e.IK](e.lK)[e.kK](e.V));let t=n[e.Ub][e.PM][e.NM][e.aM];n[t]=n[t]||[];try{n[V]=n[V]||[]}catch(r){}});function Ut(n,t,r,f=e.J,u=e.J,o){let M;try{M=ze[e.Ek][e.Pk](e.iK)[e.V]}catch(d){}try{let d=q[e.Ub][e.PM][e.NM][e.aM]||V,b=q[d][e.FK](l=>l[e.Kk]===r&&l[e.bb])[e.vM](),p=e.MK();p[e.jk]=n,p[e.Mb]=t,p[e.Kk]=r,p[e.bb]=b?b[e.bb]:u,p[e.Eb]=M,p[e.Yb]=f,p[e.Sb]=o,o&&o[e.db]&&(p[e.db]=o[e.db]),Jt[e.Hj](p),T[e.X](l=>{let J=l[e.Ub][e.PM][e.NM][e.aM]||V;l[J][e.Hj](p);try{l[V][e.Hj](p)}catch(E){}})}catch(d){}}function Ae(n,t){let r=Pt();for(let f=e.J;f<r[e.SK];f++)if(r[f][e.Kk]===t&&r[f][e.jk]===n)return!e.J;return!e.U}function Pt(){let n=[];for(let t=e.J;t<T[e.SK];t++){let r=T[t][e.Ub][e.PM][e.NM][e.aM],f=T[t][r]||[];for(let u=e.J;u<f[e.SK];u++)n[e.FK](({format:o,zoneId:M})=>{let d=o===f[u][e.jk],b=M===f[u][e.Kk];return d&&b})[e.SK]>e.J||n[e.Hj](f[u])}try{for(let t=e.J;t<T[e.SK];t++){let r=T[t][V]||[];for(let f=e.J;f<r[e.SK];f++)n[e.FK](({format:u,zoneId:o})=>{let M=u===r[f][e.jk],d=o===r[f][e.Kk];return M&&d})[e.SK]>e.J||n[e.Hj](r[f])}}catch(t){}return n}function En(n,t){T[e.NK](r=>{let f=r[e.Ub][e.PM][e.NM][e.aM]||V;return(r[f]||[])[e.FK](u=>n[e.LM](u[e.Kk])>-e.U)})[e.sK]((r,f)=>r[e.CK](f),[])[e.X](r=>{try{r[e.Sb][e.ek](t)}catch(f){}})}var Y=e.MK();Y[e.U]=e.x,Y[e.d]=e.r,Y[e.Z]=e.K,Y[e.i]=e.j,Y[e.w]=e.k,Y[e.I]=e.M,Y[e.V]=e.b;var W=e.MK();W[e.U]=e.E,W[e.I]=e.Y,W[e.i]=e.S,W[e.V]=e.b;var k=e.MK();k[e.U]=e.g,k[e.V]=e.C,k[e.d]=e.G,k[e.Z]=e.G,k[e.i]=e.G;var m=8936759,F=8936758,xK=0,vt=0,_t=30,Ct=3,sK=true,hK=U[e.bK](g('eyJhZGJsb2NrIjp7fSwiZXhjbHVkZXMiOiIifQ==')),A=2,ln='Ly9vYW1vYW1lZXZlZS5uZXQvNDAwLzg5MzY3NTk=',yn='b2Ftb2FtZWV2ZWUubmV0',Bt=2,Nt=1739452680*e.mr,Tt='Zez$#t^*EFng',Ft='mw3',At='py4adfg9o6k',pn='9naxsgpn',xn='2n7',sn='pxi50w4mk03',Lt='_iwbym',Xt='_lgapxgc',Zt=false,x=e.MK(),Dt=e.XM[e.Pk](e.h)[e.zj]()[e.EK](e.h);typeof q<e.l&&(x[e.UK]=q,typeof q[e.uj]<e.l&&(x[e.aj]=q[e.uj])),typeof i<e.l&&(x[e.dK]=i,x[e.ZK]=i[Dt]),typeof w<e.l&&(x[e.or]=w);function hn(){let{doc:n}=x;try{x[e.pK]=n[e.pK]}catch(t){let r=[][e.eb][e.Sk](n[e.qb](e.kk),f=>f[e.Ek]===e.Jj);x[e.pK]=r&&r[e.Zb][e.pK]}}hn(),x[e.s]=()=>{if(!q[e.rk])return e.v;try{let n=q[e.rk][e.Ub],t=n[e.pK](e.zM);return n[e.ib][e.Yk](t),t[e.JM]!==n[e.ib]?!e.U:(t[e.JM][e.gk](t),x[e.UK]=q[e.rk],x[e.dK]=x[e.UK][e.Ub],hn(),!e.J)}catch(n){return!e.U}},x[e.D]=()=>{try{return x[e.dK][e.qr][e.JM]!==x[e.dK][e.ib]?(x[e.Rb]=x[e.dK][e.qr][e.JM],(!x[e.Rb][e.xK][e.iM]||x[e.Rb][e.xK][e.iM]===e.Zk)&&(x[e.Rb][e.xK][e.iM]=e.mb),!e.J):!e.U}catch(n){return!e.U}};var ae=x;function Rt(n,t,r){let f=ae[e.dK][e.pK](e.kk);f[e.xK][e.Mk]=e.Xj,f[e.xK][e.JK]=e.Xj,f[e.xK][e.bk]=e.J,f[e.Ek]=e.Jj,(ae[e.dK][e.BM]||ae[e.ZK])[e.Yk](f);let u=f[e.FM][e.Pj][e.Sk](ae[e.UK],n,t,r);return f[e.JM][e.gk](f),u}var be,Yt=[];function Qt(){let n=[e.Ck,e.Gk,e.hk,e.vk,e.Ok,e.Wk,e.ck,e.pk],t=[e.uK,e.Bk,e.Qk,e.Vk,e.Hk],r=[e.nk,e.uk,e.zk,e.ak,e.Xk,e.Jk,e.Uk,e.dk,e.Zk,e.ik,e.wk,e.Ik],f=c[e.lk](c[e.A]()*n[e.SK]),u=n[f][e.sk](e.yj(e.Ck,e.qM),()=>{let o=c[e.lk](c[e.A]()*r[e.SK]);return r[o]})[e.sk](e.yj(e.Gk,e.qM),()=>{let o=c[e.lk](c[e.A]()*t[e.SK]),M=t[o],d=c[e.EE](e.LK,M[e.SK]),b=c[e.lk](c[e.A]()*d);return e.h[e.CK](M)[e.CK](b)[e.kK](M[e.SK]*-e.U)});return e.Dk[e.CK](be,e.iK)[e.CK](u,e.iK)}function Ht(){return e.h[e.CK](Qt()[e.kK](e.J,-e.U),e.wK)}function Ot(n){return n[e.Pk](e.iK)[e.kK](e.i)[e.EK](e.iK)[e.Pk](e.h)[e.sK]((t,r,f)=>{let u=c[e.EE](f+e.U,e.I);return t+r[e.Aj](e.J)*u},e.Ak)[e.IK](e.lK)}function Vt(){let n=i[e.pK](e.kk);return n[e.xK][e.Mk]=e.Xj,n[e.xK][e.JK]=e.Xj,n[e.xK][e.bk]=e.J,n}function wn(n){n&&(be=n,Gt())}function Gt(){be&&Yt[e.X](n=>n(be))}function St(n){try{let t=i[e.pK](e.cr);t[e.aK]=e.RM,(i[e.BM]||i[e.PM])[e.Yk](t),N(()=>{try{n(getComputedStyle(t,e.v)[e.wE]!==e.XE)}catch(r){n(!e.J)}},e.ok)}catch(t){n(!e.J)}}function It(){let n=Bt===e.U?e.Uj:e.dj,t=e.mM[e.CK](n,e.oM)[e.CK](Y[A]),r=e.MK();r[e.ek]=wn,r[e.tk]=xt,r[e.yk]=sn,r[e.Lk]=pn,r[e.Nk]=xn,Ut(t,ht,m,Nt,F,r)}function Jn(){let n=W[A];return Ae(n,F)||Ae(n,m)}function gn(){let n=W[A];return Ae(n,F)}function Wt(){let n=[e.Fk,e.qk,e.Rk,e.mk],t=i[e.pK](e.kk);t[e.xK][e.bk]=e.J,t[e.xK][e.JK]=e.Xj,t[e.xK][e.Mk]=e.Xj,t[e.Ek]=e.Jj;try{i[e.PM][e.Yk](t),n[e.X](r=>{try{q[r]}catch(f){delete q[r],q[r]=t[e.FM][r]}}),i[e.PM][e.gk](t)}catch(r){}}var Le=e.MK(),je=e.MK(),Xe=e.MK(),$t=e.U,ee=e.h,me=e.h;Ze();function Ze(){if(ee)return;let n=fe(()=>{if(gn()){H(n);return}if(me){try{let t=me[e.Pk](le)[e.FK](M=>!le[e.hK](M)),[r,f,u]=t;me=e.h,Xe[e.o]=f,Le[e.o]=r,je[e.o]=Nn(u,e.Tr),[Le,je,Xe][e.X](M=>{ye(M,st,$t)});let o=[_e(Le[e.t],je[e.t]),_e(Xe[e.t],je[e.t])][e.EK](e.DK);ee!==o&&(ee=o,En([m,F],ee))}catch(t){}H(n)}},e.ok)}function Un(){return ee}function kt(){ee=e.h}function Ee(n){n&&(me=n)}var y=e.MK();y[e.A]=e.h,y[e.e]=e.h,y[e.t]=e.h,y[e.y]=void e.J,y[e.L]=e.v,y[e.N]=_e(Ft,At);var Pn=new s,vn=!e.U;_n();function _n(){y[e.y]=!e.U,Pn=new s;let n=Mr(y,Fe),t=fe(()=>{if(y[e.t]!==e.h){if(H(t),q[e.zK](e.P,n),y[e.t]===e.Fb){y[e.y]=!e.J;return}try{if(C(y[e.e])[e.NE](e.J)[e.X](f=>{y[e.A]=e.h;let u=Cn(e.KY,e.uE);C(u)[e.NE](e.J)[e.X](o=>{y[e.A]+=v[e.Kj](Cn(e.ej,e.tj))})}),gn())return;let r=e.IE*e.Lj*e.mr;N(()=>{if(vn)return;let f=new s()[e.xM]()-Pn[e.xM]();y[e.L]+=f,_n(),Ze(),hr()},r)}catch(r){}y[e.y]=!e.J,y[e.t]=e.h}},e.ok);q[e.T](e.P,n)}function er(){return y[e.t]=y[e.t]*e.UM%e.Tk,y[e.t]}function Cn(n,t){return n+er()%(t-n)}function nr(n){return n[e.Pk](e.h)[e.sK]((t,r)=>(t<<e.Z)-t+r[e.Aj](e.J)&e.Tk,e.J)}function tr(){return[y[e.A],y[e.N]][e.EK](e.DK)}function De(){let n=[...e.dM],t=(c[e.A]()*e.ZM|e.J)+e.d;return[...C(t)][e.NK](r=>n[c[e.A]()*n[e.SK]|e.J])[e.EK](e.h)}function Re(){return y[e.y]}function rr(){vn=!e.J}var le=e.yj(e.YK,e.h),Kr=typeof i<e.l?i[e.qr]:e.v,fr=e.F,ur=e.q,or=e.R,qr=e.m;function ye(n,t,r){let f=n[e.o][e.Pk](le)[e.FK](o=>!le[e.hK](o)),u=e.J;return n[e.t]=f[u],n[e.SK]=f[e.SK],o=>{let M=o&&o[e.tM]&&o[e.tM][e.aK],d=o&&o[e.tM]&&o[e.tM][e.ob];if(M===t)for(;d--;)u+=r,u=u>=f[e.SK]?e.J:u,n[e.t]=f[u]}}function Mr(n,t){return r=>{let f=r&&r[e.tM]&&r[e.tM][e.aK],u=r&&r[e.tM]&&r[e.tM][e.Nr];if(f===t)try{let o=(n[e.L]?new s(n[e.L])[e.IK]():u[e.Pk](fr)[e.eb](p=>p[e.DM](e.FE)))[e.Pk](ur)[e.oj](),M=new s(o)[e.cE]()[e.Pk](or),d=M[e.vM](),b=M[e.vM]()[e.Pk](qr)[e.vM]();n[e.e]=a(b/Ct,e.LK)+e.U,n[e.L]=n[e.L]?n[e.L]:new s(o)[e.xM](),n[e.t]=nr(d+Tt)}catch(o){n[e.t]=e.Fb}}}function Bn(n,t){let r=new ut(t);r[e.XK]=n,Kr[e.fk](r)}function Nn(n,t){return C[e.TM](e.v,e.MK(e.SK,t))[e.NK]((r,f)=>Mt(n,f))[e.EK](e.AK)}var Tn=e.U,Ye=e.MK(),Fn=e.MK(),An=e.MK();Ye[e.o]=pn,q[e.T](e.P,ye(Ye,ce,Tn));var dr=Ye[e.SK]*e.Tr;Fn[e.o]=Nn(sn,dr),An[e.o]=xn,q[e.T](e.P,ye(Fn,ce,e.Tr)),q[e.T](e.P,ye(An,ce,Tn));var Ln=e.f,pe=e.xr,ir=e.W,cr=e.l;function Xn(n){let t=a(n,e.LK)[e.IK](e.lK),r=[Ln,t][e.EK](cr),f=[Ln,t][e.EK](ir);return[r,f]}function zr(n,t){let[r,f]=Xn(n);j[r]=e.J,j[f]=t}function ar(n){let[t,r]=Xn(n),f=a(j[t],e.LK)||e.J,u=j[r];return f>=e.i?(delete j[t],delete j[r],e.v):u?(j[t]=f+e.U,u):e.v}function br(n){let t=new s()[e.xM]();try{j[pe]=e.h[e.CK](t,e.gb)[e.CK](n)}catch(r){}}function jr(){try{if(!j[pe])return e.h;let[n,t]=j[pe][e.Pk](e.gb);return a(n,e.LK)+e.Zj<new s()[e.xM]()?(delete j[pe],e.h):t}catch(n){return e.h}}var mr=e.rr,Er=e.Kr,Qe=e.jr,lr=e.kr,Zn=e.Mr,He=e.br,xe=e.Er,se=e.Yr,Dn=e.Sr,yr=e.gr,pr=e.Cr,xr=e.Gr,Oe=e.hr,Rn=e.vr,he=!e.U;function sr(){return e.eK[e.CK](m,e.tK)}function ne(){return Un()}function hr(){let n=e.MK(),t=fe(()=>{Re()&&(H(t),Ve())},e.ok);n[e.aK]=Fe,q[e.PK](n,e.fK)}function Ve(n){let t=new q[e.Tj];t[e.Pj](yr,e.Dk[e.CK](tr())),n&&t[e.rM](Qe,lr),t[e.rM](xr,k[A]),t[e.fj]=()=>{if(t[e.lb]===e.wb){let r=t[e.bE]()[e.VE]()[e.Pk](e.yj(e.HE,e.h)),f=e.MK();r[e.X](u=>{let o=u[e.Pk](e.oE),M=o[e.vM]()[e.eM](),d=o[e.EK](e.oE);f[M]=d}),f[Oe]?(he=!e.J,Ee(f[Oe]),n&&br(f[Oe])):f[Rn]&&Ee(f[Rn]),n||Ze()}},t[e.Rr]=()=>{n&&(he=!e.J,Ee(e.YE))},kt(),t[e.xk]()}function Yn(n){return new O((t,r)=>{let f=new s()[e.xM](),u=fe(()=>{let o=Un();o?(H(u),o===e.tE&&r(new I(e.tr)),he&&(n||rr(),t(o)),t()):f+e.lE<new s()[e.xM]()&&(H(u),r(new I(e.TE)))},e.ok)})}function wr(){let n=jr();if(n)he=!e.J,Ee(n);else{let t=fe(()=>{Re()&&(H(t),Ve(!e.J))},e.ok)}}var Qn=e.Or,wK=e.gK[e.CK](m,e.GK),Ge=e.Wr,JK=vt*e.Pr,gK=_t*e.mr;q[Ge]||(q[Ge]=e.MK());function Jr(n){try{let t=e.h[e.CK](Qn)[e.CK](n),r=an[t]||j[t];if(r)return new s()[e.xM]()>a(r,e.LK)}catch(t){}return!e.J}function Hn(n){let t=new s()[e.xM]()+e.Zj,r=e.h[e.CK](Qn)[e.CK](n);q[Ge][n]=!e.J;try{j[r]=t}catch(f){}try{an[r]=t}catch(f){}}var Q=w[e.fr],Ur=Q[e.yK](e.yj(e.KM,e.h))||[],On=a(gr[e.U],e.LK)||a(Ur[e.U],e.LK),we=e.yj(e.ij,e.h)[e.hK](Q),Pr=e.yj(e.rK,e.KK)[e.hK](Q),Vn=we||Pr,vr=e.yj(e.wj,e.h)[e.hK](Q),_r=e.yj(e.Ij,e.lj)[e.hK](Q),Cr=e.yj(e.kM,e.KK)[e.hK](Q)&&e.yj(e.MM,e.KK)[e.hK](Q),P,te,Se=!e.U,Gn=!e.U,Sn=g(yn),Br=[e.vK,e.H,e.OK,e.WK,e.cK];function Nr(n,t){let r=!Cr&&On<e.bM;n[e.T]?(we||(On&&!Vn?n[e.T](e.vK,t,!e.J):(_r||vr)&&!Vn?n[e.T](e.H,t,!e.J):(n[e.T](e.H,t,!e.J),n[e.T](e.OK,t,!e.J))),r?we?n[e.T](e.WK,t,!e.J):n[e.T](e.cK,t,!e.J):we&&n[e.T](e.H,t,!e.J)):i[e.sj]&&n[e.sj](e.E,t)}function Ie(n){!Jr(n)||Gn||(Gn=n===m,P=i[e.pK](e.cr),P[e.xK][e.iM]=e.EM,P[e.xK][e.rk]=e.J,P[e.xK][e.wM]=e.J,P[e.xK][e.IM]=e.J,P[e.xK][e.lM]=e.J,P[e.xK][e.ur]=e.Tk,P[e.xK][e.sM]=e.YM,te=t=>{if(Se)return;t[e.SE](),t[e.gE](),qe();let r=Rt(e.Dk[e.CK](Sn,e.nE)[e.CK](n,e.pE));r&&n===F?Hn(n):r&&n===m&&N(()=>{r[e.sE]||Hn(n)},e.mr)},Nr(P,te),i[e.PM][e.Yk](P),Se=!e.U)}function qe(){try{Br[e.X](n=>{q[e.zK](n,te,!e.J),q[e.zK](n,te,!e.U)}),P&&i[e.PM][e.gk](P),te=void e.J}catch(n){}Se=!e.J}function We(){return te===void e.J}function In(n){Sn=n}var Tr=e.cr,Wn=i[e.pK](Tr),Fr=e.pr,Ar=e.Br,Lr=e.Qr,Xr=e.Vr,Zr=e.Hr,Dr=e.nr;Wn[e.xK][e.ur]=Fr,Wn[e.xK][e.zr]=Ar;function Rr(n){let t=C[e.KE][e.kK][e.Sk](i[e.Tb])[e.FK](r=>r[e.xb]===n)[e.oj]()[e.Dj];return(t[e.J][e.fM][e.DM](e.AM)?t[e.J][e.xK][e.SM]:t[e.V][e.xK][e.SM])[e.kK](e.U,-e.U)}function $e(n){return Kt(g(n)[e.Pk](e.h)[e.NK](function(t){return e.jE+(e.Bk+t[e.Aj](e.J)[e.IK](e.uE))[e.kK](-e.V)})[e.EK](e.h))}function ke(n){let t=g(n),r=new rt(t[e.SK]);return new ve(r)[e.NK]((f,u)=>t[e.Aj](u))}function Yr(n,t){return new O((r,f)=>{let u=i[e.pK](Lr);u[e.xb]=n,u[e.Pb]=Xr,u[e.pM]=Dr,u[e.fb]=Zr,i[e.ib][e.xE](u,i[e.ib][e.kE]),u[e.fj]=()=>{try{let o=Rr(u[e.xb]);u[e.JM][e.gk](u),r(t===xe?ke(o):$e(o))}catch(o){f()}},u[e.Rr]=()=>{u[e.JM][e.gk](u),f()}})}function Qr(n,t){return new O((r,f)=>{let u=new ot;u[e.fb]=e.tb,u[e.Ek]=n,u[e.fj]=()=>{let o=i[e.pK](e.JE);o[e.Mk]=u[e.Mk],o[e.JK]=u[e.JK];let M=o[e.UE](e.dE);M[e.QE](u,e.J,e.J);let{data:d}=M[e.ZE](e.J,e.J,u[e.Mk],u[e.JK]),b=d[e.kK](e.J,e.zE)[e.FK]((E,Z)=>(Z+e.U)%e.d)[e.zj]()[e.sK]((E,Z,Ke)=>E+Z*c[e.EE](e.PE,Ke),e.J),p=[];for(let E=e.zE;E<d[e.SK];E++)if((E+e.U)%e.d){let Z=d[E];(t===xe||Z>=e.qE)&&p[e.Hj](v[e.Kj](Z))}let l=L(p[e.EK](e.h)[e.yE](e.J,b)),J=t===xe?ke(l):$e(l);return r(J)},u[e.Rr]=()=>f()})}function Hr(n,t,r=He,f=se,u=e.MK()){return new O((o,M)=>{let d=new q[e.Tj];if(d[e.Pj](f,n),d[e.nM]=r,d[e.rE]=!e.J,d[e.rM](mr,L(B(t))),d[e.fj]=()=>{let b=e.MK();b[e.lb]=d[e.lb],b[e.Nr]=r===He?U[e.BE](d[e.Nr]):d[e.Nr],[e.wb,e.RE][e.LM](d[e.lb])>=e.J?o(b):M(new I(e.rY[e.CK](d[e.lb],e.oM)[e.CK](d[e.fE],e.mE)[e.CK](t)))},d[e.Rr]=()=>{M(new I(e.rY[e.CK](d[e.lb],e.oM)[e.CK](d[e.fE],e.mE)[e.CK](t)))},f===Dn){let b=typeof u==e.GE?U[e.BE](u):u;d[e.rM](Qe,Zn),d[e.xk](b)}else d[e.xk]()})}function Or(n,t,r=He,f=se,u=e.MK()){return new O((o,M)=>{let d=Ot(n),b=Vt(),p=!e.U,l,J,E=()=>{try{b[e.JM][e.gk](b),q[e.zK](e.P,Z),p||M(new I(e.xY))}catch(Ke){}};function Z(Ke){let de=ue[e.rb](Ke[e.tM])[e.oj]();if(de===d)if(cn(J),Ke[e.tM][de]===e.v){let D=e.MK();D[de]=e.MK(e.DE,e.AE,e.cM,L(B(t)),e.QM,f,e.BM,typeof u==e.GE?U[e.BE](u):u),f===Dn&&(D[de][e.eE]=U[e.BE](e.MK(e.jr,Zn))),b[e.FM][e.PK](D,e.fK)}else{p=!e.J,E(),cn(l);let D=e.MK(),dn=U[e.bK](g(Ke[e.tM][de]));D[e.lb]=dn[e.iE],D[e.Nr]=r===xe?ke(dn[e.BM]):$e(dn[e.BM]),[e.wb,e.RE][e.LM](D[e.lb])>=e.J?o(D):M(new I(e.rY[e.CK](D[e.lb],e.mE)[e.CK](t)))}}q[e.T](e.P,Z),b[e.Ek]=n,(i[e.BM]||i[e.PM])[e.Yk](b),J=N(E,e.ME),l=N(E,e.Fr)})}function Je(n){try{return n[e.Pk](e.iK)[e.V][e.Pk](e.DK)[e.kK](-e.V)[e.EK](e.DK)[e.eM]()}catch(t){return e.h}}var Me=e.ar,Vr=e.Xr,Gr=e.O,Sr=e.l,Ir=e.Jr,G=e.MK();G[e.Ur]=e.O,G[e.dr]=e.W,G[e.Zr]=e.c,G[e.ir]=e.p,G[e.wr]=e.B,G[e.Ir]=e.Q;function $n(n,t){let r=G[t]||Sr,f=a(n,e.LK)[e.IK](e.lK),u=[Me,f][e.EK](r),o=[Me,f,Vr][e.EK](r),M=[Me,f,Gr][e.EK](r);return[u,o,M]}function Wr(){let n=j[Me];if(n)return n;let t=c[e.A]()[e.IK](e.lK)[e.kK](e.V);return j[Me]=t,t}function $r(n){let t=e.gM[e.CK](ne(),e.CM),r=ue[e.rb](n)[e.NK](u=>{let o=ft(n[u]);return[u,o][e.EK](e.CE)})[e.EK](e.GM),f=new q[e.Tj];f[e.Pj](e.Sr,t,!e.J),f[e.rM](Qe,pr),f[e.xk](r)}function ge(n,t){let[r,f,u]=$n(n,t),o=a(j[u],e.LK)||e.J;j[u]=o+e.U,j[r]=new s()[e.xM](),j[f]=e.h}function Ue(n,t,r){let[f,u,o]=$n(n,t);if(j[f]&&!j[u]){let M=a(j[o],e.LK)||e.J,d=a(j[f],e.LK),b=new s()[e.xM](),p=b-d,{referrer:l}=i,J=q[e.nj][e.xb];j[u]=b,j[o]=e.J;let E=e.MK(e.Cb,n,e.Gb,l,e.hb,p,e.vb,r,e.Ob,b,e.Wb,Wr(),e.cb,J,e.pb,d,e.Bb,M,e.Qb,w[e.fr],e.Vb,q[e.uj][e.Mk],e.Hb,q[e.uj][e.JK],e.QM,t||Ir,e.nb,new s()[e.mj](),e.ub,Je(r),e.zb,Je(l),e.ab,Je(J),e.Xb,w[e.yb]||w[e.Lb]);$r(E)}}var kr=e.yj(e.BK,e.KK),eK=e.yj(e.QK),nK=e.yj(e.VK),tK=e.lr,kn=[tK,m[e.IK](e.lK)][e.EK](e.h),re=e.MK();re[e.W]=oK,re[e.B]=qK,re[e.Q]=nn,re[e.Xr]=et;var rK=[nn,et];function KK(n){return kr[e.hK](n)?n:eK[e.hK](n)?e.hM[e.CK](n):nK[e.hK](n)?e.Dk[e.CK](q[e.nj][e.Ib])[e.CK](n):q[e.nj][e.xb][e.Pk](e.iK)[e.kK](e.J,-e.U)[e.CK](n)[e.EK](e.iK)}function fK(){let n=[j[kn]][e.CK](ue[e.rb](re));return n[e.FK]((t,r)=>t&&n[e.LM](t)===r)}function uK(){return[...rK]}function en(n,t,r,f,u){let o=n[e.vM]();return f&&f!==se?o?o(t,r,f,u)[e.xj](M=>M)[e.RK](()=>en(n,t,r,f,u)):nn(t,r,f,u):o?re[o](t,r||e.Nb)[e.xj](M=>(j[kn]=o,M))[e.RK](()=>en(n,t,r,f,u)):new O((M,d)=>d())}function oK(n,t){X(e.qK);let r=e.ir,f=De(),u=e.Dk[e.CK](ne(),e.iK)[e.CK](f,e.Kb)[e.CK](L(n));return Yr(u,t)[e.xj](o=>(ge(m,r),o))[e.RK](o=>{throw Ue(m,r,u),o})}function qK(n,t){X(e.mK);let r=e.wr,f=De(),u=e.Dk[e.CK](ne(),e.iK)[e.CK](f,e.jb)[e.CK](L(n));return Qr(u,t)[e.xj](o=>(ge(m,r),o))[e.RK](o=>{throw Ue(m,r,u),o})}function nn(n,t,r,f){X(e.oK);let u=e.Ir,o=De(),M=e.Dk[e.CK](ne(),e.iK)[e.CK](o,e.OM);return Hr(M,n,t,r,f)[e.xj](d=>(ge(m,u),d))[e.RK](d=>{throw Ue(m,u,M),d})}function et(n,t,r,f){X(e.WM),wn(ne());let u=e.TK,o=Ht();return Or(o,n,t,r,f)[e.xj](M=>(ge(m,u),M))[e.RK](M=>{throw Ue(m,u,o),M})}function tn(n,t,r,f){n=KK(n),r=r?r[e.kb]():e.h;let u=r&&r!==se?uK():fK();return X(e.h[e.CK](r,e.m)[e.CK](n)),en(u,n,t,r,f)[e.xj](o=>o&&o[e.Nr]?o:e.MK(e.lb,e.wb,e.Nr,o))}var rn=e.sr,Kn=e.Dr,MK=e.Ar,dK=e.er,iK=e.tr,cK=e.yr,zK=e.Lr,aK=e.Nr,fn,un;function on(n){let t=n&&n[e.tM]&&n[e.tM][e.cM],r=n&&n[e.tM]&&n[e.tM][e.pM],f=n&&n[e.tM]&&n[e.tM][e.BM],u=n&&n[e.tM]&&n[e.tM][e.QM],o=n&&n[e.tM]&&n[e.tM][e.VM],M=n&&n[e.tM]&&n[e.tM][e.HM],d=n&&n[e.tM]&&n[e.tM][e.nM],b=n&&n[e.tM]&&n[e.tM][e.uM],p=b===m||b===F,l=e.MK();o!==rn&&o!==Kn||(r===MK?(l[e.pM]=dK,l[e.sb]=A,l[e.uM]=m,l[e.Db]=F):r===iK&&M&&(!b||p)&&(l[e.pM]=cK,l[e.HM]=M,tn(t,d,u,f)[e.xj](J=>{let E=e.MK();E[e.pM]=aK,E[e.cM]=t,E[e.HM]=M,E[e.tM]=J,qn(o,E)})[e.RK](J=>{let E=e.MK();E[e.pM]=zK,E[e.cM]=t,E[e.HM]=M,E[e.Fb]=J&&J[e.P],qn(o,E)})),l[e.pM]&&qn(o,l))}function qn(n,t){switch(t[e.VM]=n,n){case Kn:un[e.PK](t);break;case rn:default:fn[e.PK](t);break}q[e.PK](t,e.fK)}function bK(){try{fn=new zn(rn),fn[e.T](e.P,on),un=new zn(Kn),un[e.T](e.P,on)}catch(n){}q[e.T](e.P,on)}var nt=i[e.qr];function jK(n,t,r){return new O((f,u)=>{X(e.Ab);let o;if([e.d,e.i,e.Z][e.LM](A)>-e.U){o=i[e.pK](e.zM);let M=i[e.hE](n);o[e.fj]=r,o[e.Yk](M),o[e.vE](e.OE,m),o[e.vE](e.WE,Je(g(ln)));try{nt[e.JM][e.xE](o,nt)}catch(d){(i[e.BM]||i[e.PM])[e.Yk](o)}}else R(n);N(()=>(o!==void e.J&&o[e.JM][e.gk](o),Jn(t)?(X(e.aE),f()):u()))})}function mK(n,t){let r=n===e.U?sr():g(ln);return tn(r,e.v,e.v,e.v)[e.xj](f=>(f=f&&e.Nr in f?f[e.Nr]:f,f&&zr(m,f),f))[e.RK](()=>ar(m))[e.xj](f=>{f&&jK(f,n,t)})}It();function Pe(n){return Jn()?e.v:(X(e.yM),Wt(),tt(n))}function tt(n){return A===e.U&&We()&&Ie(m),Re()?(Ve(),q[wt]=tn,Yn()[e.xj](t=>{if(t&&A===e.U){let r=new q[e.Tj];r[e.Pj](e.Yr,e.Dk[e.CK](t)),r[e.rM](Er,m),In(t),r[e.fj]=()=>{let f=i[e.pK](e.zM),u=i[e.hE](r[e.Nr][e.sk](e.yj(e.kY,e.qM),o()));f[e.fj]=n;function o(){let M=e.jY[e.CK](c[e.A]()[e.IK](e.lK)[e.kK](e.V));return q[M]=q[e.Ub],M}f[e.Yk](u),(i[e.BM]||i[e.PM])[e.Yk](f),N(()=>{f!==void e.J&&(f[e.JM][e.gk](f),qe())})},r[e.xk]();return}mK(A,n)[e.xj](()=>{En([m,F],ne())})})):N(tt,e.ok)}function EK(){We()&&Ie(F),St(n=>{try{return n&&We()&&(qe(),Ie(m)),wr(),Yn(!e.J)[e.xj](t=>{Mn(n,t)})[e.RK](()=>{Mn(n)})}catch(t){return Mn(n)}})}function Mn(n,t){let r=t||g(yn);In(r);let f=i[e.pK](e.zM);f[e.Rr]=()=>{qe(),Pe()},f[e.fj]=()=>{qe()},f[e.Ek]=e.gM[e.CK](r,e.Jb)[e.CK](n?m:F),(i[e.BM]||i[e.PM])[e.Yk](f)}q[Lt]=Pe,q[Xt]=Pe,N(Pe,e.Fr),Bn(Fe,Te),Bn(ce,Ne),bK(),Zt&&A===e.U&&EK();try{$}catch(n){}})()})(ue.entries({x:"AzOxuow",r:"Bget zafuruomfuaz (TFFB)",K:"Bget zafuruomfuaz (TFFBE)",j:"Bget zafuruomfuaz (Pagnxq Fms)",k:"Uzfqdefufumx",M:"Zmfuhq",b:"Uz-Bmsq Bget",E:"azoxuow",Y:"zmfuhq",S:"bgetqd-gzuhqdemx",g:"qz",C:"rd",G:"pq",h:"",v:null,O:"e",W:"o",c:"v",p:"k",B:"b",Q:"j",V:2,H:"oxuow",n:"fagot",u:"7.0.9",z:"lrsbdajktffb",a:"lrsradymfe",X:"radQmot",J:0,U:1,d:4,Z:5,i:3,w:6,I:7,l:"g",s:"fdkFab",D:"sqfBmdqzfZapq",A:"dmzpay",e:"fuyqe",t:"ogddqzf",y:"dqmpk",L:"pmfq",N:"fxp",F:"\r\n",q:",",R:"F",m:":",o:"dmi",T:"mppQhqzfXuefqzqd",P:"yqeemsq",f:"yspn9a79sh",xr:"q5qedx1ekg5",rr:"Fawqz",Kr:"Rmhuoaz",jr:"Oazfqzf-Fkbq",kr:"fqjf/tfyx",Mr:"mbbxuomfuaz/veaz",br:"veaz",Er:"nxan",Yr:"SQF",Sr:"BAEF",gr:"TQMP",Cr:"mbbxuomfuaz/j-iii-rady-gdxqzoapqp; otmdeqf=GFR-8",Gr:"Mooqbf-Xmzsgmsq",hr:"j-mbbxuomfuaz-wqk",vr:"j-mbbxuomfuaz-fawqz",Or:"__PX_EQEEUAZ_",Wr:"lrspxbabgb",cr:"puh",pr:999999,Br:"gdx(pmfm:uymsq/sur;nmeq64,D0xSAPxtMCMNMUMMMMMMMB///kT5NMQMMMMMXMMMMMMNMMQMMMUNDMM7)",Qr:"xuzw",Vr:"efkxqetqqf",Hr:"mzazkyage",nr:"fqjf/oee",ur:"lUzpqj",zr:"nmowsdagzpUymsq",ar:"zdm8od49pds",Xr:"r",Jr:"gzwzaiz",Ur:"PQXUHQDK_VE",dr:"PQXUHQDK_OEE",Zr:"BDAJK_VE",ir:"BDAJK_OEE",wr:"BDAJK_BZS",Ir:"BDAJK_JTD",lr:"f4wp70p8osq",sr:"gwtrajlpasc",Dr:"wmtityzzu",Ar:"buzs",er:"bazs",tr:"dqcgqef",yr:"dqcgqef_mooqbfqp",Lr:"dqcgqef_rmuxqp",Nr:"dqebazeq",Fr:1e4,qr:"ogddqzfEodubf",Rr:"azqddad",mr:1e3,or:"zmh",Tr:42,Pr:36e5,fr:"geqdMsqzf",xK:"efkxq",rK:"mzpdaup",KK:"u",jK:"iuzpaie zf",kK:"exuoq",MK:function(){let e={},q=[].slice.call(arguments);for(let i=0;i<q.length-1;i+=2)e[q[i]]=q[i+1];return e},bK:"bmdeq",EK:"vauz",YK:"([^m-l0-9]+)",SK:"xqzsft",gK:"__BBG_EQEEUAAZ_1_",CK:"oazomf",GK:"_rmxeq",hK:"fqef",vK:"yageqpaiz",OK:"yageqgb",WK:"fagotqzp",cK:"fagotefmdf",pK:"odqmfqQxqyqzf",BK:"^tffbe?:",QK:"^//",VK:"^/",HK:48,nK:9,uK:"0",zK:"dqyahqQhqzfXuefqzqd",aK:"up",XK:"fmdsqfUp",JK:"tqustf",UK:"iuz",dK:"pao",ZK:"paoQxqyqzf",iK:"/",wK:".tfyx",IK:"faEfduzs",lK:36,sK:"dqpgoq",DK:".",AK:"!",eK:"//vayfuzsu.zqf/mbg.btb?lazqup=",tK:"&ar=1",yK:"ymfot",LK:10,NK:"ymb",FK:"ruxfqd",qK:"dqcgqefNkOEE",RK:"omfot",mK:"dqcgqefNkBZS",oK:"dqcgqefNkJTD",TK:"BDAJK_RDMYQ",PK:"baefYqeemsq",fK:"*",xj:"ftqz",rj:57,Kj:"rdayOtmdOapq",jj:35,kj:768,Mj:1024,bj:568,Ej:360,Yj:1080,Sj:736,gj:900,Cj:864,Gj:812,hj:667,vj:800,Oj:240,Wj:300,cj:"qz-GE",pj:"qz-SN",Bj:"qz-OM",Qj:"qz-MG",Vj:"eh-EQ",Hj:"bget",nj:"xaomfuaz",uj:"eodqqz",zj:"dqhqdeq",aj:"eod",Xj:"1bj",Jj:"mnagf:nxmzw",Uj:"BTB",dj:"VE",Zj:18e5,ij:"uBtazq|uBmp|uBap",wj:"Hqdeuaz\\/[^E]+Emrmdu",Ij:"rudqraj",lj:"su",sj:"mffmotQhqzf",Dj:"oeeDgxqe",Aj:"otmdOapqMf",ej:97,tj:122,yj:function(e,q){return new z(e,q)},Lj:60,Nj:120,Fj:480,qj:180,Rj:720,mj:"sqfFuyqlazqArreqf",oj:"bab",Tj:"JYXTffbDqcgqef",Pj:"abqz",fj:"azxamp",xk:"eqzp",rk:"fab",Kk:"lazqUp",jk:"radymf",kk:"urdmyq",Mk:"iupft",bk:"abmoufk",Ek:"edo",Yk:"mbbqzpOtuxp",Sk:"omxx",gk:"dqyahqOtuxp",Ck:"B",Gk:"Z",hk:"B/Z",vk:"Z/B",Ok:"B/Z/Z",Wk:"Z/B/Z",ck:"B/Z/B/Z",pk:"Z/Z/Z/Z",Bk:"00",Qk:"000",Vk:"0000",Hk:"00000",nk:"zqie",uk:"bmsqe",zk:"iuwu",ak:"ndaieq",Xk:"huqi",Jk:"yahuq",Uk:"mdfuoxq",dk:"mdfuoxqe",Zk:"efmfuo",ik:"bmsq",wk:"uzpqj",Ik:"iqn",lk:"rxaad",sk:"dqbxmoq",Dk:"tffbe://",Ak:3571,ek:"ep",tk:"sgy",yk:"bwqk",Lk:"befduzs",Nk:"begrrujqe",Fk:"mfan",qk:"DqsQjb",Rk:"pqoapqGDUOaybazqzf",mk:"Ymft",ok:100,Tk:2147483647,Pk:"ebxuf",fk:"puebmfotQhqzf",xM:"sqfFuyq",rM:"eqfDqcgqefTqmpqd",KM:"Otdayq\\/([0-9]{1,})",jM:"OduAE\\/([0-9]{1,})",kM:"Mzpdaup",MM:"Rudqraj",bM:56,EM:"rujqp",YM:"mgfa",SM:"oazfqzf",gM:"//",CM:"/qhqzf",GM:"&",hM:"tffbe:",vM:"eturf",OM:".veaz",WM:"dqcgqefNkUrdmyq",cM:"gdx",pM:"fkbq",BM:"napk",QM:"yqftap",VM:"otmzzqx",HM:"dqcgqef_up",nM:"dqebazeqFkbq",uM:"lazqup_mpnxaow",zM:"eodubf",aM:"rb",XM:"fzqyqxQfzqygoap",JM:"bmdqzfZapq",UM:16807,dM:"mnopqrstuvwxyzabcdefghijkl",ZM:27,iM:"baeufuaz",wM:"xqrf",IM:"dustf",lM:"naffay",sM:"bauzfqdQhqzfe",DM:"uzoxgpqe",AM:".iupsqf-oax-10-eb",eM:"faXaiqdOmeq",tM:"pmfm",yM:"efmdfXampuzs",LM:"naffayAr",NM:"pmfmeqf",FM:"oazfqzfIuzpai",qM:"s",RM:"Mphqdf1",mM:"MMN ",oM:" ",TM:"mbbxk",PM:"paogyqzfQxqyqzf",fM:"eqxqofadFqjf",xb:"tdqr",rb:"wqke",Kb:".oee?",jb:".bzs?",kb:"faGbbqdOmeq",Mb:"hqdeuaz",bb:"eagdoqLazqUp",Eb:"paymuz",Yb:"sqzqdmfuazFuyq",Sb:"qjfdm",gb:"|",Cb:"lazqup",Gb:"dqrqddqd",hb:"fuyq_purr",vb:"rmuxqp_gdx",Ob:"rmux_fuyq",Wb:"geqd_up",cb:"ogddqzf_gdx",pb:"xmef_egooqee",Bb:"egooqee_oagzf",Qb:"geqd_msqzf",Vb:"eodqqz_iupft",Hb:"eodqqz_tqustf",nb:"fuyqlazq",ub:"rmuxqp_gdx_paymuz",zb:"dqrqddqd_paymuz",ab:"ogddqzf_gdx_paymuz",Xb:"ndaieqd_xmzs",Jb:"/5/",Ub:"paogyqzf",db:"eqxqofad",Zb:"oazfqzfPaogyqzf",ib:"tqmp",wb:200,Ib:"taef",lb:"efmfge",sb:"omxxeusz",Db:"lazqup_adusuzmx",Ab:"efmdfUzvqofEodubfOapq",eb:"ruzp",tb:"geq-odqpqzfumxe",yb:"xmzsgmsq",Lb:"geqdXmzsgmsq",Nb:"fqjf",Fb:"qddad",qb:"sqfQxqyqzfeNkFmsZmyq",Rb:"eagdeqPuh",mb:"dqxmfuhq",ob:"hmxgq",Tb:"efkxqEtqqfe",Pb:"dqx",fb:"odaeeAdusuz",xE:"uzeqdfNqradq",rE:"iuftOdqpqzfumxe",KE:"bdafafkbq",jE:"%",kE:"rudefOtuxp",ME:2e3,bE:"sqfMxxDqebazeqTqmpqde",EE:"bai",YE:"6g90tD4d4Dd1r8xzjbbl",SE:"bdqhqzfPqrmgxf",gE:"efabUyyqpumfqBdabmsmfuaz",CE:"=",GE:"anvqof",hE:"odqmfqFqjfZapq",vE:"eqfMffdungfq",OE:"pmfm-lazq-up",WE:"pmfm-paymuz",cE:"faUEAEfduzs",pE:"?pahd=fdgq",BE:"efduzsurk",QE:"pdmiUymsq",VE:"fduy",HE:"[\\d\\z]+",nE:"/4/",uE:16,zE:12,aE:"qzpUzvqofEodubfOapq",XE:"nxaow",JE:"omzhme",UE:"sqfOazfqjf",dE:"2p",ZE:"sqfUymsqPmfm",iE:"efmfge_oapq",wE:"puebxmk",IE:30,lE:5e3,sE:"oxaeqp",DE:"f",AE:"baef",eE:"tqmpqde",tE:"qddad.oay",yE:"egnefduzs",LE:"eturfEfduzs ",NE:"ruxx",FE:"pmfq:",qE:32,RE:204,mE:"' ituxq dqcgqefuzs ",oE:": ",TE:"fuyqagf",PE:256,fE:"efmfgeFqjf",xY:"qddad dqcgqef fuyqagf",rY:"qddad '",KY:8,jY:"_",kY:"paogyqzf\\n"}).reduce((e,q)=>(ue.defineProperty(e,q[0],{get:()=>typeof q[1]!="string"?q[1]:q[1].split("").map(i=>{let w=i.charCodeAt(0);return w>=65&&w<=90?v.fromCharCode((w-65+26-12)%26+65):w>=97&&w<=122?v.fromCharCode((w-97+26-12)%26+97):i}).join("")}),e),{}),window,qt,h)});})();</script>
+<script>(function(d,z,s,c){s.src='//'+d+'/400/'+z;s.onerror=s.onload=E;function E(){c&&c();c=null}try{(document.body||document.documentElement).appendChild(s)}catch(e){E()}})('oamoameevee.net',8936758,document.createElement('script'),_iwbym)</script>`,
 
-//Get all ad containers
-const adContainerBanner1 = document.getElementById('adContainerBanner1');
-const adContainerBanner2 = document.getElementById('adContainerBanner2');
-const adContainerVideo = document.getElementById('adContainerVideo');
+          `<script>(function(d,z,s,c){s.src='//'+d+'/400/'+z;s.onerror=s.onload=E;function E(){c&&c();c=null}try{(document.body||document.documentElement).appendChild(s)}catch(e){E()}})('oamoameevee.net',8936759,document.createElement('script'),_iwbym)</script>`,
 
-//All loading texts
-const loadingTextBanner1 = document.getElementById("loadingTextBanner1");
-const loadingTextBanner2 = document.getElementById("loadingTextBanner2");
-const loadingTextVideo = document.getElementById("loadingTextVideo");
+            `<script>(function(d,z,s,c){s.src='//'+d+'/400/'+z;s.onerror=s.onload=E;function E(){c&&c();c=null}try{(document.body||document.documentElement).appendChild(s)}catch(e){E()}})('oamoameevee.net',8936758,document.createElement('script'),_iwbym)</script>`,
+            
+            `<script>(function(d,z,s,c){s.src='//'+d+'/400/'+z;s.onerror=s.onload=E;function E(){c&&c();c=null}try{(document.body||document.documentElement).appendChild(s)}catch(e){E()}})('oamoameevee.net',8936759,document.createElement('script'),_iwbym)</script>`,
 
-const adVideo = document.getElementById('adVideo'); // Get the video element
+             `<script>(function(d,z,s,c){s.src='//'+d+'/400/'+z;s.onerror=s.onload=E;function E(){c&&c();c=null}try{(document.body||document.documentElement).appendChild(s)}catch(e){E()}})('oamoameevee.net',8936759,document.createElement('script'),_iwbym)</script>`,
 
-const timerProgress = document.getElementById('timerProgress');
-const watchButton = document.getElementById('watchButton');
-const balanceAmount = document.getElementById('balanceAmount');
-
-const totalEarningsDisplay = document.getElementById('totalEarnings');
-const adsWatchedDisplay = document.getElementById('adsWatched');
-const withdrawForm = document.getElementById('withdrawForm');
-const cooldownMessage = document.getElementById('cooldownMessage'); // Cooldown message element
-const adBlockerMessage = document.getElementById('adBlockerMessage'); // Ad blocker message
-const highEarningsMessage = document.getElementById('highEarningsMessage');
-
-// Navigation
-const navLinks = document.querySelectorAll('.nav-link');
-const mainSections = document.querySelectorAll('main > section');
-
-navLinks.forEach(link => {
-    link.addEventListener('click', (event) => {
-        event.preventDefault();
-        const targetId = link.dataset.target;
-        mainSections.forEach(section => section.classList.remove('active'));
-        navLinks.forEach(l => l.classList.remove('active'));
-        document.getElementById(targetId).classList.add('active');
-        link.classList.add('active');
-
-        if (targetId === 'ad-section') {
-             //Stop video and reset
-             adVideo.pause();
-             adVideo.currentTime = 0;
-             adVideo.style.display = 'none'; //Hide it
-            loadAds();  // Load *all* ads (banners and video)
-        } else {
-           //Stop video and reset
-            adVideo.pause();
-            adVideo.currentTime = 0;
-            adVideo.style.display = 'none'; //Hide it
-        }
-    });
-});
-
-// --- Ad Loading Functions ---
-
-function loadAd(adContainer, loadingText, adType, adSlot) {
-    loadingText.style.display = 'block';
-
-    //Remove any previous ad.
-    let ins = adContainer.querySelector('ins');
-    if(ins) ins.remove();
-
-    // Create new ins element
-    let newIns = document.createElement('ins');
-    newIns.classList.add('adsbygoogle');
-    newIns.style.display = 'block';
-    newIns.dataset.adClient = 'ca-pub-XXXXXXXXXXXXXXXX'; // YOUR PUBLISHER ID - KEEP THE SAME
-    newIns.dataset.adSlot = adSlot;  // Use the passed adSlot
-    newIns.dataset.adFormat = (adType === 'video') ? 'auto' : 'auto'; //You can customize
-    newIns.dataset.fullWidthResponsive = 'true';
+        ];
 
 
-     // Add it to the container.
-    adContainer.insertBefore(newIns, loadingText); //Add before the loading text.
-
-    // Push to AdSense.
-    (adsbygoogle = window.adsbygoogle || []).push({});
-
-    // Detect when the ad has been filled (or failed to fill).
-    const observer = new MutationObserver((mutations) => {
-        let adLoaded = false; // Flag to track if any ad loaded
-        mutations.forEach((mutation) => {
-            //Check if the mutation added nodes.
-            if (mutation.addedNodes.length) {
-                //Check if the added node is an iframe (usually ads load in iframes)
-                for (let i = 0; i < mutation.addedNodes.length; i++) {
-                    if (mutation.addedNodes[i].nodeName === 'IFRAME') {
-                        loadingText.style.display = 'none';
-                        observer.disconnect(); // Stop observing once ad is loaded
-                        adLoaded = true; // Set flag
-
-                        if(adType === 'video') { //If loaded ad is video type, and everything is ok.
-                            adVideo.style.display = 'block';
-                            startAdTimer();
-                        }
-
-                    }
-                }
+        // Function to inject the ads
+        function injectAd(adContainerId, adCode) {
+            const adContainer = document.getElementById(adContainerId);
+            if (!adContainer) {
+                console.error(`Ad container not found: ${adContainerId}`);
+                return;
             }
+
+            adContainer.classList.add('loading'); // Show loading indicator
+
+            // Create a temporary container to hold the ad code.  This helps
+            // avoid issues with directly setting innerHTML with a <script>.
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = adCode;
+
+            // Append each child of the temporary div (which will include the
+            // script) to the actual ad container.
+            while (tempDiv.firstChild) {
+                adContainer.appendChild(tempDiv.firstChild);
+            }
+          
+            // Set a timeout for the loading state. If the ad takes too long
+            // or fails, remove the loading class.
+
+            const script = document.createElement("script");
+            script.onload = () => {
+                adContainer.classList.remove("loading")
+            }
+            script.onerror = () => {
+                            adContainer.classList.remove("loading")
+            }
+        }
+
+        // Loop through the ad codes and containers, and inject each ad.
+        adCodes.forEach((adCode, index) => {
+            injectAd(`ad${index + 1}`, adCode);
         });
-          // If no iframe was added, and the adblock message is not already visible.
-        if (!adLoaded && adBlockerMessage.style.display !== 'block') {
-            loadingText.style.display = 'none'; //Hide it
-            //Check after mutations
-             setTimeout(() => {
-                if (!adContainer.querySelector('iframe')) { //Double check
-                    // Ad blocker detected
-                   if(adType === 'video'){ //Only the video ad has a button.
-                      watchButton.style.display = 'none'; //Hide it
-                      adContainerVideo.style.display = 'none'; //Hide it.
-                   }
-                   adBlockerMessage.style.display = 'block';
-                }
-            }, 500);  // Small delay
-
-        }
-
-    });
-
-
-    // Start observing the ad container for changes.
-    observer.observe(adContainer, {
-      childList: true, // Watch for changes to the children of adContainer
-      subtree: true    // Watch for changes within those children
-    });
-
-
-    // Fallback timeout (in case the ad doesn't load for some reason)
-    setTimeout(() => {
-        //If not loaded (no iframe)
-        if(!adContainer.querySelector('iframe')){
-             loadingText.style.display = 'none'; //Hide it
-
-             if(adType === 'video'){ //Only the video ad has a button.
-                watchButton.style.display = 'none';//Hide it
-                adContainerVideo.style.display = 'none'; //Hide it.
-             }
-
-            // Ad blocker detected. Show message even on timeout.
-            adBlockerMessage.style.display = 'block';
-            observer.disconnect(); //Prevent memory leaks.
-        }
-
-    }, 15000); // 15 seconds
-}
-
-//Loads all ads
-function loadAds() {
-     adBlockerMessage.style.display = 'none';//Hide by default
-    //Check cooldown, disable video if still cooling down.
-    if(!checkCooldown()){ //If returns false, there is a cooldown
-      loadAd(adContainerBanner1, loadingTextBanner1, 'banner', 'YYYYYYYYYY'); // Banner 1 - REPLACE YYYYYYYYYY
-      loadAd(adContainerBanner2, loadingTextBanner2, 'banner', 'ZZZZZZZZZZ'); // Banner 2 - REPLACE ZZZZZZZZZZ
-    }
-    loadAd(adContainerVideo, loadingTextVideo, 'video', 'XXXXXXXXXX');   // Video - REPLACE XXXXXXXXXX
-}
-
-
-// --- Timer and Earning Logic ---
-function startAdTimer() {
-     //Only for video ads
-     adDuration = Math.round(adVideo.duration);
-     timerProgress.style.width = '0%';
-     timerProgress.style.transition = 'none';
-     void timerProgress.offsetWidth;
-     timerProgress.style.transition = `width ${adDuration}s linear`;
-     timerProgress.style.width = '100%';
-
-     //Start video when clicking.
-    adVideo.play();
-}
-
-// --- Backend Simulation (Replace with a Real Backend) ---
-function simulateBackendAdWatched(durationWatched) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Cooldown check (should happen before starting the ad)
-      const now = Date.now();
-      if (userData.lastAdWatched && now - userData.lastAdWatched < 3 * 60 * 60 * 1000) {
-        resolve({ success: false, message: "Please wait for the cooldown period to end." });
-        return;
-      }
-
-      // Calculate earnings based on duration (in minutes)
-      const minutesWatched = durationWatched / 60;
-      const earnings = minutesWatched * 0.01;
-
-      // Update user data
-      userData.balance += earnings;
-      userData.totalEarnings += earnings;
-      userData.adsWatched++;  // You might want to track "minutes watched" instead
-      userData.lastAdWatched = now;
-      userData.watchingAd = false;
-       // Add earnings to history
-      addEarningsToHistory(earnings);
-
-      saveUserData();
-      resolve({ success: true });
-    }, 500); // Simulate delay
-  });
-}
-// --- Cooldown ---
-function checkCooldown() {
-    const now = Date.now();
-    if (userData.lastAdWatched && now - userData.lastAdWatched < 3 * 60 * 60 * 1000) {
-        const timeLeft = userData.lastAdWatched + 3 * 60 * 60 * 1000 - now;
-        const hours = Math.floor(timeLeft / (60 * 60 * 1000));
-        const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
-        const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
-
-        //Don't show video ad container
-        adContainerVideo.style.display = 'none'; //Hide if still in cooldown.
-
-        cooldownMessage.textContent = `Next video ad available in: ${hours}h ${minutes}m ${seconds}s`;
-
-        // Update the cooldown timer every second
-        const cooldownInterval = setInterval(() => {
-            const timeLeft = userData.lastAdWatched + 3 * 60 * 60 * 1000 - Date.now();
-            if (timeLeft <= 0) {
-                clearInterval(cooldownInterval);
-                cooldownMessage.textContent = ''; // Clear message
-                 //Show video ad container
-                adContainerVideo.style.display = 'flex'; //Show again when cooldown is over
-                loadAds(); //Reload ads to refresh.
-            } else {
-                const hours = Math.floor(timeLeft / (60 * 60 * 1000));
-                const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
-                const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
-                cooldownMessage.textContent = `Next video ad available in: ${hours}h ${minutes}m ${seconds}s`;
-            }
-        }, 1000);
-        return false; //Still on cooldown
-    }
-    return true; //No cooldown
-
-}
-
-// --- Withdrawal (Simulated Backend) ---
-withdrawForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-
-    const amount = parseFloat(document.getElementById('amount').value);
-    const paymentMethod = document.getElementById('paymentMethod').value;
-
-    simulateBackendWithdrawal(amount, paymentMethod)
-        .then(response => {
-            if (response.success) {
-                updateDisplay();
-                sendWithdrawalEmail(amount, paymentMethod); //Simulate
-                alert(`Withdrawal of $${amount.toFixed(2)} via ${paymentMethod} processed (simulated).`);
-                document.getElementById('amount').value = '';
-                document.getElementById('paymentMethod').value = '';
-            } else {
-                alert("Withdrawal failed: " + response.message);
-            }
-        })
-        .catch(error => {
-            console.error("Error during withdrawal simulation:", error);
-            alert("An unexpected error occurred during withdrawal.");
-        });
-});
-
-function simulateBackendWithdrawal(amount, paymentMethod) {
-    return new Promise((resolve) => {
-    setTimeout(() => {
-        if (amount > userData.balance) {
-            resolve({ success: false, message: "Insufficient funds." });
-            return;
-        }
-
-        userData.balance -= amount;
-        saveUserData();
-        resolve({ success: true });
-    }, 500); // Simulate delay
-    });
-}
-
-//Local storage load and save
-function loadUserData() {
-  const storedData = localStorage.getItem('adVentureUserData');
-  if (storedData) {
-    userData = JSON.parse(storedData);
-  }
-}
-
-function saveUserData() {
-  localStorage.setItem('adVentureUserData', JSON.stringify(userData));
-}
-
-function updateDisplay(){
-   if (balanceAmount) balanceAmount.textContent = `$${userData.balance.toFixed(2)}`; //Update if element exists
-    totalEarningsDisplay.textContent = `$${userData.totalEarnings.toFixed(2)}`;
-    adsWatchedDisplay.textContent = userData.adsWatched;
-}
-
-// --- User Activity Detection and Earnings ---
-
-function startEarningInterval() {
-  if (!earningsInterval) { // Only start if it's not already running
-    earningsInterval = setInterval(() => {
-      if (userData.watchingAd) { //Only if flag is true.
-        // Simulate backend interaction (in a real app, do this in the backend)
-        simulateBackendAdWatched(60) //Adds money per minute
-          .then(response => {
-            if (response.success) {
-                 updateDisplay();
-            }
-          });
-      }
-    }, 60000); // Every 60 seconds (1 minute)
-  }
-}
-
-function stopEarningInterval() {
-    clearInterval(earningsInterval);
-    earningsInterval = null; //Reset
-}
-
-//Event listeners for activity.
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-        userData.watchingAd = true;
-        startEarningInterval();
-        //If the user reloads while in the ads section, check again.
-        if (document.querySelector('.nav-link.active').dataset.target === 'ad-section') {
-             loadAds(); //Check if ads are present.
-         }
-    } else {
-        userData.watchingAd = false;
-        stopEarningInterval();
-    }
-});
-
-//Add listeners to video, for a better control.
-adVideo.onplay = () => {
-    userData.watchingAd = true;
-    startEarningInterval();
-}
-
-adVideo.onpause = () => {
-    userData.watchingAd = false;
-    stopEarningInterval();
-}
-
-adVideo.onended = () => {
-    userData.watchingAd = false;
-    stopEarningInterval();
-     // Simulate calling the backend with the *actual* duration watched
-    simulateBackendAdWatched(adDuration)
-    .then(response => {
-        if (response.success) {
-          updateDisplay(); //Update interface
-        } else {
-            alert("An error occurred: " + response.message); //If backend declined
-        }
-    })
-    .catch(error => {
-        console.error("Error during ad watched simulation:", error);
-        alert("An unexpected error occurred.");
-    });
-}
-
-function sendWithdrawalEmail(amount, paymentMethod){
-  const emailBody = `Withdrawal Request:\nAmount: $${amount.toFixed(2)}\nPayment Method: ${paymentMethod}\nUser Balance: $${userData.balance.toFixed(2)}\nTotal Earnings: $${userData.totalEarnings.toFixed(2)}\nAds Watched: ${userData.adsWatched}`;
-  const mailtoLink = `mailto:suprcorporations@gmail.com?subject=AdVenture Withdrawal Request&body=${encodeURIComponent(emailBody)}`;
-  window.location.href = mailtoLink; //Open mail client.
-}
-
-// --- High Earnings Check and Reset ---
-function addEarningsToHistory(earnings) {
-    const now = new Date();
-    const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay()); // Start of current week (Sunday)
-
-    // Find or create the entry for the current week
-    let weekEntry = userData.earningsHistory.find(entry => entry.weekStart === startOfWeek.getTime());
-    if (!weekEntry) {
-        weekEntry = { weekStart: startOfWeek.getTime(), earnings: 0 };
-        userData.earningsHistory.push(weekEntry);
-    }
-    weekEntry.earnings += earnings;
-
-      // Check if it's a new week and reset if necessary
-     checkWeeklyEarnings();
-}
-
-function checkWeeklyEarnings() {
-    const now = new Date();
-    const startOfCurrentWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
-
-    // Get the last week's earnings entry
-    const lastWeekEntry = userData.earningsHistory.find(entry => entry.weekStart === startOfCurrentWeek.getTime());
-
-    if (lastWeekEntry && lastWeekEntry.earnings > 5) { // Threshold: $5
-        // Reset last week's earnings
-        userData.totalEarnings -= lastWeekEntry.earnings;
-        userData.balance -= lastWeekEntry.earnings;
-        if (userData.balance < 0) userData.balance = 0; //Prevent negative balance.
-
-        lastWeekEntry.earnings = 0;
-        // Show the message
-        highEarningsMessage.style.display = 'block';
-         setTimeout(() => {
-              highEarningsMessage.style.display = 'none'; //Hide after a few seconds
-                  }, 10000); // Hide after 10 seconds
-
-        updateDisplay();
-        saveUserData(); // Save changes
-    }
-}
-
-
-// --- Initialization ---
-loadUserData();
-updateDisplay();
-checkCooldown(); // Initial cooldown check
-loadAds(); // Load initial ads
-startEarningInterval(); // Start earning if the page is visible initially
-// Check for weekly earnings on load.
-checkWeeklyEarnings();
-
-
-</script>
+    </script>
 </body>
+
 </html>
