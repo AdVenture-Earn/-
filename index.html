@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pac-Man Enhanced</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden; /* Prevent scrollbars */
+        }
+
+        #game-container {
+            position: relative;
+            width: 448px; /* Standard Pac-Man width */
+            height: 496px; /* Standard Pac-Man height */
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden; /*  VERY IMPORTANT:  Keep everything inside the container */
+            background-color: black; /*  Set the background to black */
+        }
+
+
+        #game-board {
+           width: 100%;  /* Use the full container width. */
+            height: 100%; /* Use the full container height. */
+            position: relative;  /*  Important for absolute positioning of elements */
+            /* background-color: black;  No longer needed, set on container */
+        }
+        
+         .wall {
+            background-color: blue;
+            position: absolute;  /*  Absolutely positioned within the board */
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            background-color: #f0e68c; /* Khaki color */
+            border-radius: 50%;
+            position: absolute;
+               /* Place dots relative to game-board */
+        }
+
+
+        .power-pellet {
+            width: 10px;
+            height: 10px;
+            background-color: #f0e68c;
+            border-radius: 50%;
+            position: absolute;
+                /* Position relative to game-board */
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.3);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Pacman */
+        #pacman {
+            width: 20px;
+            height: 20px;
+            background-color: yellow;
+            border-radius: 50%;
+            position: absolute;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 50% 50%);  /* Initial triangle shape (mouth closed) */
+            animation: chomp 0.4s infinite steps(2);
+        }
+         @keyframes chomp {
+          0% {
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 50% 50%);  /* Mouth Closed */
+          }
+          50% {
+             clip-path: polygon(0% 0%, 100% 0%, 100% 25%, 50% 50%, 100% 75%, 100% 100%, 0% 100%); /* Mouth Open*/
+          }
+        }
+
+
+        /* Ghosts */
+        .ghost {
+           width: 20px;
+            height: 20px;
+            border-top-left-radius: 10px;  /* Rounded top */
+            border-top-right-radius: 10px;
+            position: absolute;
+             /*  Ghosts move independently */
+             background-color: red; /* Default ghost color */
+             display: flex;           /* Use flexbox for the eyes */
+            justify-content: space-around; /* Space eyes evenly */
+            align-items: center;   /* Center eyes vertically */
+        }
+        .ghost-eyes {
+          display: flex;
+          padding-top: 2px; /* Adjust as needed */
+        }
+          .ghost .eye {
+              width: 4px;
+              height: 4px;
+              background-color: white;
+              border-radius: 50%;
+              margin: 0 1px;  /*  Small horizontal spacing */
+          }
+            .ghost-body {
+            height: 60%;  /*  Body takes up 60% of the height */
+            width: 100%;
+            background-color: inherit; /* Inherit from .ghost */
+             position: absolute;
+              bottom: 0;
+            left: 0;
+                overflow: hidden; /* Ensure the wavy effect stays within bounds. */
+        }
+            .ghost-skirt {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 20%;
+                background-color: inherit;
+                background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.2)); /* Subtle darkening at the bottom */
+              /*  border-bottom-left-radius: 4px;   Rounding is no longer necessary
+                border-bottom-right-radius: 4px;*/
+                  display: flex;
+                justify-content: space-between;
+
+            }
+            .ghost-skirt-piece{
+                width: 25%;
+                height: 100%;
+                background-color: inherit;
+                clip-path: polygon(0 0, 50% 100%, 100% 0); /*  Triangle pieces */
+                box-sizing: border-box; /*  Include padding/border in width */
+                /* border-right: 1px solid rgba(0,0,0,0.1);  Subtle separator, optional */
+            }
+        
+          .ghost[data-color="red"] { background-color: red; }
+        .ghost[data-color="pink"] { background-color: pink; }
+        .ghost[data-color="cyan"] { background-color: cyan; }
+        .ghost[data-color="orange"] { background-color: orange; }
+
+        .ghost.vulnerable {
+            background-color: #add8e6; /* Light blue for vulnerable state */
+        }
+        .ghost.vulnerable .eye {
+            background-color: black; /*  Eyes change color when vulnerable */
+        }
+         .ghost.vulnerable .ghost-skirt-piece {
+            /*  Style changes for vulnerable ghosts */
+        }
+
+
+
+        /* Other Enemies (Dragons, Skeletons, Zombies) */
+        .dragon {
+            width: 24px;
+            height: 24px;
+            background-color: green;
+            position: absolute;
+               /*  Dragons move independently */
+            border-radius: 4px;
+        }
+
+        .skeleton {
+            width: 18px;
+            height: 22px;
+            background-color: #f5f5dc;
+            /* Beige */
+            position: absolute;
+            /*  Skeletons move independently */
+            border-radius: 2px;
+        }
+
+        .zombie {
+            width: 20px;
+            height: 22px;
+            background-color: #556b2f;
+            /* Dark olive green */
+            position: absolute;
+             /*  Zombies move independently */
+            border-radius: 3px;
+        }
+
+
+
+        /* Power-Ups (Example - adjust as needed) */
+        .powerup-speed {
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, #ff4500, #ffa07a);
+            /* Orange gradient */
+            border-radius: 50%;
+            position: absolute;
+           /* Powerups stay in place*/
+            animation: pulse 1s infinite;
+        }
+
+        .powerup-freeze {
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, #00bfff, #87cefa);
+            /* Light blue gradient */
+            border-radius: 50%;
+            position: absolute;
+            animation: pulse 1s infinite;
+        }
+
+        /* Score/UI - Floating, Minimalist */
+        #score-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            z-index: 100;
+            /*  Ensure it's above other elements */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Game Over Message (Floating, Animated) */
+        #game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 101;
+            display: none;
+              /* Hidden by default */
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            animation: fadeInOut 3s;
+        }
+        #game-over h2 {
+          margin: 0 0 10px 0; /* Add margin below the h2 */
+        }
+
+         @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <div id="game-container">
+        <div id="game-board">
+            <!-- Game elements will be added here -->
+        </div>
+        <div id="score-container">
+            Score: <span id="score">0</span>
+        </div>
+        <div id="game-over">
+            <h2>Game Over</h2>
+             <button id="restart-button">Restart</button>
+        </div>
+    </div>
+
+    <script>
+
+        // --- Game Setup ---
+        const gameBoard = document.getElementById('game-board');
+        const scoreDisplay = document.getElementById('score');
+        const gameOverScreen = document.getElementById('game-over');
+        const restartButton = document.getElementById('restart-button');
+
+        let score = 0;
+        let pacman;
+        let ghosts = [];
+        let dragons = [];
+        let skeletons = [];
+        let zombies = [];
+        let dots = [];
+        let powerPellets = [];
+        let powerups = [];   //  For the new powerups
+        let walls = [];
+        let gameInterval;
+
+
+        // --- Game Objects ---
+        //  Use a class for common properties
+        class GameObject {
+             constructor(x, y, element) {
+                this.x = x;
+                this.y = y;
+                this.element = element;
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+                gameBoard.appendChild(this.element);  // Add to the board directly
+                this.direction = { x: 0, y: 0 }; //  Add a direction property
+            }
+             updatePosition() {
+                this.x += this.direction.x;
+                this.y += this.direction.y;
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+
+                  // Basic Wrap-around (left/right, top/bottom)
+                if (this.x < -20) this.x = gameBoard.offsetWidth;
+                if (this.x > gameBoard.offsetWidth) this.x = -20;
+                if (this.y < -20) this.y = gameBoard.offsetHeight;
+                if (this.y > gameBoard.offsetHeight) this.y = -20;
+            }
+        }
+
+        class Pacman extends GameObject {
+          constructor(x, y) {
+            const element = document.createElement('div');
+            element.id = 'pacman';
+            super(x, y, element);
+             this.nextDirection = { x: 0, y: 0 }; // For smoother movement changes
+          }
+           move() {
+                //  Use nextDirection, but check for collisions *before* updating
+                let nextX = this.x + this.nextDirection.x;
+                let nextY = this.y + this.nextDirection.y;
+
+                if (!this.checkWallCollision(nextX, nextY)) {
+                  this.direction = { ...this.nextDirection }; //  Copy nextDirection
+                }
+                // Now, check collision with the *current* direction.  This prevents
+                // Pac-Man from stopping if the *next* direction is blocked, but the
+                // current one is not.
+                 if (!this.checkWallCollision(this.x + this.direction.x, this.y + this.direction.y)) {
+                    super.updatePosition();  // Call the base class's updatePosition
+                    this.eatDot();        //  Moved eatDot() and eatPowerPellet() here
+                    this.eatPowerPellet();
+                    this.checkPowerupCollision();
+                }
+
+           }
+           checkWallCollision(x, y) {
+            for (const wall of walls) {
+                if (this.isColliding(x, y, wall)) {
+                    return true; // Collision detected
+                }
+            }
+            return false; // No collision
+          }
+            eatDot() {
+                for (let i = 0; i < dots.length; i++) {
+                    if (this.isColliding(this.x, this.y, dots[i])) {
+                        gameBoard.removeChild(dots[i].element);
+                        dots.splice(i, 1);
+                        score += 10;
+                        scoreDisplay.textContent = score;
+                        break; //  Important: Only eat one dot at a time
+                    }
+                }
+            }
+            eatPowerPellet() {
+                for (let i = 0; i < powerPellets.length; i++) {
+                    if (this.isColliding(this.x, this.y, powerPellets[i])) {
+                        gameBoard.removeChild(powerPellets[i].element);
+                        powerPellets.splice(i, 1);
+                        score += 50;
+                        scoreDisplay.textContent = score;
+                        this.makeGhostsVulnerable();
+                        break;
+                    }
+                }
+            }
+
+            makeGhostsVulnerable() {
+                ghosts.forEach(ghost => {
+                   if(!ghost.isEaten) {
+                      ghost.element.classList.add('vulnerable');
+                   }
+                });
+                // Reset after a delay (e.g., 8 seconds)
+                clearTimeout(this.vulnerableTimeout); // Clear any existing timeout
+
+                this.vulnerableTimeout = setTimeout(() => {
+                  ghosts.forEach((ghost) => {
+                    if(!ghost.isEaten){
+                       ghost.element.classList.remove("vulnerable");
+                    }
+
+                    });
+
+                }, 8000);
+            }
+
+             checkPowerupCollision() {
+                 for (let i = 0; i < powerups.length; i++) {
+                    if (this.isColliding(this.x, this.y, powerups[i])) {
+                        this.applyPowerup(powerups[i]);
+                        gameBoard.removeChild(powerups[i].element);
+                        powerups.splice(i, 1);
+                        break;
+                    }
+                }
+             }
+             applyPowerup(powerup) {
+                if (powerup.type === 'speed') {
+                    // Increase Pacman's speed
+                    this.speedMultiplier = 2;  // Double speed
+                    setTimeout(() => { this.speedMultiplier = 1; }, 5000); //  5 seconds
+
+                } else if (powerup.type === 'freeze') {
+                    // Freeze enemies
+                    ghosts.forEach(ghost => { ghost.freeze(); });
+                    dragons.forEach(dragon => { dragon.freeze(); });
+                    skeletons.forEach(skeleton => { skeleton.freeze();});
+                    zombies.forEach(zombie => { zombie.freeze();});
+                }
+            }
+
+           //  Simplified collision check using bounding boxes
+            isColliding(x, y, other) {
+                const pacmanRect = {  //  Create a rectangle for Pacman's *next* position
+                    left: x,
+                    top: y,
+                    right: x + this.element.offsetWidth,
+                    bottom: y + this.element.offsetHeight
+                };
+                const otherRect = other.element.getBoundingClientRect(); //  Use built-in function
+
+                  // Check for overlap
+                return !(pacmanRect.right < otherRect.left ||
+                         pacmanRect.left > otherRect.right ||
+                         pacmanRect.bottom < otherRect.top ||
+                         pacmanRect.top > otherRect.bottom);
+            }
+        }
+
+         class Ghost extends GameObject {
+            constructor(x, y, color) {
+                const element = document.createElement('div');
+                element.classList.add('ghost');  // Use class for common ghost styles
+                 element.dataset.color = color; // Store color as a data attribute
+                super(x, y, element);
+
+                 // Add eyes
+                const eyes = document.createElement('div');
+                eyes.classList.add('ghost-eyes');
+                const eye1 = document.createElement('div');
+                eye1.classList.add('eye');
+                const eye2 = document.createElement('div');
+                eye2.classList.add('eye');
+                eyes.appendChild(eye1);
+                eyes.appendChild(eye2);
+                this.element.appendChild(eyes);
+
+                //Add wavy body
+                const body = document.createElement("div");
+                body.classList.add("ghost-body");
+                this.element.appendChild(body);
+
+                const skirt = document.createElement("div");
+                skirt.classList.add("ghost-skirt");
+                for(let i = 0; i < 4; i++){
+                    const skirtPiece = document.createElement("div");
+                    skirtPiece.classList.add("ghost-skirt-piece");
+                    skirt.appendChild(skirtPiece);
+                }
+                body.appendChild(skirt);
+
+                 this.speed = 1;
+                this.scatter = false; // Add scatter mode
+                this.isEaten = false;
+                this.scatterTarget = { x: 0, y: 0 }; //  Default scatter target
+
+            }
+            setScatterTarget(x,y){
+                this.scatterTarget = {x,y}
+            }
+
+            move() {
+                if(this.isEaten){
+                  this.returnToStart();
+                }
+                else if (this.scatter) {
+                   this.moveTowards(this.scatterTarget);  // Move towards scatter target
+                }
+                else{
+                  this.chasePacman();
+                }
+
+                if (!this.checkWallCollision(this.x + this.direction.x, this.y + this.direction.y)) {
+                  super.updatePosition();
+                } else {
+                  this.chooseRandomDirection(); // Change direction if colliding
+                }
+
+                this.checkPacmanCollision(); // Moved out of checkVulnerable
+            }
+
+               checkWallCollision(x, y) {
+                for (const wall of walls) {
+                    if (this.isColliding(x, y, wall)) {
+                        return true;  // Collision detected
+                    }
+                }
+                return false; // No collision
+            }
+
+             isColliding(x, y, other) {
+                const ghostRect = {  //  Create a rectangle for ghost's *next* position
+                    left: x,
+                    top: y,
+                    right: x + this.element.offsetWidth,
+                    bottom: y + this.element.offsetHeight
+                };
+                const otherRect = other.element.getBoundingClientRect(); //  Use built-in function
+
+                  // Check for overlap
+                return !(ghostRect.right < otherRect.left ||
+                         ghostRect.left > otherRect.right ||
+                         ghostRect.bottom < otherRect.top ||
+                         ghostRect.top > otherRect.bottom);
+            }
+
+
+              chasePacman() {
+                //  Simple "best path" algorithm
+                let dx = pacman.x - this.x;
+                let dy = pacman.y - this.y;
+
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    // Move horizontally
+                    this.direction.x = dx > 0 ? 1 : -1;
+                    this.direction.y = 0;
+                } else {
+                    //  Move vertically
+                    this.direction.x = 0;
+                    this.direction.y = dy > 0 ? 1 : -1;
+                }
+                 // Attempt to correct course if blocked
+                if (this.checkWallCollision(this.x + this.direction.x, this.y + this.direction.y)) {
+                  if(this.direction.x !== 0){
+                      this.direction.x = 0;
+                      this.direction.y = dy > 0 ? 1 : -1;
+                  }
+                  else{
+                      this.direction.y = 0;
+                      this.direction.x = dx > 0 ? 1 : -1;
+                  }
+                }
+            }
+
+             chooseRandomDirection() {
+                const options = [
+                    { x: 1, y: 0 },
+                    { x: -1, y: 0 },
+                    { x: 0, y: 1 },
+                    { x: 0, y: -1 }
+                ];
+                //  Filter out directions that would cause a collision
+                const validOptions = options.filter(option => {
+                    return !this.checkWallCollision(this.x + option.x, this.y + option.y);
+                });
+
+                if (validOptions.length > 0) {
+                    const choice = validOptions[Math.floor(Math.random() * validOptions.length)];
+                    this.direction = choice;
+                } else {
+                    // No valid options (rare, but possible) - just stop
+                    this.direction = { x: 0, y: 0 };
+                }
+             }
+
+              moveTowards(target) {
+                let dx = target.x - this.x;
+                let dy = target.y - this.y;
+
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    this.direction.x = dx > 0 ? 1 : -1;
+                    this.direction.y = 0;
+                } else {
+                    this.direction.x = 0;
+                    this.direction.y = dy > 0 ? 1 : -1;
+                }
+                  // Attempt to correct course if blocked (same as in chasePacman)
+                  if (this.checkWallCollision(this.x + this.direction.x, this.y + this.direction.y)) {
+                    if(this.direction.x !== 0){
+                        this.direction.x = 0;
+                        this.direction.y = dy > 0 ? 1 : -1;
+                    }
+                    else{
+                        this.direction.y = 0;
+                        this.direction.x = dx > 0 ? 1 : -1;
+                    }
+                  }
+            }
+
+              checkPacmanCollision() {
+                if (this.isColliding(this.x, this.y, pacman)) {
+                    if (this.element.classList.contains('vulnerable')) {
+                        this.beEaten();
+                    } else {
+                        gameOver();
+                    }
+                }
+             }
+             beEaten(){
+              this.isEaten = true;
+              this.element.classList.remove("vulnerable");
+              this.element.style.backgroundColor = "transparent"; // Make invisible
+              this.element.querySelector(".ghost-eyes").style.display = "block"; //Keep eyes visible
+              this.element.querySelector(".ghost-body").style.display = "none"; //Hide Body
+              score += 200;
+             }
+             returnToStart(){
+                this.moveTowards({x: 11*20, y: 11*20});
+                if(Math.abs(this.x - (11*20)) < 5 && Math.abs(this.y - (11*20)) < 5){
+                    this.isEaten = false;
+                     this.element.style.backgroundColor = this.element.dataset.color; // Reset to original color
+                    this.element.querySelector(".ghost-body").style.display = "block";
+                }
+             }
+
+             freeze() {
+                this.frozen = true;
+                clearTimeout(this.freezeTimer); // Clear any existing timer
+                this.freezeTimer = setTimeout(() => { this.frozen = false; }, 3000);  // 3 seconds
+             }
+
+        }
+
+        // --- Other Enemies (Dragons, Skeletons, Zombies) ---
+          class Dragon extends GameObject {
+            constructor(x, y) {
+                const element = document.createElement('div');
+                element.classList.add('dragon');
+                super(x, y, element);
+                this.speed = 1.5; // Dragons are faster
+            }
+                move() {
+                this.chasePacman();  //  Dragons also chase Pac-Man
+                if (!this.checkWallCollision(this.x + this.direction.x, this.y + this.direction.y)) {
+                    super.updatePosition();
+                }
+                else{
+                  this.chooseRandomDirection();
+                }
+                 this.checkPacmanCollision();
+                }
+
+               checkWallCollision(x, y) {
+                for (const wall of walls) {
+                    if (this.isColliding(x, y, wall)) {
+                        return true; // Collision detected
+                    }
+                }
+                return false; // No collision
+              }
+
+             isColliding(x, y, other) {
+                const dragonRect = {  //  Create a rectangle for Dragon's *next* position
+                    left: x,
+                    top: y,
+                    right: x + this.element.offsetWidth,
+                    bottom: y + this.element.offsetHeight
+                };
+                const otherRect = other.element.getBoundingClientRect(); //  Use built-in function
+
+                  // Check for overlap
+                return !(dragonRect.right < otherRect.left ||
+                         dragonRect.left > otherRect.right ||
+                         dragonRect.bottom < otherRect.top ||
+                         dragonRect.top > otherRect.bottom);
+            }
+               chooseRandomDirection() {
+                const options = [
+                    { x: 1, y: 0 },
+                    { x: -1, y: 0 },
+                    { x: 0, y: 1 },
+                    { x: 0, y: -1 }
+                ];
+                //  Filter out directions that would cause a collision
+                const validOptions = options.filter(option => {
+                    return !this.checkWallCollision(this.x + option.x, this.y + option.y);
+                });
+
+                if (validOptions.length > 0) {
+                    const choice = validOptions[Math.floor(Math.random() * validOptions.length)];
+                    this.direction = choice;
+                } else {
+                    // No valid options (rare, but possible) - just stop
+                    this.direction = { x: 0, y: 0 };
+                }
+             }
+
+              chasePacman() {
+                //  Simple "best path" algorithm
+                let dx = pacman.x - this.x;
+                let dy = pacman.y - this.y;
+
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    // Move horizontally
+                    this.direction.x = dx > 0 ? 1 : -1;
+                    this.direction.y = 0;
+                } else {
+                    //  Move vertically
+                    this.direction.x = 0;
+                    this.direction.y = dy > 0 ? 1 : -1;
+                }
+                 // Attempt to correct course if blocked
+                if (this.checkWallCollision(this.x + this.direction.x, this.y + this.direction.y)) {
+                  if(this.direction.x !== 0){
+                      this.direction.x = 0;
+                      this.direction.y = dy > 0 ? 1 : -1;
+                  }
+                  else{
+                      this.direction.y = 0;
+                      this.direction.x = dx > 0 ? 1 : -1;
+                  }
+                }
+            }
+
+              checkPacmanCollision() {
+                if (this.isColliding(this.x, this.y, pacman)) {
+                    gameOver();  //  Dragons always defeat Pac-Man
+                }
+             }
+               freeze() {
+                this.frozen = true;
+                clearTimeout(this.freezeTimer);
+                this.freezeTimer = setTimeout(() => { this.frozen = false; }, 3000);
+             }
+
+          }
+          class Skeleton extends GameObject{
+            constructor(x,y){
+                const element = document.createElement("div");
+                element.classList.add("skeleton");
+                super(x,y, element);
+                this.speed = 0.8;
+            }
+               move() {
+                this.chasePacman();  //  Dragons also chase Pac-Man
+                if (!this.checkWallCollision(this.x + this.direction.x, this.y + this.direction.y)) {
+                    super.updatePosition();
+                }
+                else{
+                  this.chooseRandomDirection();
+                }
+                 this.checkPacmanCollision();
+                }
+
+               checkWallCollision(x, y) {
+                for (const wall of walls) {
+                    if (this.isColliding(x, y, wall)) {
+                        return true; // Collision detected
+                    }
+                }
+                return false; // No collision
+              }
+
+             isColliding(x, y, other) {
+                const skeletonRect = {  //  Create a rectangle for skeleton's *next* position
+                    left: x,
+                    top: y,
+                    right: x + this.element.offsetWidth,
+                    bottom: y + this.element.offsetHeight
+                };
+                const otherRect = other.element.getBoundingClientRect(); //  Use built-in function
+
+                  // Check for overlap
+                return !(skeletonRect.right < otherRect.left ||
+                         skeletonRect.left > otherRect.right ||
+                         skeletonRect.bottom < otherRect.top ||
+                         skeletonRect.top > otherRect.bottom);
+            }
+               chooseRandomDirection() {
+                const options = [
+                    { x: 1, y: 0 },
+                    { x: -1, y: 0 },
+                    { x: 0, y: 1 },
+                    { x: 0, y: -1 }
+                ];
+                //  Filter out directions that would cause a collision
+                const validOptions = options.filter(option => {
+                    return !this.checkWallCollision(this.x + option.x, this.y + option.y);
+                });
+
+                if (validOptions.length > 0) {
+                    const choice = validOptions[Math.floor(Math.random() * validOptions.length)];
+                    this.direction = choice;
+                } else {
+                    // No valid options (rare, but possible) - just stop
+                    this.direction = { x: 0, y: 0 };
+                }
+             }
+
+              chasePacman() {
+                //  Simple "best path" algorithm
+                let dx = pacman.x - this.x;
+                let dy = pacman.y - this.y;
+
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    // Move horizontally
+                    this.direction.x = dx > 0 ? 1 : -1;
+                    this.direction.y = 0;
+                } else {
+                    //  Move vertically
+                    this.direction.x = 0;
+                    this.direction.y = dy > 0 ? 1 : -1;
+                }
+                 // Attempt to correct course if blocked
+                if (this.checkWallCollision(this.x + this.direction.x, this.y + this.direction.y)) {
+                  if(this.direction.x !== 0){
+                      this.direction.x = 0;
+                      this.direction.y = dy > 0 ? 1 : -1;
+                  }
+                  else{
+                      this.direction.y = 0;
+                      this.direction.x = dx > 0 ? 1 : -1;
+                  }
+                }
+            }
+
+              checkPacmanCollision() {
+                if (this.isColliding(this.x, this.y, pacman)) {
+                    gameOver();  //  Dragons always defeat Pac-Man
+                }
+             }
+               freeze() {
+                this.frozen = true;
+                clearTimeout(this.freezeTimer);
+                this.freezeTimer = setTimeout(() => { this.frozen = false; }, 3000);
+             }
+
+          }
+          class Zombie extends GameObject{
+            constructor(x,y){
+                const element = document.createElement("div");
+                element.classList.add("zombie");
+                super(x,y,element);
+                this.speed = 0.5;
+            }
+            move() {
+                this.chasePacman();  //  Dragons also chase Pac-Man
+                if (!this.checkWallCollision(this.x + this.direction.x, this.y + this.direction.y)) {
+                    super.updatePosition();
+                }
+                else{
+                  this.chooseRandomDirection();
+                }
+                 this.checkPacmanCollision();
+                }
+                           checkWallCollision(x, y) {
+                for (const wall of walls) {
+                    if (this.isColliding(x, y, wall)) {
+                        return true; // Collision detected
+                    }
+                }
+                return false; // No collision
+              }
+
+             isColliding(x, y, other) {
+                const zombieRect = {  //  Create a rectangle for zombie's *next* position
+                    left: x,
+                    top: y,
+                    right: x + this.element.offsetWidth,
+                    bottom: y + this.element.offsetHeight
+                };
+                const otherRect = other.element.getBoundingClientRect(); //  Use built-in function
+
+                  // Check for overlap
+                return !(zombieRect.right < otherRect.left ||
+                         zombieRect.left > otherRect.right ||
+                         zombieRect.bottom < otherRect.top ||
+                         zombieRect.top > otherRect.bottom);
+            }
+               chooseRandomDirection() {
+                const options = [
+                    { x: 1, y: 0 },
+                    { x: -1, y: 0 },
+                    { x: 0, y: 1 },
+                    { x: 0, y: -1 }
+                ];
+                //  Filter out directions that would cause a collision
+                const validOptions = options.filter(option => {
+                    return !this.checkWallCollision(this.x + option.x, this.y + option.y);
+                });
+
+                if (validOptions.length > 0) {
+                    const choice = validOptions[Math.floor(Math.random() * validOptions.length)];
+                    this.direction = choice;
+                } else {
+                    // No valid options (rare, but possible) - just stop
+                    this.direction = { x: 0, y: 0 };
+                }
+             }
+
+              chasePacman() {
+                //  Simple "best path" algorithm
+                let dx = pacman.x - this.x;
+                let dy = pacman.y - this.y;
+
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    // Move horizontally
+                    this.direction.x = dx > 0 ? 1 : -1;
+                    this.direction.y = 0;
+                } else {
+                    //  Move vertically
+                    this.direction.x = 0;
+                    this.direction.y = dy > 0 ? 1 : -1;
+                }
+                 // Attempt to correct course if blocked
+                if (this.checkWallCollision(this.x + this.direction.x, this.y + this.direction.y)) {
+                  if(this.direction.x !== 0){
+                      this.direction.x = 0;
+                      this.direction.y = dy > 0 ? 1 : -1;
+                  }
+                  else{
+                      this.direction.y = 0;
+                      this.direction.x = dx > 0 ? 1 : -1;
+                  }
+                }
+            }
+
+              checkPacmanCollision() {
+                if (this.isColliding(this.x, this.y, pacman)) {
+                    gameOver();  //  Dragons always defeat Pac-Man
+                }
+             }
+               freeze() {
+                this.frozen = true;
+                clearTimeout(this.freezeTimer);
+                this.freezeTimer = setTimeout(() => { this.frozen = false; }, 3000);
+             }
+          }
+
+        class Dot {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.element = document.createElement('div');
+                this.element.classList.add('dot');
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+                gameBoard.appendChild(this.element);
+            }
+        }
+
+        class PowerPellet {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.element = document.createElement('div');
+                this.element.classList.add('power-pellet');
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+                gameBoard.appendChild(this.element);
+            }
+        }
+
+        class Powerup {  //  New Powerup class
+           constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type;  // 'speed' or 'freeze', etc.
+                this.element = document.createElement('div');
+                this.element.classList.add(`powerup-${this.type}`);
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+                gameBoard.appendChild(this.element);
+            }
+        }
+
+         class Wall {
+            constructor(x, y, width, height) {
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                this.element = document.createElement('div');
+                this.element.classList.add('wall');
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+                this.element.style.width = `${this.width}px`;
+                this.element.style.height = `${this.height}px`;
+                gameBoard.appendChild(this.element);
+            }
+        }
+
+        // --- Level Design (Map) ---
+
+        function createLevel() {
+            const levelData = [
+                //  0 = empty, 1 = wall, 2 = dot, 3 = power pellet, 4 = speed powerup, 5 = freeze powerup
+                //  Use a smaller grid (28x31 is classic, but we have limited space)
+                //  This is a *very* simplified map.  A real map would need to be MUCH more detailed.
+                 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1],
+                [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+                [1,3,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,3,1],
+                [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+                [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+                [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
+                [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
+                [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
+                [1,1,1,1,1,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,1,1,1,1,1],
+                [1,1,1,1,1,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,1,1,1,1,1],
+                [1,1,1,1,1,1,2,1,1,0,1,1,1,0,0,1,1,1,0,1,1,2,1,1,1,1,1,1],
+                [1,1,1,1,1,1,2,1,1,0,1,0,0,0,0,0,0,1,0,1,1,2,1,1,1,1,1,1],
+                [0,0,0,0,0,0,2,0,0,0,1,0,0,0,0,0,0,1,0,0,0,2,0,0,0,0,0,0], // Middle
+                [1,1,1,1,1,1,2,1,1,0,1,0,0,0,0,0,0,1,0,1,1,2,1,1,1,1,1,1],
+                [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
+                [1,1,1,1,1,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,1,1,1,1,1],
+                [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
+                [1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1],
+                [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+                [1,3,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,3,1],
+                [1,2,2,2,1,1,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,1,1,2,2,2,1],
+                [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
+                [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
+                [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
+                [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
+                [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
+                [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            ];
+
+              const TILE_SIZE = 20; // Assuming each grid cell is 20x20 pixels
+
+            for (let row = 0; row < levelData.length; row++) {
+                for (let col = 0; col < levelData[row].length; col++) {
+                    const x = col * TILE_SIZE;
+                    const y = row * TILE_SIZE;
+
+                    switch (levelData[row][col]) {
+                        case 1:
+                            walls.push(new Wall(x, y, TILE_SIZE, TILE_SIZE));
+                            break;
+                        case 2:
+                            dots.push(new Dot(x + TILE_SIZE / 2 - 2, y + TILE_SIZE / 2 - 2)); // Center the dot
+                            break;
+                        case 3:
+                            powerPellets.push(new PowerPellet(x + TILE_SIZE / 2 - 5, y + TILE_SIZE / 2 - 5)); // Center
+                            break;
+                        case 4:
+                            powerups.push(new Powerup(x + TILE_SIZE/2 -6, y + TILE_SIZE/2 -6, 'speed')); // Center
+                            break;
+                        case 5:
+                           powerups.push(new Powerup(x+ TILE_SIZE/2 -6, y + TILE_SIZE/2 -6, 'freeze')); // Center
+                            break;
+
+                    }
+                }
+            }
+                //  Create enemies *after* the level
+            createEnemies();
+        }
+
+        // --- Enemy Creation ---
+        function createEnemies() {
+          //  Ghosts - Blinky (red), Pinky (pink), Inky (cyan), Clyde (orange)
+          ghosts.push(new Ghost(11 * 20, 11 * 20, "red"));  //  Start in the ghost house
+          ghosts.push(new Ghost(11 * 20 + 40, 11 * 20, "pink"));
+          ghosts.push(new Ghost(11 * 20 - 40, 11* 20, "cyan"));
+          ghosts.push(new Ghost(11 * 20, 11 * 20 + 40, "orange"));
+
+          ghosts[0].setScatterTarget(0,0); // Example:  Top-left
+          ghosts[1].setScatterTarget(gameBoard.offsetWidth, 0); // Top-right
+          ghosts[2].setScatterTarget(0,gameBoard.offsetHeight); //  Bottom-left
+          ghosts[3].setScatterTarget(gameBoard.offsetWidth, gameBoard.offsetHeight); // Bottom-right;
+
+            // Dragons - Example placement
+            dragons.push(new Dragon(5 * 20, 5 * 20));
+            dragons.push(new Dragon(20 * 20, 20 * 20));
+
+             // Skeletons - Example placement
+            skeletons.push(new Skeleton(8 * 20, 8 * 20));
+            skeletons.push(new Skeleton(15 * 20, 15 * 20));
+
+            // Zombies - Example placement
+            zombies.push(new Zombie(10 * 20, 5 * 20));
+            zombies.push(new Zombie(18 * 20, 10 * 20));
+        }
+
+
+        // --- Game Logic ---
+
+        function startGame() {
+            // Initialize game objects
+            pacman = new Pacman(13 * 20, 23 * 20); // Starting position
+            createLevel();
+
+
+            // Start the game loop
+            gameInterval = setInterval(gameLoop, 30); //  ~30 FPS
+             // Set initial scatter mode
+            setScatterMode(true);
+            // Switch to chase mode after a delay
+            setTimeout(() => {setScatterMode(false);}, 7000) //  7 seconds
+        }
+         function setScatterMode(scatter) {
+            ghosts.forEach(ghost => {
+                ghost.scatter = scatter;
+            });
+        }
+
+
+        function gameLoop() {
+             pacman.move();
+             if(!ghosts[0].frozen){
+              ghosts.forEach(ghost => ghost.move());
+             }
+             if(!dragons[0].frozen){
+                dragons.forEach(dragon => dragon.move());
+             }
+             if(!skeletons[0].frozen){
+               skeletons.forEach(skeleton => skeleton.move());
+             }
+             if(!zombies[0].frozen){
+               zombies.forEach(zombie => zombie.move());
+             }
+
+             if(dots.length == 0){
+                gameOver();
+             }
+        }
+
+        function gameOver() {
+            clearInterval(gameInterval);
+            gameOverScreen.style.display = 'block';
+            //  No need to remove elements individually, just clear innerHTML
+              // gameBoard.innerHTML = ''; // This clears *everything* on the board
+        }
+
+         function resetGame() {
+
+            //  Remove all existing game objects from the board.
+             dots.forEach(dot => gameBoard.removeChild(dot.element));
+             powerPellets.forEach(pellet => gameBoard.removeChild(pellet.element));
+             powerups.forEach(powerup => gameBoard.removeChild(powerup.element));
+             walls.forEach(wall => gameBoard.removeChild(wall.element));
+             ghosts.forEach(ghost => gameBoard.removeChild(ghost.element));
+             dragons.forEach(dragon => gameBoard.removeChild(dragon.element));
+             skeletons.forEach(skeleton => gameBoard.removeChild(skeleton.element));
+             zombies.forEach(zombie => gameBoard.removeChild(zombie.element));
+             gameBoard.removeChild(pacman.element);
+
+
+            // Clear the arrays themselves.
+            dots = [];
+            powerPellets = [];
+            powerups = [];
+            walls = [];
+            ghosts = [];
+            dragons = [];
+            skeletons = [];
+            zombies = [];
+
+
+            // Reset score.
+            score = 0;
+            scoreDisplay.textContent = score;
+
+             gameOverScreen.style.display = "none";
+
+            // Restart the game.
+            startGame();
+         }
+
+
+        // --- Input Handling ---
+
+        document.addEventListener('keydown', (event) => {
+           switch (event.key) {
+                case 'ArrowUp':
+                    pacman.nextDirection = { x: 0, y: -1 };
+                    break;
+                case 'ArrowDown':
+                    pacman.nextDirection = { x: 0, y: 1 };
+                    break;
+                case 'ArrowLeft':
+                    pacman.nextDirection = { x: -1, y: 0 };
+                    break;
+                case 'ArrowRight':
+                    pacman.nextDirection = { x: 1, y: 0 };
+                    break;
+            }
+        });
+
+        restartButton.addEventListener("click", resetGame);
+
+        // --- Start the game ---
+        startGame();
+
+    </script>
+</body>
+
+</html>
