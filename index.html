@@ -4,24 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Inescapable Void</title>
+    <title>The Truly Inescapable Void</title>
     <style>
-        /* --- General & Reset --- */
+        /* --- (Same styles as before, plus additions below) --- */
         body,
         html {
             margin: 0;
             padding: 0;
             height: 100%;
             overflow: hidden;
-            /* Initially hide scrollbars */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #111, #333, #111);
             color: #eee;
             cursor: url('data:image/x-icon;base64,AAACAAEAICAQAAAAAADoAgAAFgAAACgAAAAgAAAAQAAAAAEABAAAAAAAAAIAAAAAAAAAAAAAEAAAAAAAAAAAAAAA/4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8AAA=='), auto; /* Custom "void" cursor */
         }
 
-
-        /* --- Main Container --- */
         #container {
             position: relative;
             width: 100%;
@@ -30,51 +27,42 @@
             justify-content: center;
             align-items: center;
             perspective: 1000px;
-            /* For 3D effects */
             overflow: hidden;
-            /* Keeps floating elements contained (mostly) */
         }
 
-
-        /* --- The Core Message --- */
         #message {
-            position: relative;  /* Important for z-index and animation */
-            z-index: 100;      /*  High z-index to be on top (initially)*/
+            position: relative;
+            z-index: 100;
             text-align: center;
             font-size: 3em;
             font-weight: bold;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-            animation: pulse 2s infinite alternate,  rotate 15s linear infinite; /* Subtle, constant animation */
-            transform-style: preserve-3d; /* For 3D rotation */
-             padding: 20px;
+            animation: pulse 2s infinite alternate, rotate 15s linear infinite;
+            transform-style: preserve-3d;
+            padding: 20px;
             border-radius: 15px;
-             background: linear-gradient(135deg,  rgba(255,255,255,0.2), rgba(255,255,255,0.05));
-            backdrop-filter: blur(5px);  /* Nice glass-like effect */
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+            backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.1);
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            max-width: 80%;  /* Prevent it from taking up the whole screen */
+            max-width: 80%;
         }
 
-        /* --- Floating Elements Base --- */
         .floater {
             position: absolute;
             pointer-events: none;
-            /*  Make them non-interactive by default (except the close button) */
-            border-radius: 10px;  /*  Rounded corners */
-            opacity: 0;      /*  Start hidden for fade-in */
-             transform-style: preserve-3d;  /* Enable 3D transforms for depth */
-            will-change: transform, opacity; /*  Optimization hint */
+            border-radius: 10px;
+            opacity: 0;
+            transform-style: preserve-3d;
+            will-change: transform, opacity;
         }
-
-        .floater img {
+          .floater img {
             max-width: 100%;
             height: auto;
             display: block; /* Prevents extra spacing below images*/
              border-radius: 10px; /*  Match parent */
         }
 
-
-        /* --- Close Button (The Tease) --- */
         #close-button {
             position: fixed;
             top: 20px;
@@ -86,40 +74,36 @@
             border-radius: 5px;
             cursor: pointer;
             z-index: 1000;
-            /* Highest z-index */
             animation: jiggle 0.5s infinite alternate;
-            /* Annoying jiggle */
-            pointer-events: auto;  /*  Make it clickable! */
+            pointer-events: auto;
+              transition: transform 0.2s, box-shadow 0.2s; /* Smooth transitions */
         }
 
         #close-button:hover {
-           background-color: rgba(255,0,0,0.9);
-            transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(255,0,0,0.7);
+              transform: scale(1.1) rotate(5deg);  /*  Slight rotation on hover */
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.9); /*  Brighter glow */
         }
 
-
-        /* --- Fake Ads --- */
         .fake-ad {
             background: linear-gradient(to bottom, #444, #222);
             color: #fff;
             padding: 15px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
             font-size: 1.1em;
-             border-radius: 10px;
+            border-radius: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;  /* Center text vertically */
-             text-align: center; /* Center text horizontally */
+            justify-content: center;
+            text-align: center;
         }
 
         .fake-ad img {
-            margin-bottom: 10px; /* Space between image and text */
+            margin-bottom: 10px;
         }
 
-        /* --- Animations --- */
-        @keyframes pulse {
+        /* --- Animations (Same as before) --- */
+         @keyframes pulse {
             from {
                 transform: scale(1);
             }
@@ -179,8 +163,83 @@
             }
         }
 
+        /* --- NEW: Distraction Overlay --- */
+        #distraction-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            /* Semi-transparent black */
+            z-index: 500;
+            /* Above most things, below close button */
+            pointer-events: none;
+            /* Allows clicking through */
+            display: none;
+            /* Hidden by default */
+            opacity: 0;
+            transition: opacity 0.5s ease;
+             /* Add a grid for a "broken screen" effect */
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
 
-        /* --- Media Queries (Responsiveness) --- */
+        }
+
+          #distraction-overlay.active {
+            display: block;
+            opacity: 1;
+              animation: flicker 0.1s infinite alternate; /* Quick flicker */
+        }
+          @keyframes flicker {
+            from { opacity: 0.8; }
+            to { opacity: 1; }
+         }
+
+
+        /* --- NEW: Fake Buttons --- */
+        .fake-button {
+             position: absolute; /*  Absolutely positioned */
+            padding: 10px 15px;
+            background-color: rgba(0, 128, 255, 0.7); /*  A different color */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 600; /*  Above the distraction overlay */
+            animation:  moveAround 5s linear infinite; /*  Make them move */
+        }
+
+          @keyframes moveAround {
+                0%   { transform: translate(0, 0); }
+                25%  { transform: translate(var(--move-x), var(--move-y)); }
+                50%  { transform: translate(calc(var(--move-x) * 0.5), calc(var(--move-y) * -0.5)); }
+                75%  { transform: translate(calc(var(--move-x) * -0.5), calc(var(--move-y) * 0.5)); }
+                100% { transform: translate(0, 0); }
+            }
+
+        /* --- NEW: Fullscreen Message --- */
+        #fullscreen-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 0, 0.9); /*  Intense red */
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4em;
+            z-index: 2000; /*  Very high, above everything else */
+            display: none; /* Hidden initially */
+            text-align: center;
+            padding: 20px;
+        }
+
+         /* --- Media Queries (Responsiveness) --- */
 
         /*  Smaller screens:  Reduce font size, simplify */
         @media (max-width: 768px) {
@@ -206,6 +265,7 @@
                 animation-duration: 20s !important;  /* Slower animation */
             }
         }
+
     </style>
 </head>
 
@@ -213,14 +273,19 @@
     <div id="container">
         <div id="message">You have met your inevitable end. <br> There is no escape... or is there?</div>
         <button id="close-button">Close (Maybe?)</button>
+        <div id="distraction-overlay"></div>
+         <div id="fullscreen-message">ARE YOU SURE YOU WANT TO LEAVE?</div>
     </div>
 
     <script>
         const container = document.getElementById('container');
         const closeButton = document.getElementById('close-button');
-        let floaterCount = 0; // Keep track of how many floaters we've made
-        let maxFloaters = 30;   //  Limit the total number
+        const distractionOverlay = document.getElementById('distraction-overlay');
+        const fullscreenMessage = document.getElementById('fullscreen-message');
+        let floaterCount = 0;
+        let maxFloaters = 30;
         let closeAttempt = 0;
+        let fakeButtons = []; // Array to store fake buttons
 
 
         // --- Function to create a floating element ---
@@ -285,51 +350,130 @@
         }
 
 
-         // ---  Initial Floaters ---
+        // --- Function to create fake buttons ---
+        function createFakeButton() {
+            const button = document.createElement('button');
+            button.classList.add('fake-button');
+            button.textContent = "Don't Click";
+
+             // Random position, but keep it within the viewport
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 50);
+            button.style.left = `${x}px`;
+            button.style.top = `${y}px`;
+
+
+            // --- Movement variables for animation ---
+             const moveX = (Math.random() * 200) - 100; // -100 to 100
+             const moveY = (Math.random() * 200) - 100;
+              button.style.setProperty('--move-x', `${moveX}px`);
+            button.style.setProperty('--move-y', `${moveY}px`);
+
+
+            // Add click handler (they do nothing!)
+            button.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent clicks from reaching the container
+                 createFloater(); // Spawn a floater as "punishment"
+                //Maybe move the button after click
+                button.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+                button.style.top =  Math.random() * (window.innerHeight - 50) + 'px';
+            });
+
+            container.appendChild(button);
+            fakeButtons.push(button); // Add to the array
+        }
+
+
+          // --- Remove Fake Buttons (cleanup) ---
+         function removeFakeButtons() {
+             for (const button of fakeButtons) {
+                 container.removeChild(button);
+             }
+              fakeButtons = []; // Clear the array
+         }
+
+          // ---  Initial Floaters ---
         for (let i = 0; i < 10; i++) {
             createFloater();
         }
 
+        // --- Close Button Logic ---
+        closeButton.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevent click from reaching elements below
+            closeAttempt++;
 
-        // ---  Close Button Shenanigans ---
-        closeButton.addEventListener('click', () => {
-           closeAttempt++;
-
-           if(closeAttempt < 3){
-               // Move the button
+            if (closeAttempt < 3) {
                 closeButton.style.top = Math.random() * (window.innerHeight - 100) + 'px';
-                closeButton.style.left = Math.random() * (window.innerWidth - 100) + 'px';  // Use left, not right
-                // Spawn more floaters!
+                closeButton.style.left = Math.random() * (window.innerWidth - 100) + 'px';
                 for (let i = 0; i < 5; i++) {
-                 createFloater();
+                    createFloater();
                 }
-           } else if (closeAttempt < 6) {
-                // Start making the message harder to read
-                document.getElementById("message").style.filter = "blur(" + (closeAttempt - 2) + "px)";
-                 // and more floaters...
-               for (let i = 0; i < 10; i++) {
-                 createFloater();
+            } else if (closeAttempt < 6) {
+                  document.getElementById("message").style.filter = "blur(" + (closeAttempt - 2) + "px)";
+                for (let i = 0; i < 10; i++) {
+                    createFloater();
                 }
-           }else{
-               // Ok, fine, they can close it (maybe)
-               alert("Fine, you win... for now.");  //Or actually close the window: window.close();
-           }
+                 // Activate distraction overlay
+                distractionOverlay.classList.add('active');
+                 // Create fake buttons
+                for (let i = 0; i < 3; i++) {
+                    createFakeButton();
+                }
 
+            } else if(closeAttempt < 8) {
+               // Remove fake buttons and distraction
+                removeFakeButtons();
+                 distractionOverlay.classList.remove('active');
+
+                // Show fullscreen message
+                fullscreenMessage.style.display = 'flex';
+
+                // Hide the message after a few seconds
+                setTimeout(() => {
+                    fullscreenMessage.style.display = 'none';
+                 }, 3000);
+
+            }else {
+                alert("Okay, okay, I get it. You're persistent.  You can leave... maybe.");
+                // window.close();  // Or actually close the window
+            }
         });
 
 
-
         // --- Create new floaters periodically ---
-        setInterval(createFloater, 2000); // Every 2 seconds
+        setInterval(createFloater, 2000);
 
-         // --- Disable Right-Click (because that's annoying) ---
+
+        // --- Prevent Default Actions (More inescapable!) ---
         document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', event => event.preventDefault());  // Disable all keys
+        // document.addEventListener('click', event => event.preventDefault());  // Disable all clicks (except on the close button)
 
-        // ---  Prevent accidental closing (optional, and very mean) ---
+        // --- Prevent Accidental Closing ---
         // window.addEventListener('beforeunload', (event) => {
         //     event.preventDefault();
-        //     event.returnValue = ''; //  Modern browsers require this
+        //     event.returnValue = ''; // Required for modern browsers
         // });
+
+          // Prevent selecting text (makes it feel less like a webpage)
+         document.body.style.userSelect = 'none';
+         document.body.style.webkitUserSelect = 'none'; // For Safari
+
+           // --- Handle window resize ---
+        window.addEventListener('resize', () => {
+             // Reposition the close button (optional)
+            closeButton.style.top = '20px';
+            closeButton.style.right = '20px';
+              removeFakeButtons(); // Remove and recreate fake buttons to keep them in bounds
+
+             // Recreate fake buttons
+             if (distractionOverlay.classList.contains('active')) {
+                 for (let i = 0; i < 3; i++) {
+                    createFakeButton();
+                 }
+             }
+        });
+
     </script>
 </body>
 
