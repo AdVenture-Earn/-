@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Void's Challenge</title>
+    <title>The Void's Gauntlet</title>
     <style>
-        /* --- Basic Reset and Shared Styles --- */
+        /* --- Reset & General Styles --- */
         body,
         html {
             margin: 0;
@@ -15,378 +15,886 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #111, #333, #111);
             color: #eee;
-            overflow: hidden; /* Hide scrollbars during gameplay */
+            overflow: hidden;
+            /* Initially hide scrollbars */
         }
 
-        #container {
-            position: relative;  /* For absolute positioning of game elements */
+        /* --- Main Container --- */
+        #game-container {
+            position: relative;
+            /*  Needed for absolute positioning of game elements */
             width: 100%;
             height: 100%;
-            overflow: hidden; /* Critical for keeping things within bounds */
+            overflow: hidden;
+            /*  Prevent scrollbars caused by moving elements */
+            display: none;
+            /* Hidden initially, shown after "winning" */
+            cursor: crosshair; /* More game-like cursor */
         }
 
-        /* --- "You Win" Message Styles --- */
-        #win-message {
-            position: fixed; /* Stays in a fixed position */
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 180, 0, 0.9);
-            color: white;
-            padding: 30px 50px;
-            font-size: 3em;
-            border-radius: 15px;
-            z-index: 2000; /* High z-index, appears on top */
-            display: none; /* Hidden initially */
-            text-align: center;
-             box-shadow: 0 0 20px rgba(0, 255, 0, 0.8); /* Glow effect */
-             opacity: 0; /*  Start hidden for fade-in */
-            transition: opacity 0.5s ease; /* Smooth fade-in */
-        }
-
-           #win-message.show {
-             display: block;
-             opacity: 1;
-             animation: winPulse 2s infinite alternate; /*  Subtle pulse */
-        }
-
-        @keyframes winPulse {
-            from { transform: translate(-50%, -50%) scale(1); }
-            to { transform: translate(-50%, -50%) scale(1.05); }
-        }
-
-         /* --- Game Level Styles --- */
-        #game-level {
+        /* --- Player Character --- */
+        #player {
             position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #0f0;
+            /* Bright green */
+            border-radius: 50%;
+            /* Circle */
+            transition: transform 0.1s linear;
+            /* Smooth movement */
+            z-index: 100;
+            /*  Above obstacles */
+             box-shadow: 0 0 10px 2px rgba(0, 255, 0, 0.8); /*  Glow */
+        }
+
+        /* --- Obstacles --- */
+        .obstacle {
+            position: absolute;
+            background: linear-gradient(to bottom, #800, #f00);
+            /* Dark red to bright red */
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- Goal --- */
+        #goal {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(to bottom, #ff0, #ffa500);
+            /* Yellow to orange */
+            border-radius: 50%;
+            z-index: 50;
+             /* Below player, above obstacles */
+             animation: rotate 2s linear infinite;  /*  Subtle rotation */
+             box-shadow: 0 0 15px 5px rgba(255, 255, 0, 0.7); /*  Glowing effect */
+        }
+
+          @keyframes rotate {
+             from { transform: rotate(0deg); }
+             to { transform: rotate(360deg); }
+          }
+
+
+        /* --- Hidden Areas --- */
+        .hidden-area {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Semi-transparent black */
+            cursor: pointer;
+            /* Indicate interactivity */
+            z-index: 75;
+           /*  Below player, above goal/obstacles */
+        }
+
+        /* --- Hidden Messages --- */
+        .hidden-message {
+            position: absolute;
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            /* Hidden by default */
+            z-index: 200; /*  Above everything else */
+             pointer-events: none; /*  Don't interfere with clicks */
+             font-size: 0.9em; /*  Slightly smaller text */
+            text-align: center;
+        }
+
+
+          /* --- Game Over Screen --- */
+          #game-over {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            display: none; /* Hidden initially, shown after "winning" */
-             background: linear-gradient(to bottom, #222, #444); /* Darker background */
-        }
-
-         #player {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background-color: #007bff; /* Bright blue */
-            border-radius: 50%; /* Circle */
-            left: 50px; /* Starting position */
-            top: 50px;
-            transition: top 0.1s linear, left 0.1s linear; /* Smooth movement */
-            z-index: 100; /* Above obstacles, below goal */
-        }
-
-         .obstacle {
-            position: absolute;
-             background: linear-gradient(to right, #800000, #ff0000); /* Red gradient */
-             border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-            z-index: 50; /* Below player and goal */
-
-        }
-
-
-        #goal {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-             background: linear-gradient(to bottom, #00ff00, #008000); /* Green gradient */
-            border-radius: 50%;
-            right: 50px; /* Position at the right edge */
-            bottom: 50px;
-             z-index: 150;  /*  Above the player, so it can be "collected" */
-             animation: goalSpin 5s linear infinite;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.7); /* Glowing effect */
-        }
-
-        @keyframes goalSpin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* --- Hidden Area --- */
-        #hidden-area {
-             position: absolute;
-            width: 100px;
-            height: 100px;
-            background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent */
-             top: 200px; /*  Example position - change this */
-             left: 350px;
-            z-index: 200;
-             /* Hidden by default, revealed on hover (see JS) */
-            display: none;  /* Initially hidden */
-            border-radius: 10px;
-             transition: background-color 0.3s ease; /* Smooth transition */
-
-        }
-
-         #hidden-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            background: rgba(255, 0, 0, 0.8); /* Red overlay */
             color: white;
-             font-size: 1.2em;
-            text-align: center;
-            display: none;  /* Hidden by default */
-            opacity: 0; /* Start hidden */
-             transition: opacity 0.3s ease; /* Smooth fade-in */
-            pointer-events: none; /*  Don't block interaction with hidden area */
-        }
-        #hidden-area:hover #hidden-message {
-            display: block; /* Show on hover */
-            opacity: 1;
+            display: flex;
+            flex-direction: column; /* Stack elements vertically */
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+            z-index: 3000; /*  Highest z-index */
+            display: none; /* Hidden initially */
+             text-align: center; /* Center text horizontally */
 
-        }
-           #hidden-area:hover {
-            background-color: rgba(255, 255, 255, 0.3); /*  Brighter on hover */
-             cursor: pointer; /*  Change cursor to indicate interactivity */
+          }
+
+        #retry-button {
+            padding: 15px 30px;
+            background-color: #007bff; /* Blue button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2em; /* Larger font */
+            margin-top: 20px; /* Space above the button */
+            transition: background-color 0.3s;
+         }
+
+        #retry-button:hover {
+           background-color: #0056b3; /* Darker blue on hover */
+         }
+
+        /* --- "You Win" Screen --- */
+           #you-win {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 255, 0, 0.8); /* Green overlay */
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+            z-index: 3000;
+            display: none;
+            text-align: center;
+            padding: 20px;
            }
 
-        /* --- Styles from the "inescapable" part (condensed) --- */
-        /* ... (Include the styles from the previous response, but remove
-               the styles that are specific to the initial inescapable part,
-               like the close button, floaters, distraction overlay, etc.
-               Keep general styles like body, #container, animations, etc.) ... */
+            /* ---  Styles from the previous "inescapable" page --- */
+        /*   (Include *all* the CSS from the previous version here.  I'm omitting it for brevity,
+            but in your *actual* code, you need to paste it in.  This ensures consistency.)  */
+        /* START PREVIOUS STYLES */
+        #container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+            overflow: hidden;
+        }
 
+        #message {
+            position: relative;
+            z-index: 100;
+            text-align: center;
+            font-size: 3em;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            animation: pulse 2s infinite alternate, rotate 15s linear infinite;
+            transform-style: preserve-3d;
+            padding: 20px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            max-width: 80%;
+        }
+
+        .floater {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 10px;
+            opacity: 0;
+            transform-style: preserve-3d;
+            will-change: transform, opacity;
+        }
+
+        .floater img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 10px;
+        }
+
+        #close-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background-color: rgba(255, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+            animation: jiggle 0.5s infinite alternate;
+            pointer-events: auto;
+            transition: transform 0.2s, box-shadow 0.2s;
+            /* Initial transform - scale down slightly */
+            transform: scale(0.9);
+
+        }
+
+        #close-button:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.9);
+        }
+
+        .fake-ad {
+            background: linear-gradient(to bottom, #444, #222);
+            color: #fff;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            font-size: 1.1em;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .fake-ad img {
+            margin-bottom: 10px;
+        }
+
+        /* --- Animations (Same as before) --- */
+        @keyframes pulse {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.05);
+            }
+        }
+
+
+        @keyframes rotate {
+            from {
+                transform: rotateY(0deg);
+            }
+
+            to {
+                transform: rotateY(360deg);
+            }
+        }
+
+
+
+        @keyframes floatAndRotate {
+
+            /*  More complex, individual keyframes for more natural movement  */
+            0% {
+                transform: translate(0, 0) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            /* Fade in quickly */
+            30% {
+                transform: translate(var(--x), var(--y)) rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(var(--rz));
+            }
+
+            60% {
+                transform: translate(calc(var(--x) * 0.8), calc(var(--y) * 1.2))
+                    rotateX(calc(var(--rx) * 1.2)) rotateY(calc(var(--ry) * 0.8)) rotateZ(calc(var(--rz) * 1.1));
+            }
+
+            90% {
+                transform: translate(calc(var(--x) * 0.5), calc(var(--y) * 0.7))
+                    rotateX(calc(var(--rx) * 0.9)) rotateY(calc(var(--ry) * 1.1)) rotateZ(calc(var(--rz) * 0.8));
+
+            }
+
+            100% {
+                transform: translate(0, 0) rotateX(0) rotateY(0deg) rotateZ(0deg);
+                opacity: 0;
+                /*  Fade out at the end */
+            }
+        }
+
+        @keyframes jiggle {
+            0% {
+                transform: rotate(-2deg);
+            }
+
+            50% {
+                transform: rotate(2deg);
+            }
+
+            100% {
+                transform: rotate(-2deg);
+            }
+        }
+
+        /* --- NEW: Distraction Overlay --- */
+        #distraction-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            /* Semi-transparent black */
+            z-index: 500;
+            /* Above most things, below close button */
+            pointer-events: none;
+            /* Allows clicking through */
+            display: none;
+            /* Hidden by default */
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            /* Add a grid for a "broken screen" effect */
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+
+        }
+
+        #distraction-overlay.active {
+            display: block;
+            opacity: 1;
+            animation: flicker 0.1s infinite alternate;
+            /* Quick flicker */
+        }
+
+        @keyframes flicker {
+            from {
+                opacity: 0.8;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+
+        /* --- NEW: Fake Buttons --- */
+        .fake-button {
+            position: absolute;
+            /*  Absolutely positioned */
+            padding: 10px 15px;
+            background-color: rgba(0, 128, 255, 0.7);
+            /*  A different color */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 600;
+            /*  Above the distraction overlay */
+            animation: moveAround 5s linear infinite;
+            /*  Make them move */
+        }
+
+        @keyframes moveAround {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            25% {
+                transform: translate(var(--move-x), var(--move-y));
+            }
+
+            50% {
+                transform: translate(calc(var(--move-x) * 0.5), calc(var(--move-y) * -0.5));
+            }
+
+            75% {
+                transform: translate(calc(var(--move-x) * -0.5), calc(var(--move-y) * 0.5));
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+
+        /* --- NEW: Fullscreen Message --- */
+        #fullscreen-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 0, 0.9);
+            /*  Intense red */
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4em;
+            z-index: 2000;
+            /*  Very high, above everything else */
+            display: none;
+            /* Hidden initially */
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* --- NEW: Mouse Trail --- */
+        .mouse-trail {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            /*  Don't interfere with clicks */
+            z-index: 1500;
+            /*  Above most things */
+            transition: opacity 0.2s, transform 0.2s;
+            /* Smooth fade-out */
+            opacity: 0;
+            /* Initially hidden */
+        }
+
+        /* --- NEW: Audio --- */
+        #background-audio {
+            display: none;
+            /* Hidden by default */
+        }
+
+        /* --- Media Queries (Responsiveness) --- */
+
+        /*  Smaller screens:  Reduce font size, simplify */
+        @media (max-width: 768px) {
+            #message {
+                font-size: 2em;
+            }
+
+            .fake-ad {
+                font-size: 0.9em;
+            }
+        }
+
+        /* Very small screens:  Make things even smaller, less animation */
+        @media (max-width: 480px) {
+            #message {
+                font-size: 1.5em;
+            }
+
+            .fake-ad {
+                padding: 10px;
+            }
+
+            .floater {
+                animation-duration: 20s !important;
+                /* Slower animation */
+            }
+        }
+
+        /* END PREVIOUS STYLES */
     </style>
 </head>
 
 <body>
+    <!-- "Inescapable" Page Elements (Keep these) -->
     <div id="container">
-        <!-- "You Win" message (initially hidden) -->
-        <div id="win-message">You Escaped... But Can You Conquer the Void?</div>
+        <div id="message">You have met your inevitable end. <br> There is no escape... or is there?</div>
+        <button id="close-button">Close (Maybe?)</button>
+        <div id="distraction-overlay"></div>
+        <div id="fullscreen-message">ARE YOU SURE YOU WANT TO LEAVE?</div>
+        <audio id="background-audio" loop>
+            <source src="https://www.freesound.org/data/previews/514/514857_11158877-lq.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
 
-        <!-- Game level elements -->
-        <div id="game-level">
-            <div id="player"></div>
-            <div id="goal"></div>
-            <div id="hidden-area">
-                <div id="hidden-message">A secret!<br> (Maybe it helps?)</div>
-            </div>
-            <!-- Obstacles (added dynamically via JavaScript) -->
+
+    <!-- Game Elements (New) -->
+    <div id="game-container">
+        <div id="player"></div>
+        <div id="goal"></div>
+        <div class="obstacle" style="width: 100px; height: 20px; top: 200px; left: 150px;"></div>
+        <div class="obstacle" style="width: 20px; height: 150px; top: 300px; left: 300px;"></div>
+        <div class="obstacle" style="width: 150px; height: 20px; top: 450px; left: 50px;"></div>
+        <!-- Add more obstacles as needed -->
+        <div class="hidden-area" style="width: 50px; height: 50px; top: 100px; left: 400px;"
+            data-message="Hint: Go around the long way."></div>
+        <div class="hidden-area" style="width: 100px; height: 30px; top: 550px; left: 200px;"
+            data-message="There's always a way."></div>
+         <div class="hidden-message"></div>
+         <div id="game-over">
+              Game Over!
+              <button id="retry-button">Retry</button>
         </div>
-
-        <!-- (No need for the close button, floaters, etc., from the previous part) -->
+         <div id="you-win">You Escaped... This Time!</div>
+        <!-- More hidden areas -->
     </div>
 
     <script>
-        // --- Variables from the "inescapable" part ---
+        // --- Variables from the "inescapable" page ---
         const container = document.getElementById('container');
-        // ... (other variables like closeButton, distractionOverlay -  remove them)
-        let floaterCount = 0; // Keep this, but it won't be used as much
-        let maxFloaters = 30; //  Keep this, but it won't be used as much
-        let closeAttempt = 0; // Keep, and reset to 0 when the game starts
+        const closeButton = document.getElementById('close-button');
+        const distractionOverlay = document.getElementById('distraction-overlay');
+        const fullscreenMessage = document.getElementById('fullscreen-message');
+        const backgroundAudio = document.getElementById('background-audio');
+        let floaterCount = 0;
+        let maxFloaters = 30;
+        let closeAttempt = 0;
+        let fakeButtons = [];
 
-        // --- NEW: Game Level Variables ---
-        const gameLevel = document.getElementById('game-level');
+        // --- NEW: Game Variables ---
+        const gameContainer = document.getElementById('game-container');
         const player = document.getElementById('player');
         const goal = document.getElementById('goal');
-        const winMessage = document.getElementById('win-message');
-        const hiddenArea = document.getElementById('hidden-area');
-        let playerX = 50; // Initial player position
+        const gameOverScreen = document.getElementById('game-over');
+        const retryButton = document.getElementById('retry-button');
+        const youWinScreen = document.getElementById("you-win");
+        const hiddenMessage = document.querySelector('.hidden-message');
+        let playerX = 50;
         let playerY = 50;
-        let obstacles = []; // Array to store obstacle data
-        let gameRunning = false; // Flag to track if the game is active
+        let gameRunning = false; // Flag to control game state
+        let keys = {}; // Object to track pressed keys
 
-        // --- Function to create obstacles ---
-        function createObstacle(x, y, width, height) {
-            const obstacle = document.createElement('div');
-            obstacle.classList.add('obstacle');
-            obstacle.style.left = `${x}px`;
-            obstacle.style.top = `${y}px`;
-            obstacle.style.width = `${width}px`;
-            obstacle.style.height = `${height}px`;
-            gameLevel.appendChild(obstacle);
-            obstacles.push({ element: obstacle, x, y, width, height }); // Store for collision checks
+
+
+        // --- Function to create a floating element ---
+        function createFloater() {
+            if (floaterCount >= maxFloaters) return; // Stop if we've made too many
+            floaterCount++;
+
+            const floater = document.createElement('div');
+            floater.classList.add('floater');
+
+            // --- Randomize position, size, and rotation ---
+            const x = (Math.random() * 200) - 100; // -100 to 100
+            const y = (Math.random() * 200) - 100;
+            const rx = (Math.random() * 60) - 30;  // +/- 30 degrees
+            const ry = (Math.random() * 60) - 30;
+            const rz = (Math.random() * 60) - 30;
+            const size = Math.random() * 150 + 50; // 50 to 200px
+
+            floater.style.setProperty('--x', `${x}px`);
+            floater.style.setProperty('--y', `${y}px`);
+            floater.style.setProperty('--rx', `${rx}deg`);
+            floater.style.setProperty('--ry', `${ry}deg`);
+            floater.style.setProperty('--rz', `${rz}deg`);
+            floater.style.width = `${size}px`;
+            floater.style.height = `${size}px`;
+
+
+            // ---  50/50 chance of an image or a fake ad  ---
+            if (Math.random() < 0.5) {
+                const img = document.createElement('img');
+                //  Placeholder image source (replace with your friend's images!)
+                img.src = `https://picsum.photos/id/${Math.floor(Math.random() * 1000)}/${Math.floor(size)}`;  //Random image
+                floater.appendChild(img);
+
+            } else {
+                floater.classList.add('fake-ad');
+                //  Add some silly text
+                const adTexts = [
+                    "Buy more RAM! Your computer is dying!",
+                    "Click here to win a free toaster!",
+                    "Your soul is now ours! (Terms and Conditions apply)",
+                    "Congratulations! You are the 1,000,000th visitor to the void!",
+                    "One weird trick to escape death! (Doctors hate this!)"
+                ];
+                floater.textContent = adTexts[Math.floor(Math.random() * adTexts.length)];
+            }
+
+
+            // ---  Animation timing ---
+            const duration = (Math.random() * 10 + 5) + 's'; // 5 to 15 seconds
+            floater.style.animation = `floatAndRotate ${duration} linear forwards`;
+
+            // ---  Add to the container ---
+            container.appendChild(floater);
+
+
+            // --- Remove after animation completes (cleanup) ---
+            floater.addEventListener('animationend', () => {
+                container.removeChild(floater);
+                floaterCount--;
+            });
+        }
+        // --- Function to create fake buttons ---
+        function createFakeButton() {
+            const button = document.createElement('button');
+            button.classList.add('fake-button');
+            button.textContent = "Don't Click";
+
+            // Random position, but keep it within the viewport
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 50);
+            button.style.left = `${x}px`;
+            button.style.top = `${y}px`;
+
+
+            // --- Movement variables for animation ---
+            const moveX = (Math.random() * 200) - 100; // -100 to 100
+            const moveY = (Math.random() * 200) - 100;
+            button.style.setProperty('--move-x', `${moveX}px`);
+            button.style.setProperty('--move-y', `${moveY}px`);
+
+
+            // Add click handler (they do nothing!)
+            button.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent clicks from reaching the container
+                createFloater(); // Spawn a floater as "punishment"
+                //Maybe move the button after click
+                button.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+                button.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+            });
+
+            container.appendChild(button);
+            fakeButtons.push(button); // Add to the array
+        }
+
+        // --- Remove Fake Buttons (cleanup) ---
+        function removeFakeButtons() {
+            for (const button of fakeButtons) {
+                container.removeChild(button);
+            }
+            fakeButtons = []; // Clear the array
+        }
+
+        // --- Mouse Trail Function ---
+        function createMouseTrail(x, y) {
+            const trail = document.createElement('div');
+            trail.classList.add('mouse-trail');
+            trail.style.left = `${x}px`;
+            trail.style.top = `${y}px`;
+            document.body.appendChild(trail); // Append to body, not container
+
+            // Fade out and remove after a short delay
+            setTimeout(() => {
+                trail.style.opacity = 0;
+                trail.style.transform = 'scale(2)'; // Optional: grow before fading
+                setTimeout(() => {
+                    document.body.removeChild(trail);
+                }, 300); // Remove after fade-out
+            }, 50);
+        }
+        // --- Initial close button "pulse" to draw attention ---
+        closeButton.style.animation = "pulse 1.5s infinite alternate";
+        // Remove the pulse after a short time, so it doesn't keep going forever
+        setTimeout(() => {
+            closeButton.style.animation = "jiggle 0.5s infinite alternate";
+        }, 5000);  // 5 seconds
+
+        // --- NEW: Game Functions ---
+
+        // --- Update Player Position ---
+        function updatePlayerPosition() {
+            player.style.transform = `translate(${playerX}px, ${playerY}px)`;
         }
 
 
-        // --- Function to start the game ---
-        function startGame() {
-            gameRunning = true;
-            closeAttempt = 0; // Reset close attempts
-
-            // --- 1. Hide the "inescapable" elements ---
-            //  (Remove or hide any elements from the previous part that are no longer needed)
-             // Example:  If you had a close button:
-            // if (closeButton) { closeButton.style.display = 'none'; }
-
-            // --- 2. Show the game level ---
-            gameLevel.style.display = 'block';
-
-            // --- 3. Reset player position ---
-            playerX = 50;
-            playerY = 50;
-            player.style.left = `${playerX}px`;
-            player.style.top = `${playerY}px`;
-
-            // --- 4. Create obstacles ---
-            //  (You can adjust the number, positions, and sizes of obstacles)
-            obstacles = []; // Clear any existing obstacles
-            createObstacle(150, 100, 200, 20); // Example obstacle
-            createObstacle(300, 250, 30, 150);
-            createObstacle(500, 100, 50, 300);
-             createObstacle(100, 400, 250, 40); // Add more obstacles!
-            createObstacle(600, 50, 80, 80);
-            createObstacle(400, 350, 100, 20);
-
-            // --- 5. Show the hidden area (if you want it to be visible at the start) ---
-            hiddenArea.style.display = "block";
-        }
-
-
-
-        // --- Function to check for collisions ---
+         // ---  Check Collision with Obstacles ---
         function checkCollision() {
              const playerRect = player.getBoundingClientRect();
+            const obstacles = document.querySelectorAll('.obstacle');
 
+             for (const obstacle of obstacles) {
+                const obstacleRect = obstacle.getBoundingClientRect();
+
+                if (playerRect.left < obstacleRect.right &&
+                    playerRect.right > obstacleRect.left &&
+                    playerRect.top < obstacleRect.bottom &&
+                    playerRect.bottom > obstacleRect.top) {
+                        // Collision detected!
+                        endGame();
+                        return; // Exit the function after a collision
+                }
+             }
               // Check collision with goal
             const goalRect = goal.getBoundingClientRect();
-             if (rectsOverlap(playerRect, goalRect)) {
-                endGame(true); // Player wins!
-                return; // Stop checking other collisions
+             if (playerRect.left < goalRect.right &&
+                    playerRect.right > goalRect.left &&
+                    playerRect.top < goalRect.bottom &&
+                    playerRect.bottom > goalRect.top) {
+
+                 winGame();
+                 return;
              }
-
-            // Check collision with obstacles
-            for (const obstacle of obstacles) {
-                const obstacleRect = obstacle.element.getBoundingClientRect();
-                if (rectsOverlap(playerRect, obstacleRect)) {
-                    endGame(false); // Player loses
-                    return; // Stop checking other collisions
-                }
-            }
-
-             // Check collision with hidden area
-             const hiddenAreaRect = hiddenArea.getBoundingClientRect();
-            if (rectsOverlap(playerRect, hiddenAreaRect)) {
-                 // Do something special when the player finds the hidden area (optional)
-                 console.log("You found the hidden area!");
-                 // Maybe reveal a hint, give a power-up, etc.
-            }
-
         }
 
-           // Helper function to check if two rectangles overlap
-         function rectsOverlap(rect1, rect2) {
-             return !(rect1.right < rect2.left ||
-                      rect1.left > rect2.right ||
-                      rect1.bottom < rect2.top ||
-                      rect1.top > rect2.bottom);
+        // --- Game Loop ---
+        function gameLoop() {
+            if (!gameRunning) return;
+
+            // ---  Movement based on pressed keys ---
+            if (keys['ArrowUp'] || keys['w']) playerY -= 5;
+            if (keys['ArrowDown'] || keys['s']) playerY += 5;
+            if (keys['ArrowLeft'] || keys['a']) playerX -= 5;
+            if (keys['ArrowRight'] || keys['d']) playerX += 5;
+
+             // ---  Keep player within bounds ---
+              playerX = Math.max(0, Math.min(playerX, gameContainer.offsetWidth - player.offsetWidth));
+              playerY = Math.max(0, Math.min(playerY, gameContainer.offsetHeight - player.offsetHeight));
+
+            updatePlayerPosition();
+            checkCollision();
+
+            requestAnimationFrame(gameLoop); // Continue the loop
         }
 
-          // --- Function to end the game ---
-        function endGame(playerWins) {
+        // --- Start Game ---
+        function startGame() {
+              // Hide "inescapable" elements
+            container.style.display = 'none';
+            // Show game elements
+            gameContainer.style.display = 'block';
+
+              // Reset player position
+             playerX = 50;
+             playerY = 50;
+            updatePlayerPosition();
+
+               //  Position the goal (randomly)
+             goal.style.left = Math.random() * (gameContainer.offsetWidth - goal.offsetWidth) + 'px';
+             goal.style.top = Math.random() * (gameContainer.offsetHeight - goal.offsetHeight) + 'px';
+
+
+            gameRunning = true;
+            gameLoop();
+        }
+
+
+          // --- End Game (Collision) ---
+        function endGame() {
             gameRunning = false;
+             gameOverScreen.style.display = 'flex';
+        }
 
-              // Remove all obstacles
-            for (const obstacle of obstacles) {
-                 gameLevel.removeChild(obstacle.element);
-             }
-            obstacles = [];
-
-             if (playerWins) {
-                // Show "You Win" message
-                winMessage.classList.add('show'); // Use the class for animation
-                setTimeout(() => {
-                    winMessage.classList.remove('show'); // Hide after a delay
-                     resetGame();
-                }, 5000); // 5 seconds
-
-             } else {
-                // Show "Game Over" message (optional)
-                // alert("Game Over! You hit an obstacle."); // Or create a more stylish message
-                 resetGame();
-            }
-              // Hide the game level
-            gameLevel.style.display = 'none';
+        // --- Win Game (Reach Goal) ---
+        function winGame(){
+            gameRunning = false;
+            youWinScreen.style.display = "flex";
         }
 
 
-         // --- Function to reset the game ---
-        function resetGame() {
-             // Hide game level and win message
-            gameLevel.style.display = 'none';
-            winMessage.classList.remove('show');
-             // Reset any game state (player position, obstacles, etc.)
-
-             // You might want to show the initial "inescapable" elements again here
-            //  (e.g., the close button, floaters - but probably in a less intense way)
+        // --- Retry Game ---
+        function retryGame() {
+             gameOverScreen.style.display = 'none';
+            startGame(); // Restart the game
         }
-
         // --- Event Listeners ---
-           // --- Key Down (for player movement) ---
-         document.addEventListener('keydown', (event) => {
-             if (!gameRunning) return; // Don't move if the game isn't active
 
-              const speed = 10; // Player movement speed
-
-            switch (event.key) {
-                case 'ArrowUp':
-                case 'w':
-                case 'W':
-                    playerY = Math.max(0, playerY - speed); // Prevent going off-screen (top)
-                    break;
-                case 'ArrowDown':
-                case 's':
-                case 'S':
-                     playerY = Math.min(window.innerHeight - player.offsetHeight, playerY + speed); // Prevent going off-screen (bottom)
-                    break;
-                case 'ArrowLeft':
-                case 'a':
-                case 'A':
-                      playerX = Math.max(0, playerX - speed); // Prevent going off-screen (left)
-                     break;
-                case 'ArrowRight':
-                case 'd':
-                case 'D':
-                    playerX = Math.min(window.innerWidth - player.offsetWidth, playerX + speed); // Prevent going off-screen (right)
-                    break;
-                default:
-                    return; // Ignore other keys
+        // --- Key Down ---
+        document.addEventListener('keydown', (event) => {
+             if (gameRunning) {
+                keys[event.key] = true;
+                event.preventDefault(); // Prevent scrolling with arrow keys
              }
+              if (event.key === 'Escape' && gameRunning) { //  Allow "Escape" key to pause/exit the game
+                  endGame();
+              }
+        });
 
-             player.style.left = `${playerX}px`;
-             player.style.top = `${playerY}px`;
+        // --- Key Up ---
+        document.addEventListener('keyup', (event) => {
+            keys[event.key] = false;
+        });
 
-            checkCollision(); // Check for collisions after each move
+
+         // --- Retry Button Click ---
+         retryButton.addEventListener('click', retryGame);
+
+        // ---  Hidden Area Interactions ---
+        const hiddenAreas = document.querySelectorAll('.hidden-area');
+         hiddenAreas.forEach(area => {
+             area.addEventListener('mouseenter', (event) => {
+                // Show the message associated with this hidden area
+                const message = event.target.dataset.message;
+                 hiddenMessage.textContent = message;
+                 hiddenMessage.style.display = 'block';
+
+                  // Position the message near the mouse
+                hiddenMessage.style.left = event.clientX + 15 + 'px';
+                hiddenMessage.style.top = event.clientY + 15 + 'px';
+            });
+
+             area.addEventListener('mouseleave', () => {
+                hiddenMessage.style.display = 'none'; // Hide on mouse leave
+            });
          });
 
 
-        // ---  (Remove event listeners from the "inescapable" part that are no longer needed) ---
-        // Example:
-        // document.removeEventListener('contextmenu', preventDefaultHandler);
+        // --- (Previous event listeners for the "inescapable" part) ---
 
-        // --- VERY IMPORTANT:  Find and adapt the old closeButton logic ---
+        document.addEventListener('mousemove', (event) => {
+            createMouseTrail(event.clientX, event.clientY);
+             if (backgroundAudio.paused) {
+                backgroundAudio.play().catch(error => {
+                   console.warn("Audio autoplay failed:", error);
+                });
+             }
+            // ---  Update hidden message position ---
+            if (hiddenMessage.style.display === 'block') {
+                 hiddenMessage.style.left = event.clientX + 15 + 'px';
+                hiddenMessage.style.top = event.clientY + 15 + 'px';
+             }
 
-        // Find the old closeButton event listener (from the previous response).
-        // It should look something like this:
-        //
-        // closeButton.addEventListener('click', (event) => { ... });
-        //
-        //  You need to *replace* the contents of that event listener with
-        //  logic to start the game.  For example:
+        });
 
-        const closeButton = document.getElementById('close-button'); // Make sure this is defined
-        if (closeButton) { // Check if closeButton actually exists
-            closeButton.addEventListener('click', (event) => {
-                event.stopPropagation();
-                closeAttempt++;
+        closeButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            closeAttempt++;
 
-                // ... (all the previous closeAttempt logic) ...
-                if(closeAttempt >= 11){
-                   startGame()
+            if (closeAttempt < 3) {
+                closeButton.style.top = Math.random() * (window.innerHeight - closeButton.offsetHeight) + 'px';
+                closeButton.style.left = Math.random() * (window.innerWidth - closeButton.offsetWidth) + 'px';
+                for (let i = 0; i < 5; i++) {
+                    createFloater();
                 }
+                closeButton.textContent = "Really?";
 
-            });
-        }
+            } else if (closeAttempt < 6) {
+                document.getElementById("message").style.filter = "blur(" + (closeAttempt - 2) + "px)";
+                for (let i = 0; i < 10; i++) {
+                    createFloater();
+                }
+                distractionOverlay.classList.add('active');
+                for (let i = 0; i < 3; i++) {
+                    createFakeButton();
+                }
+                closeButton.textContent = "Give up!";
+
+            } else if (closeAttempt < 8) {
+                removeFakeButtons();
+                distractionOverlay.classList.remove('active');
+                fullscreenMessage.style.display = 'flex';
+                setTimeout(() => {
+                    fullscreenMessage.style.display = 'none';
+                }, 3000);
+                closeButton.textContent = "Seriously?";
+
+            } else if (closeAttempt < 11) {
+                closeButton.style.animation = "jiggle 0.2s infinite alternate";
+                closeButton.style.backgroundColor = "rgba(0, 255, 0, 0.7)";
+                closeButton.textContent = "You can't leave!";
+
+            } else {
+                // ---  Transition to the GAME! ---
+                startGame();
+            }
+        });
+
+        // --- Other Event Listeners ---
+        setInterval(createFloater, 2000);
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        //Removed KeyDown event listener.
+        document.body.style.userSelect = 'none';
+        document.body.style.webkitUserSelect = 'none';
+
+        window.addEventListener('resize', () => {
+            // --- Game resize handling ---
+             if (gameRunning) {
+                // Keep player within bounds after resize
+                playerX = Math.max(0, Math.min(playerX, gameContainer.offsetWidth - player.offsetWidth));
+                 playerY = Math.max(0, Math.min(playerY, gameContainer.offsetHeight - player.offsetHeight));
+                updatePlayerPosition();
+              }
+
+                        closeButton.style.right = '20px';
+            removeFakeButtons();
+            if (distractionOverlay.classList.contains('active')) {
+                for (let i = 0; i < 3; i++) {
+                    createFakeButton();
+                }
+            }
+        });
 
 
-        // --- Initial Setup (if needed) ---
-        //  (You might want to initially hide the game level, etc.)
-        // gameLevel.style.display = 'none';
     </script>
 </body>
 
