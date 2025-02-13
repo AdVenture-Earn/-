@@ -4,344 +4,389 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Void: Level 2 - The Gauntlet</title>
+    <title>The Void's Challenge</title>
     <style>
-        /* --- Reset and Basic Styles --- */
+        /* --- Basic Reset and Shared Styles --- */
         body,
         html {
             margin: 0;
             padding: 0;
             height: 100%;
-            overflow: hidden;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0a0a0a;
-            /* Darker background */
+            background: linear-gradient(135deg, #111, #333, #111);
             color: #eee;
-            cursor: default;
-            /* Back to normal cursor */
+            overflow: hidden; /* Hide scrollbars during gameplay */
         }
 
-        /* --- Game Container --- */
-        #game-container {
-            position: relative;
+        #container {
+            position: relative;  /* For absolute positioning of game elements */
             width: 100%;
             height: 100%;
-            overflow: hidden;
-            /* Important for the moving platforms */
+            overflow: hidden; /* Critical for keeping things within bounds */
         }
 
-        /* --- Player --- */
-        #player {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background: linear-gradient(135deg, #4CAF50, #2E7D32);
-            /* Green gradient */
-            border-radius: 50%;
-            /* Make it a circle */
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            /* Center initially */
-            z-index: 100;
-            transition: left 0.1s linear, bottom 0.2s ease;
-            /* Smooth movement */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-        }
-
-
-        /* --- Platforms --- */
-        .platform {
-            position: absolute;
-            background: linear-gradient(135deg, #666, #444);
-            /* Gray gradient */
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-            z-index: 50;
-        }
-
-
-        /* --- Goal --- */
-        #goal {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #FFD700, #FFA000);
-            /* Gold gradient */
-            border-radius: 50%;
-            top: 20px;
-            right: 20px;
-            z-index: 150;
-             /* Higher z-index than platforms */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 215, 0, 0.5);
-             /* Glow */
-              animation: pulse 1s infinite alternate;
-        }
-
-         @keyframes pulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.1); }
-         }
-
-
-        /* --- Hidden Items --- */
-        .hidden-item {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            /* Semi-transparent white */
-            border-radius: 50%;
-            z-index: 60;
-            /* Above platforms, below player */
-            cursor: pointer;
-            /* Indicate they are clickable */
-            display: none;
-            /* Hidden by default */
-             transition: transform 0.2s, opacity 0.3s;
-        }
-         .hidden-item:hover {
-             transform: scale(1.2);
-             opacity: 0.8; /*  Slightly more visible on hover */
-
-         }
-
-         .hidden-item.active {
-            display: block;
-        }
-
-        /* --- UI (Score, etc.) --- */
-        #ui {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 200;
-            /* Highest z-index */
-            color: white;
-            font-size: 1.2em;
-             padding: 10px;
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-        }
-
-         /* --- Win Message --- */
+        /* --- "You Win" Message Styles --- */
         #win-message {
-            position: fixed;
+            position: fixed; /* Stays in a fixed position */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 180, 0, 0.9);
+            color: white;
+            padding: 30px 50px;
+            font-size: 3em;
+            border-radius: 15px;
+            z-index: 2000; /* High z-index, appears on top */
+            display: none; /* Hidden initially */
+            text-align: center;
+             box-shadow: 0 0 20px rgba(0, 255, 0, 0.8); /* Glow effect */
+             opacity: 0; /*  Start hidden for fade-in */
+            transition: opacity 0.5s ease; /* Smooth fade-in */
+        }
+
+           #win-message.show {
+             display: block;
+             opacity: 1;
+             animation: winPulse 2s infinite alternate; /*  Subtle pulse */
+        }
+
+        @keyframes winPulse {
+            from { transform: translate(-50%, -50%) scale(1); }
+            to { transform: translate(-50%, -50%) scale(1.05); }
+        }
+
+         /* --- Game Level Styles --- */
+        #game-level {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 3em;
-            z-index: 1000;
-            display: none;
+            display: none; /* Hidden initially, shown after "winning" */
+             background: linear-gradient(to bottom, #222, #444); /* Darker background */
         }
 
-        /* --- Animations --- */
-         @keyframes movePlatform {
-            0%   { transform: translateX(var(--start-x)); }
-            50%  { transform: translateX(var(--end-x)); }
-            100% { transform: translateX(var(--start-x)); }
+         #player {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #007bff; /* Bright blue */
+            border-radius: 50%; /* Circle */
+            left: 50px; /* Starting position */
+            top: 50px;
+            transition: top 0.1s linear, left 0.1s linear; /* Smooth movement */
+            z-index: 100; /* Above obstacles, below goal */
         }
+
+         .obstacle {
+            position: absolute;
+             background: linear-gradient(to right, #800000, #ff0000); /* Red gradient */
+             border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            z-index: 50; /* Below player and goal */
+
+        }
+
+
+        #goal {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+             background: linear-gradient(to bottom, #00ff00, #008000); /* Green gradient */
+            border-radius: 50%;
+            right: 50px; /* Position at the right edge */
+            bottom: 50px;
+             z-index: 150;  /*  Above the player, so it can be "collected" */
+             animation: goalSpin 5s linear infinite;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.7); /* Glowing effect */
+        }
+
+        @keyframes goalSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- Hidden Area --- */
+        #hidden-area {
+             position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent */
+             top: 200px; /*  Example position - change this */
+             left: 350px;
+            z-index: 200;
+             /* Hidden by default, revealed on hover (see JS) */
+            display: none;  /* Initially hidden */
+            border-radius: 10px;
+             transition: background-color 0.3s ease; /* Smooth transition */
+
+        }
+
+         #hidden-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+             font-size: 1.2em;
+            text-align: center;
+            display: none;  /* Hidden by default */
+            opacity: 0; /* Start hidden */
+             transition: opacity 0.3s ease; /* Smooth fade-in */
+            pointer-events: none; /*  Don't block interaction with hidden area */
+        }
+        #hidden-area:hover #hidden-message {
+            display: block; /* Show on hover */
+            opacity: 1;
+
+        }
+           #hidden-area:hover {
+            background-color: rgba(255, 255, 255, 0.3); /*  Brighter on hover */
+             cursor: pointer; /*  Change cursor to indicate interactivity */
+           }
+
+        /* --- Styles from the "inescapable" part (condensed) --- */
+        /* ... (Include the styles from the previous response, but remove
+               the styles that are specific to the initial inescapable part,
+               like the close button, floaters, distraction overlay, etc.
+               Keep general styles like body, #container, animations, etc.) ... */
+
     </style>
 </head>
 
 <body>
-    <div id="game-container">
-        <div id="player"></div>
-        <div id="goal"></div>
-        <div id="ui">Score: <span id="score">0</span></div>
-         <div id="win-message">You Escaped... For Now!</div>
+    <div id="container">
+        <!-- "You Win" message (initially hidden) -->
+        <div id="win-message">You Escaped... But Can You Conquer the Void?</div>
+
+        <!-- Game level elements -->
+        <div id="game-level">
+            <div id="player"></div>
+            <div id="goal"></div>
+            <div id="hidden-area">
+                <div id="hidden-message">A secret!<br> (Maybe it helps?)</div>
+            </div>
+            <!-- Obstacles (added dynamically via JavaScript) -->
+        </div>
+
+        <!-- (No need for the close button, floaters, etc., from the previous part) -->
     </div>
 
     <script>
-        const gameContainer = document.getElementById('game-container');
+        // --- Variables from the "inescapable" part ---
+        const container = document.getElementById('container');
+        // ... (other variables like closeButton, distractionOverlay -  remove them)
+        let floaterCount = 0; // Keep this, but it won't be used as much
+        let maxFloaters = 30; //  Keep this, but it won't be used as much
+        let closeAttempt = 0; // Keep, and reset to 0 when the game starts
+
+        // --- NEW: Game Level Variables ---
+        const gameLevel = document.getElementById('game-level');
         const player = document.getElementById('player');
         const goal = document.getElementById('goal');
-        const scoreDisplay = document.getElementById('score');
-        const winMessage = document.getElementById("win-message");
+        const winMessage = document.getElementById('win-message');
+        const hiddenArea = document.getElementById('hidden-area');
+        let playerX = 50; // Initial player position
+        let playerY = 50;
+        let obstacles = []; // Array to store obstacle data
+        let gameRunning = false; // Flag to track if the game is active
 
-        let playerX = 50; // Percentage of container width
-        let playerY = 20; //  Pixels (from the bottom)
-        let playerYSpeed = 0;
-        let gravity = 0.5;
-        let jumpStrength = -12;
-        let isJumping = false;
-        let score = 0;
-        let platforms = [];
-        let hiddenItems = [];
-        let gameRunning = true;
-
-
-        // --- Platform Creation ---
-        function createPlatform(x, y, width, height, moving = false, startX = 0, endX = 0) {
-            const platform = document.createElement('div');
-            platform.classList.add('platform');
-            platform.style.left = `${x}%`;
-            platform.style.bottom = `${y}px`;
-            platform.style.width = `${width}px`;
-            platform.style.height = `${height}px`;
-            gameContainer.appendChild(platform);
-            platforms.push(platform);
-
-            if (moving) {
-                 platform.style.setProperty('--start-x', `${startX}px`);
-                 platform.style.setProperty('--end-x', `${endX}px`);
-                platform.style.animation = `movePlatform ${Math.random() * 4 + 2}s linear infinite`; // Random speed
-            }
-
-            return platform;  // Return the created platform
-        }
-
-        // --- Hidden Item Creation ---
-        function createHiddenItem(x, y) {
-            const item = document.createElement('div');
-            item.classList.add('hidden-item');
-            item.style.left = `${x}%`;
-            item.style.bottom = `${y}px`;
-            gameContainer.appendChild(item);
-            hiddenItems.push(item);
-
-            item.addEventListener('click', () => {
-                score += 5; // Bonus points!
-                scoreDisplay.textContent = score;
-                item.style.display = 'none'; // Remove after clicking
-                 //Maybe trigger some other effect?
-            });
-            return item; // Return created item.
+        // --- Function to create obstacles ---
+        function createObstacle(x, y, width, height) {
+            const obstacle = document.createElement('div');
+            obstacle.classList.add('obstacle');
+            obstacle.style.left = `${x}px`;
+            obstacle.style.top = `${y}px`;
+            obstacle.style.width = `${width}px`;
+            obstacle.style.height = `${height}px`;
+            gameLevel.appendChild(obstacle);
+            obstacles.push({ element: obstacle, x, y, width, height }); // Store for collision checks
         }
 
 
-          // --- Initial Game Setup ---
-        function setupGame() {
-            // --- Platforms ---
+        // --- Function to start the game ---
+        function startGame() {
+            gameRunning = true;
+            closeAttempt = 0; // Reset close attempts
 
-            // Static Platforms
-            createPlatform(10, 50, 100, 20);
-            createPlatform(30, 100, 80, 20);
-            createPlatform(60, 150, 120, 20);
-            createPlatform(80, 250, 50, 20);
-            createPlatform(5, 200, 60, 20);
-            createPlatform(40, 300, 75, 20);
+            // --- 1. Hide the "inescapable" elements ---
+            //  (Remove or hide any elements from the previous part that are no longer needed)
+             // Example:  If you had a close button:
+            // if (closeButton) { closeButton.style.display = 'none'; }
 
+            // --- 2. Show the game level ---
+            gameLevel.style.display = 'block';
 
-            // Moving Platforms
-            createPlatform(20, 350, 100, 20, true, -50, 50); // Moves horizontally
-            createPlatform(70, 400, 80, 20, true, 0, 100);
-            createPlatform(50, 450, 90, 20, true, -100, 100);
+            // --- 3. Reset player position ---
+            playerX = 50;
+            playerY = 50;
+            player.style.left = `${playerX}px`;
+            player.style.top = `${playerY}px`;
 
+            // --- 4. Create obstacles ---
+            //  (You can adjust the number, positions, and sizes of obstacles)
+            obstacles = []; // Clear any existing obstacles
+            createObstacle(150, 100, 200, 20); // Example obstacle
+            createObstacle(300, 250, 30, 150);
+            createObstacle(500, 100, 50, 300);
+             createObstacle(100, 400, 250, 40); // Add more obstacles!
+            createObstacle(600, 50, 80, 80);
+            createObstacle(400, 350, 100, 20);
 
-            // --- Hidden Items ---
-             const item1 = createHiddenItem(25, 125); // On a platform
-             const item2 = createHiddenItem(90, 300);
-              const item3 = createHiddenItem(10, 400); //  Slightly off a platform
-
-               // Make them appear after a delay (more hidden!)
-              setTimeout(() => { item1.classList.add('active'); }, 3000); // Show after 3 seconds
-              setTimeout(() => { item2.classList.add('active'); }, 5000); // Show after 5 seconds
-             setTimeout(() => {item3.classList.add('active'); }, 7000); // After 7 seconds.
-
-
+            // --- 5. Show the hidden area (if you want it to be visible at the start) ---
+            hiddenArea.style.display = "block";
         }
 
 
-        // --- Player Movement ---
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowLeft' && playerX > 0) {
-                playerX -= 5; // Move left
-            } else if (event.key === 'ArrowRight' && playerX < 100) {
-                playerX += 5; // Move right
-            } else if (event.key === ' ' && !isJumping) { // Spacebar for jump
-                playerYSpeed = jumpStrength;
-                isJumping = true;
-            }
-            updatePlayerPosition();
-        });
 
-
-        // --- Update Player Position (and collision detection) ---
-        function updatePlayerPosition() {
-            // Horizontal Movement
-            player.style.left = `calc(${playerX}% - ${player.offsetWidth / 2}px)`; // Keep centered
-
-            // Vertical Movement (Gravity and Jumping)
-            playerYSpeed += gravity;
-            playerY += playerYSpeed;
-
-            // --- Collision Detection (with platforms) ---
-            let onPlatform = false;
-            for (const platform of platforms) {
-                const platformRect = platform.getBoundingClientRect();
-                const playerRect = player.getBoundingClientRect();
-
-                // Check for overlap
-                if (
-                    playerRect.bottom >= platformRect.top &&
-                    playerRect.top <= platformRect.bottom &&
-                    playerRect.right >= platformRect.left &&
-                    playerRect.left <= platformRect.right
-                ) {
-                    // Collision detected!
-                    if (playerYSpeed > 0) { // Only handle collision if falling down
-                        playerY = platformRect.top - player.offsetHeight + 1; // +1 to prevent "sinking"
-                        playerYSpeed = 0;
-                        isJumping = false;
-                        onPlatform = true;
-                    }
-
-                }
-            }
-
-             // ---  Ground Collision ---
-                if(playerY < 0){
-                    playerY = 20;
-                    playerYSpeed = 0;
-                    isJumping = false;
-                    onPlatform = true;
-                }
-
-            // --- Goal Collision ---
-             const goalRect = goal.getBoundingClientRect();
+        // --- Function to check for collisions ---
+        function checkCollision() {
              const playerRect = player.getBoundingClientRect();
-             if(
-                playerRect.bottom >= goalRect.top &&
-                playerRect.top <= goalRect.bottom &&
-                playerRect.right >= goalRect.left &&
-                playerRect.left <= goalRect.right
-             ) {
-                winGame(); // You win!
+
+              // Check collision with goal
+            const goalRect = goal.getBoundingClientRect();
+             if (rectsOverlap(playerRect, goalRect)) {
+                endGame(true); // Player wins!
+                return; // Stop checking other collisions
              }
 
-            // --- Apply vertical position ---
-            player.style.bottom = `${playerY}px`;
+            // Check collision with obstacles
+            for (const obstacle of obstacles) {
+                const obstacleRect = obstacle.element.getBoundingClientRect();
+                if (rectsOverlap(playerRect, obstacleRect)) {
+                    endGame(false); // Player loses
+                    return; // Stop checking other collisions
+                }
+            }
+
+             // Check collision with hidden area
+             const hiddenAreaRect = hiddenArea.getBoundingClientRect();
+            if (rectsOverlap(playerRect, hiddenAreaRect)) {
+                 // Do something special when the player finds the hidden area (optional)
+                 console.log("You found the hidden area!");
+                 // Maybe reveal a hint, give a power-up, etc.
+            }
 
         }
 
-        // --- Win Condition ---
-        function winGame() {
+           // Helper function to check if two rectangles overlap
+         function rectsOverlap(rect1, rect2) {
+             return !(rect1.right < rect2.left ||
+                      rect1.left > rect2.right ||
+                      rect1.bottom < rect2.top ||
+                      rect1.top > rect2.bottom);
+        }
+
+          // --- Function to end the game ---
+        function endGame(playerWins) {
             gameRunning = false;
-              winMessage.style.display = "flex";
+
+              // Remove all obstacles
+            for (const obstacle of obstacles) {
+                 gameLevel.removeChild(obstacle.element);
+             }
+            obstacles = [];
+
+             if (playerWins) {
+                // Show "You Win" message
+                winMessage.classList.add('show'); // Use the class for animation
+                setTimeout(() => {
+                    winMessage.classList.remove('show'); // Hide after a delay
+                     resetGame();
+                }, 5000); // 5 seconds
+
+             } else {
+                // Show "Game Over" message (optional)
+                // alert("Game Over! You hit an obstacle."); // Or create a more stylish message
+                 resetGame();
+            }
+              // Hide the game level
+            gameLevel.style.display = 'none';
         }
 
 
-         // --- Game Loop ---
-        function gameLoop() {
-            if(!gameRunning) return; // Stop if game is over
-            updatePlayerPosition();
-            requestAnimationFrame(gameLoop); // Smooth animation
+         // --- Function to reset the game ---
+        function resetGame() {
+             // Hide game level and win message
+            gameLevel.style.display = 'none';
+            winMessage.classList.remove('show');
+             // Reset any game state (player position, obstacles, etc.)
+
+             // You might want to show the initial "inescapable" elements again here
+            //  (e.g., the close button, floaters - but probably in a less intense way)
+        }
+
+        // --- Event Listeners ---
+           // --- Key Down (for player movement) ---
+         document.addEventListener('keydown', (event) => {
+             if (!gameRunning) return; // Don't move if the game isn't active
+
+              const speed = 10; // Player movement speed
+
+            switch (event.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    playerY = Math.max(0, playerY - speed); // Prevent going off-screen (top)
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                     playerY = Math.min(window.innerHeight - player.offsetHeight, playerY + speed); // Prevent going off-screen (bottom)
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                      playerX = Math.max(0, playerX - speed); // Prevent going off-screen (left)
+                     break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    playerX = Math.min(window.innerWidth - player.offsetWidth, playerX + speed); // Prevent going off-screen (right)
+                    break;
+                default:
+                    return; // Ignore other keys
+             }
+
+             player.style.left = `${playerX}px`;
+             player.style.top = `${playerY}px`;
+
+            checkCollision(); // Check for collisions after each move
+         });
+
+
+        // ---  (Remove event listeners from the "inescapable" part that are no longer needed) ---
+        // Example:
+        // document.removeEventListener('contextmenu', preventDefaultHandler);
+
+        // --- VERY IMPORTANT:  Find and adapt the old closeButton logic ---
+
+        // Find the old closeButton event listener (from the previous response).
+        // It should look something like this:
+        //
+        // closeButton.addEventListener('click', (event) => { ... });
+        //
+        //  You need to *replace* the contents of that event listener with
+        //  logic to start the game.  For example:
+
+        const closeButton = document.getElementById('close-button'); // Make sure this is defined
+        if (closeButton) { // Check if closeButton actually exists
+            closeButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                closeAttempt++;
+
+                // ... (all the previous closeAttempt logic) ...
+                if(closeAttempt >= 11){
+                   startGame()
+                }
+
+            });
         }
 
 
-        // --- Start the Game ---
-        setupGame();
-        gameLoop();
-
-
+        // --- Initial Setup (if needed) ---
+        //  (You might want to initially hide the game level, etc.)
+        // gameLevel.style.display = 'none';
     </script>
 </body>
 
