@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Void's Gauntlet</title>
+    <title>The Ultimate Escape...?</title>
     <style>
-        /* --- Reset & General Styles --- */
+        /* --- (Previous styles, PLUS additions) --- */
+
         body,
         html {
             margin: 0;
@@ -29,7 +30,8 @@
             /*  Prevent scrollbars caused by moving elements */
             display: none;
             /* Hidden initially, shown after "winning" */
-            cursor: crosshair; /* More game-like cursor */
+            cursor: crosshair;
+            /* More game-like cursor */
         }
 
         /* --- Player Character --- */
@@ -45,7 +47,8 @@
             /* Smooth movement */
             z-index: 100;
             /*  Above obstacles */
-             box-shadow: 0 0 10px 2px rgba(0, 255, 0, 0.8); /*  Glow */
+            box-shadow: 0 0 10px 2px rgba(0, 255, 0, 0.8);
+            /*  Glow */
         }
 
         /* --- Obstacles --- */
@@ -66,15 +69,22 @@
             /* Yellow to orange */
             border-radius: 50%;
             z-index: 50;
-             /* Below player, above obstacles */
-             animation: rotate 2s linear infinite;  /*  Subtle rotation */
-             box-shadow: 0 0 15px 5px rgba(255, 255, 0, 0.7); /*  Glowing effect */
+            /* Below player, above obstacles */
+            animation: rotate 2s linear infinite;
+            /*  Subtle rotation */
+            box-shadow: 0 0 15px 5px rgba(255, 255, 0, 0.7);
+            /*  Glowing effect */
         }
 
-          @keyframes rotate {
-             from { transform: rotate(0deg); }
-             to { transform: rotate(360deg); }
-          }
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
 
         /* --- Hidden Areas --- */
@@ -85,7 +95,7 @@
             cursor: pointer;
             /* Indicate interactivity */
             z-index: 75;
-           /*  Below player, above goal/obstacles */
+            /*  Below player, above goal/obstacles */
         }
 
         /* --- Hidden Messages --- */
@@ -97,57 +107,70 @@
             border-radius: 5px;
             display: none;
             /* Hidden by default */
-            z-index: 200; /*  Above everything else */
-             pointer-events: none; /*  Don't interfere with clicks */
-             font-size: 0.9em; /*  Slightly smaller text */
+            z-index: 200;
+            /*  Above everything else */
+            pointer-events: none;
+            /*  Don't interfere with clicks */
+            font-size: 0.9em;
+            /*  Slightly smaller text */
             text-align: center;
         }
 
 
-          /* --- Game Over Screen --- */
-          #game-over {
+        /* --- Game Over Screen --- */
+        #game-over {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 0, 0, 0.8); /* Red overlay */
+            background: rgba(255, 0, 0, 0.8);
+            /* Red overlay */
             color: white;
             display: flex;
-            flex-direction: column; /* Stack elements vertically */
+            flex-direction: column;
+            /* Stack elements vertically */
             justify-content: center;
             align-items: center;
             font-size: 3em;
-            z-index: 3000; /*  Highest z-index */
-            display: none; /* Hidden initially */
-             text-align: center; /* Center text horizontally */
+            z-index: 3000;
+            /*  Highest z-index */
+            display: none;
+            /* Hidden initially */
+            text-align: center;
+            /* Center text horizontally */
 
-          }
+        }
 
         #retry-button {
             padding: 15px 30px;
-            background-color: #007bff; /* Blue button */
+            background-color: #007bff;
+            /* Blue button */
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 1.2em; /* Larger font */
-            margin-top: 20px; /* Space above the button */
+            font-size: 1.2em;
+            /* Larger font */
+            margin-top: 20px;
+            /* Space above the button */
             transition: background-color 0.3s;
-         }
+        }
 
         #retry-button:hover {
-           background-color: #0056b3; /* Darker blue on hover */
-         }
+            background-color: #0056b3;
+            /* Darker blue on hover */
+        }
 
         /* --- "You Win" Screen --- */
-           #you-win {
+        #you-win {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 255, 0, 0.8); /* Green overlay */
+            background: rgba(0, 255, 0, 0.8);
+            /* Green overlay */
             color: white;
             display: flex;
             justify-content: center;
@@ -157,9 +180,9 @@
             display: none;
             text-align: center;
             padding: 20px;
-           }
+        }
 
-            /* ---  Styles from the previous "inescapable" page --- */
+        /* ---  Styles from the previous "inescapable" page --- */
         /*   (Include *all* the CSS from the previous version here.  I'm omitting it for brevity,
             but in your *actual* code, you need to paste it in.  This ensures consistency.)  */
         /* START PREVIOUS STYLES */
@@ -480,6 +503,168 @@
         }
 
         /* END PREVIOUS STYLES */
+
+        /* --- NEW: Virus Ad Styles --- */
+        .virus-ad {
+            position: absolute;
+            width: 300px;
+            /*  Adjust as needed */
+            padding: 20px;
+            background: linear-gradient(to bottom, #ff5733, #c70039);
+            /*  Orange/Red gradient */
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            z-index: 2500;
+            /*  High z-index */
+            display: none;
+            /*  Initially hidden */
+            text-align: center;
+            animation:  shake 0.5s infinite;  /*  Shaking animation */
+        }
+
+        .virus-ad h2 {
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+
+        .virus-ad p {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        .virus-ad button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            /*  Green button (ironic) */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+             transition: background-color 0.3s; /*  Smooth transition */
+        }
+         .virus-ad button:hover {
+              background-color: #367c39; /*  Darker green on hover */
+         }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        /* --- NEW: Sketchy Download Page Styles --- */
+        #sketchy-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #222, #444); /* Dark gradient */
+            color: #0f0; /*  Green text (hacker-ish) */
+            display: none; /* Hidden initially */
+            z-index: 4000; /*  Very, very high z-index */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+             text-align: center; /* Center text horizontally */
+            padding: 20px;
+        }
+
+         #sketchy-page h1 {
+            font-size: 3em;
+             margin-bottom: 20px;  /*  Spacing */
+             text-shadow: 0 0 5px rgba(0, 255, 0, 0.8); /*  Glow */
+         }
+
+        #sketchy-page p {
+           font-size: 1.2em;
+            margin-bottom: 30px;
+         }
+
+
+        #sketchy-download-button {
+            padding: 20px 40px;
+            background-color: #0f0;
+            color: #222;
+            border: 2px solid #0f0; /* Green border */
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.5em;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s; /* Smooth effects */
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);  /*  Subtle glow */
+
+        }
+
+        #sketchy-download-button:hover {
+             background-color: #222;  /*  Invert colors on hover */
+             color: #0f0;
+             transform: scale(1.05); /*  Slightly larger */
+        }
+
+         /*  Simulated Chrome Warning */
+        #chrome-warning {
+            position: fixed;
+            bottom: 20px;  /*  Position at the bottom */
+            left: 50%;  /*  Center horizontally */
+            transform: translateX(-50%); /*  Adjust for centering */
+            background-color: #fff;  /*  White background */
+            color: #333;  /*  Dark text */
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            z-index: 5000;  /*  Very high z-index */
+            display: none; /*  Hidden initially */
+             font-size: 0.9em; /*  Slightly smaller text */
+             text-align: center; /*  Center the text */
+
+        }
+
+         #chrome-warning img {
+            vertical-align: middle;  /*  Align icon with text */
+            margin-right: 10px;
+            height: 20px;
+         }
+
+         /*  Final "You Win" Screen */
+        #final-win {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+             background: linear-gradient(to bottom, #007bff, #0056b3); /* Blue gradient */
+             color: white;
+            display: flex;
+            flex-direction: column; /* Stack elements vertically */
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+             z-index: 6000;  /*  Highest z-index! */
+            display: none; /* Hidden initially */
+             text-align: center; /* Center text horizontally */
+             padding: 20px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.8);
+
+         }
+
+         #final-win p {
+            font-size: 1.2em;  /*  Smaller text for sub-message */
+            margin-top: 20px;
+         }
+
     </style>
 </head>
 
@@ -496,7 +681,6 @@
         </audio>
     </div>
 
-
     <!-- Game Elements (New) -->
     <div id="game-container">
         <div id="player"></div>
@@ -509,13 +693,41 @@
             data-message="Hint: Go around the long way."></div>
         <div class="hidden-area" style="width: 100px; height: 30px; top: 550px; left: 200px;"
             data-message="There's always a way."></div>
-         <div class="hidden-message"></div>
-         <div id="game-over">
-              Game Over!
-              <button id="retry-button">Retry</button>
+        <div class="hidden-message"></div>
+        <div id="game-over">
+            Game Over!
+            <button id="retry-button">Retry</button>
         </div>
-         <div id="you-win">You Escaped... This Time!</div>
+        <div id="you-win">You Escaped... This Time!</div>
         <!-- More hidden areas -->
+    </div>
+
+
+    <!-- Virus Ad (Initially hidden) -->
+    <div class="virus-ad" id="virus-ad">
+        <h2>WARNING!</h2>
+        <p>Your computer has been infected with <strong>Trojan.Void.exe</strong>!</p>
+        <p>Immediate action required!</p>
+        <button id="download-fix-button">Download Fix Now</button>
+    </div>
+
+    <!-- Sketchy Download Page (Initially hidden) -->
+    <div id="sketchy-page">
+        <h1>Download TotallyLegitFix.exe</h1>
+        <p>This file is 100% safe and definitely not a virus. Trust us.</p>
+         <button id="sketchy-download-button">Download Now</button>
+    </div>
+
+      <!--  Simulated Chrome Warning -->
+    <div id="chrome-warning">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Chrome_icon_%28September_2014%29.svg/1200px-Google_Chrome_icon_%28September_2014%29.svg.png" alt="Chrome Icon">
+        <span>This type of file can harm your computer.  Do you want to keep TotallyLegitFix.exe anyway?</span>
+    </div>
+
+     <!--  Final "You Win" Screen -->
+    <div id="final-win">
+        You REALLY Escaped!
+         <p>Congratulations, you beat the entire game!</p>
     </div>
 
     <script>
@@ -538,10 +750,17 @@
         const retryButton = document.getElementById('retry-button');
         const youWinScreen = document.getElementById("you-win");
         const hiddenMessage = document.querySelector('.hidden-message');
+        const virusAd = document.getElementById('virus-ad');
+        const downloadFixButton = document.getElementById('download-fix-button');
+        const sketchyPage = document.getElementById('sketchy-page');
+        const sketchyDownloadButton = document.getElementById('sketchy-download-button');
+        const chromeWarning = document.getElementById('chrome-warning');
+        const finalWinScreen = document.getElementById('final-win');
         let playerX = 50;
         let playerY = 50;
         let gameRunning = false; // Flag to control game state
         let keys = {}; // Object to track pressed keys
+        let virusAdInterval; //  Store the interval ID for the virus ad
 
 
 
@@ -656,8 +875,8 @@
 
             // Fade out and remove after a short delay
             setTimeout(() => {
-                trail.style.opacity = 0;
-                trail.style.transform = 'scale(2)'; // Optional: grow before fading
+                trail.style.opacity = 0
+                                trail.style.transform = 'scale(2)'; // Optional: grow before fading
                 setTimeout(() => {
                     document.body.removeChild(trail);
                 }, 300); // Remove after fade-out
@@ -678,33 +897,33 @@
         }
 
 
-         // ---  Check Collision with Obstacles ---
+        // ---  Check Collision with Obstacles ---
         function checkCollision() {
-             const playerRect = player.getBoundingClientRect();
+            const playerRect = player.getBoundingClientRect();
             const obstacles = document.querySelectorAll('.obstacle');
 
-             for (const obstacle of obstacles) {
+            for (const obstacle of obstacles) {
                 const obstacleRect = obstacle.getBoundingClientRect();
 
                 if (playerRect.left < obstacleRect.right &&
                     playerRect.right > obstacleRect.left &&
                     playerRect.top < obstacleRect.bottom &&
                     playerRect.bottom > obstacleRect.top) {
-                        // Collision detected!
-                        endGame();
-                        return; // Exit the function after a collision
+                    // Collision detected!
+                    endGame();
+                    return; // Exit the function after a collision
                 }
-             }
-              // Check collision with goal
+            }
+            // Check collision with goal
             const goalRect = goal.getBoundingClientRect();
-             if (playerRect.left < goalRect.right &&
-                    playerRect.right > goalRect.left &&
-                    playerRect.top < goalRect.bottom &&
-                    playerRect.bottom > goalRect.top) {
+            if (playerRect.left < goalRect.right &&
+                playerRect.right > goalRect.left &&
+                playerRect.top < goalRect.bottom &&
+                playerRect.bottom > goalRect.top) {
 
-                 winGame();
-                 return;
-             }
+                winGame();
+                return;
+            }
         }
 
         // --- Game Loop ---
@@ -717,9 +936,9 @@
             if (keys['ArrowLeft'] || keys['a']) playerX -= 5;
             if (keys['ArrowRight'] || keys['d']) playerX += 5;
 
-             // ---  Keep player within bounds ---
-              playerX = Math.max(0, Math.min(playerX, gameContainer.offsetWidth - player.offsetWidth));
-              playerY = Math.max(0, Math.min(playerY, gameContainer.offsetHeight - player.offsetHeight));
+            // ---  Keep player within bounds ---
+            playerX = Math.max(0, Math.min(playerX, gameContainer.offsetWidth - player.offsetWidth));
+            playerY = Math.max(0, Math.min(playerY, gameContainer.offsetHeight - player.offsetHeight));
 
             updatePlayerPosition();
             checkCollision();
@@ -729,19 +948,19 @@
 
         // --- Start Game ---
         function startGame() {
-              // Hide "inescapable" elements
+            // Hide "inescapable" elements
             container.style.display = 'none';
             // Show game elements
             gameContainer.style.display = 'block';
 
-              // Reset player position
-             playerX = 50;
-             playerY = 50;
+            // Reset player position
+            playerX = 50;
+            playerY = 50;
             updatePlayerPosition();
 
-               //  Position the goal (randomly)
-             goal.style.left = Math.random() * (gameContainer.offsetWidth - goal.offsetWidth) + 'px';
-             goal.style.top = Math.random() * (gameContainer.offsetHeight - goal.offsetHeight) + 'px';
+            //  Position the goal (randomly)
+            goal.style.left = Math.random() * (gameContainer.offsetWidth - goal.offsetWidth) + 'px';
+            goal.style.top = Math.random() * (gameContainer.offsetHeight - goal.offsetHeight) + 'px';
 
 
             gameRunning = true;
@@ -749,35 +968,72 @@
         }
 
 
-          // --- End Game (Collision) ---
+        // --- End Game (Collision) ---
         function endGame() {
             gameRunning = false;
-             gameOverScreen.style.display = 'flex';
+            gameOverScreen.style.display = 'flex';
         }
 
         // --- Win Game (Reach Goal) ---
-        function winGame(){
+        function winGame() {
             gameRunning = false;
-            youWinScreen.style.display = "flex";
+            youWinScreen.style.display = "none"; // Hide the initial win screen
+            gameContainer.style.display = "none"; // Hide the game
+             showVirusAd();
         }
 
 
         // --- Retry Game ---
         function retryGame() {
-             gameOverScreen.style.display = 'none';
+            gameOverScreen.style.display = 'none';
             startGame(); // Restart the game
         }
+
+        // --- NEW: Virus Ad and Download Sequence ---
+
+        function showVirusAd() {
+             virusAd.style.display = 'block';
+
+            // Randomly position the ad
+            virusAd.style.left = Math.random() * (window.innerWidth - virusAd.offsetWidth) + 'px';
+            virusAd.style.top = Math.random() * (window.innerHeight - virusAd.offsetHeight) + 'px';
+
+           // Make the ad reappear periodically and move
+            virusAdInterval = setInterval(() => {
+                virusAd.style.left = Math.random() * (window.innerWidth - virusAd.offsetWidth) + 'px';
+                virusAd.style.top = Math.random() * (window.innerHeight - virusAd.offsetHeight) + 'px';
+             }, 2000); // Every 2 seconds
+        }
+
+          function showSketchyPage() {
+             virusAd.style.display = 'none';
+             clearInterval(virusAdInterval); // Stop the ad from reappearing
+            sketchyPage.style.display = 'flex'; // Show the sketchy download page
+        }
+
+        function simulateDownload() {
+             sketchyPage.style.display = 'none';
+            chromeWarning.style.display = 'block';
+
+            // Simulate the warning disappearing and show the final win screen
+            setTimeout(() => {
+                chromeWarning.style.display = 'none';
+                finalWinScreen.style.display = 'flex';
+             }, 3000); // After 3 seconds
+        }
+
+
         // --- Event Listeners ---
 
         // --- Key Down ---
         document.addEventListener('keydown', (event) => {
-             if (gameRunning) {
+            if (gameRunning) {
                 keys[event.key] = true;
                 event.preventDefault(); // Prevent scrolling with arrow keys
-             }
-              if (event.key === 'Escape' && gameRunning) { //  Allow "Escape" key to pause/exit the game
-                  endGame();
-              }
+            }
+            if (event.key === 'Escape' && gameRunning) { //  Allow "Escape" key to pause/exit the game
+                endGame();
+            }
         });
 
         // --- Key Up ---
@@ -786,43 +1042,43 @@
         });
 
 
-         // --- Retry Button Click ---
-         retryButton.addEventListener('click', retryGame);
+        // --- Retry Button Click ---
+        retryButton.addEventListener('click', retryGame);
 
         // ---  Hidden Area Interactions ---
         const hiddenAreas = document.querySelectorAll('.hidden-area');
-         hiddenAreas.forEach(area => {
-             area.addEventListener('mouseenter', (event) => {
+        hiddenAreas.forEach(area => {
+            area.addEventListener('mouseenter', (event) => {
                 // Show the message associated with this hidden area
                 const message = event.target.dataset.message;
-                 hiddenMessage.textContent = message;
-                 hiddenMessage.style.display = 'block';
+                hiddenMessage.textContent = message;
+                hiddenMessage.style.display = 'block';
 
-                  // Position the message near the mouse
+                // Position the message near the mouse
                 hiddenMessage.style.left = event.clientX + 15 + 'px';
                 hiddenMessage.style.top = event.clientY + 15 + 'px';
             });
 
-             area.addEventListener('mouseleave', () => {
+            area.addEventListener('mouseleave', () => {
                 hiddenMessage.style.display = 'none'; // Hide on mouse leave
             });
-         });
+        });
 
 
         // --- (Previous event listeners for the "inescapable" part) ---
 
         document.addEventListener('mousemove', (event) => {
             createMouseTrail(event.clientX, event.clientY);
-             if (backgroundAudio.paused) {
+            if (backgroundAudio.paused) {
                 backgroundAudio.play().catch(error => {
-                   console.warn("Audio autoplay failed:", error);
+                    console.warn("Audio autoplay failed:", error);
                 });
-             }
+            }
             // ---  Update hidden message position ---
             if (hiddenMessage.style.display === 'block') {
-                 hiddenMessage.style.left = event.clientX + 15 + 'px';
+                hiddenMessage.style.left = event.clientX + 15 + 'px';
                 hiddenMessage.style.top = event.clientY + 15 + 'px';
-             }
+            }
 
         });
 
@@ -878,14 +1134,15 @@
 
         window.addEventListener('resize', () => {
             // --- Game resize handling ---
-             if (gameRunning) {
+            if (gameRunning) {
                 // Keep player within bounds after resize
                 playerX = Math.max(0, Math.min(playerX, gameContainer.offsetWidth - player.offsetWidth));
-                 playerY = Math.max(0, Math.min(playerY, gameContainer.offsetHeight - player.offsetHeight));
+                playerY = Math.max(0, Math.min(playerY, gameContainer.offsetHeight - player.offsetHeight));
                 updatePlayerPosition();
-              }
+            }
 
-                        closeButton.style.right = '20px';
+            closeButton.style.top = '20px';
+            closeButton.style.right = '20px';
             removeFakeButtons();
             if (distractionOverlay.classList.contains('active')) {
                 for (let i = 0; i < 3; i++) {
@@ -894,7 +1151,9 @@
             }
         });
 
-
+        // --- NEW: Event Listeners for Virus Ad and Download ---
+        downloadFixButton.addEventListener('click', showSketchyPage);
+        sketchyDownloadButton.addEventListener('click', simulateDownload);
     </script>
 </body>
 
