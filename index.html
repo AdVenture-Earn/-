@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>20 Ads Showcase - New Code</title>
-  <!-- Auto-refresh the page every 60 seconds -->
+  <title>Ad Debugging Page - 20 Ad Units</title>
+  <!-- Auto-refresh every 60 seconds -->
   <meta http-equiv="refresh" content="60" />
   <style>
-    /* Basic styling for the page */
+    /* Basic styling for the debugging page */
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
@@ -30,17 +30,16 @@
   </style>
   <!--
     Legal & Security Warning:
-    - Ensure that you are authorized by your ad provider to use multiple ad units on one page.
-    - Always comply with the ad network’s guidelines regarding key usage and domain whitelisting.
+    - Verify that your domain is whitelisted and your ad key is active.
+    - Ensure you have permission to use multiple ad units on one page.
     - Do not use this code for unethical or illegal practices.
   -->
 </head>
 <body>
-  <h1>Ad Showcase</h1>
-  <p>This page displays 20 ad units with new ad code. The page auto-refreshes every minute.</p>
+  <h1>Ad Debugging Page</h1>
+  <p>This page attempts to load 20 ad units using the new ad code. Open your browser's console to view debugging messages.</p>
   
   <div class="ads-container">
-    <!-- Repeat this ad block 20 times -->
     <!-- Ad 1 -->
     <div class="ad-block">
       <script type="text/javascript">
@@ -54,8 +53,14 @@
           };
           var script = document.createElement("script");
           script.type = "text/javascript";
-          // Use explicit HTTPS for the ad script
+          // Explicit HTTPS URL to avoid protocol issues
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 1 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 1 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -75,6 +80,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 2 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 2 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -94,6 +105,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 3 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 3 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -113,6 +130,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 4 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 4 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -132,6 +155,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 5 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 5 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -151,6 +180,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 6 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 6 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -170,6 +205,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 7 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 7 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -189,6 +230,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 8 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 8 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -208,6 +255,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 9 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 9 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -227,6 +280,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 10 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 10 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -246,6 +305,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 11 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 11 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -265,6 +330,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 12 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 12 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -284,6 +355,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 13 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 13 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -303,6 +380,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 14 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 14 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -322,6 +405,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 15 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 15 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -341,6 +430,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 16 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 16 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -360,6 +455,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 17 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 17 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -379,6 +480,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 18 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 18 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -398,6 +505,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 19 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 19 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -417,6 +530,12 @@
           var script = document.createElement("script");
           script.type = "text/javascript";
           script.src = "https://www.highperformanceformat.com/ad74248120de1c50eca8713f26b5fa70/invoke.js";
+          script.onload = function() {
+            console.log("Ad 20 loaded successfully.");
+          };
+          script.onerror = function(e) {
+            console.error("Error loading Ad 20 script:", e);
+          };
           document.currentScript.parentNode.appendChild(script);
         })();
       </script>
@@ -425,10 +544,10 @@
   
   <!--
     Summary:
-    - This page displays 20 ad units using the new ad code.
-    - Each ad unit is isolated in an IIFE to prevent variable conflicts.
+    - This page creates 20 ad units using the new ad code with debugging events.
     - The page auto-refreshes every minute.
-    - Test on a web server and confirm your domain is whitelisted with your ad provider.
+    - Open the browser console to view messages indicating whether each ad script loaded successfully.
+    - Ensure your testing environment is whitelisted and ad key is active.
   -->
 </body>
 </html>
