@@ -66,23 +66,6 @@
             40%, 60% { transform: translateX(4px); }
         }
 
-        .cracked {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(1);
-            width: 100%;
-            height: 100%;
-            background: black;
-            opacity: 0;
-            animation: crackEffect 1s forwards;
-        }
-
-        @keyframes crackEffect {
-            from { transform: translate(-50%, -50%) scale(1); opacity: 0; }
-            to { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-        }
-
         .loading-label {
             position: absolute;
             font-size: 24px;
@@ -97,12 +80,13 @@
             width: 100%;
             height: 100%;
             background: black;
-            opacity: 0;
+            animation: tearEffect 1s forwards 3s;
+            display: none;
         }
 
         @keyframes tearEffect {
-            from { transform: scaleY(1); opacity: 1; }
-            to { transform: scaleY(0); opacity: 0; }
+            from { transform: scaleY(1); }
+            to { transform: scaleY(0); }
         }
 
         @keyframes fadeOut {
@@ -118,19 +102,25 @@
     <div class="tearing" id="tearing"></div>
 
     <script>
+        document.getElementById('loading-label').style.display = 'none';
+
         function redirect() {
             const button = document.querySelector('.redirect-button');
             button.style.animation = 'shake 1s forwards';
             setTimeout(() => {
                 button.style.display = 'none';
-                document.getElementById('tearing').style.opacity = '1';
-                document.getElementById('tearing').style.animation = 'tearEffect 1s forwards';
-                document.getElementById('loading-label').style.opacity = '1';
+                document.getElementById('tearing').style.display = 'block';
+                document.getElementById('loading-label').style.display = 'block';
                 document.getElementById('loading-label').style.animation = 'fadeIn 1s forwards';
                 setTimeout(() => {
                     document.body.style.animation = 'fadeOut 2s forwards';
                     setTimeout(() => {
-                        window.location.href = "https://example.com";
+                        const path = window.location.pathname.replace("/", "");
+                        if (path) {
+                            window.location.href = `https://example.com/${path}`;
+                        } else {
+                            window.location.href = "https://example.com/home";
+                        }
                     }, 2000);
                 }, 1000);
             }, 1000);
