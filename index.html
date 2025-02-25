@@ -11,6 +11,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
             overflow: hidden;
             background: linear-gradient(45deg, #ff416c, #ff4b2b, #1fa2ff, #12d8fa, #a6ffcb, #ff9a9e, #fad0c4);
             background-size: 400% 400%;
@@ -29,8 +30,13 @@
             to { opacity: 1; }
         }
 
+        .container {
+            text-align: center;
+        }
+
         .button-container {
             position: relative;
+            margin-top: 20px;
         }
 
         .redirect-button {
@@ -73,20 +79,15 @@
             opacity: 0;
         }
 
-        .tearing {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: black;
-            animation: tearEffect 1s forwards 3s;
-            display: none;
+        .search-container {
+            margin-top: 30px;
+            text-align: center;
         }
 
-        @keyframes tearEffect {
-            from { transform: scaleY(1); }
-            to { transform: scaleY(0); }
+        .search-container input, .search-container button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 5px;
         }
 
         @keyframes fadeOut {
@@ -95,21 +96,33 @@
     </style>
 </head>
 <body>
-    <div class="button-container">
-        <button class="redirect-button" onclick="redirect()">Go</button>
+    <div class="container" id="home">
+        <h1 style="color: white;">Welcome to the Redirect Platform</h1>
+        <div class="search-container">
+            <input type="text" id="search-box" placeholder="Enter redirect number...">
+            <button onclick="searchRedirect()">Go</button>
+        </div>
+        <div class="button-container">
+            <button class="redirect-button" onclick="redirect()">Go</button>
+        </div>
+        <div class="loading-label" id="loading-label">Loading the redirection link...</div>
     </div>
-    <div class="loading-label" id="loading-label">Loading the redirection link...</div>
-    <div class="tearing" id="tearing"></div>
 
     <script>
         document.getElementById('loading-label').style.display = 'none';
+
+        function searchRedirect() {
+            const input = document.getElementById('search-box').value;
+            if (input) {
+                window.location.href = `/${input}`;
+            }
+        }
 
         function redirect() {
             const button = document.querySelector('.redirect-button');
             button.style.animation = 'shake 1s forwards';
             setTimeout(() => {
                 button.style.display = 'none';
-                document.getElementById('tearing').style.display = 'block';
                 document.getElementById('loading-label').style.display = 'block';
                 document.getElementById('loading-label').style.animation = 'fadeIn 1s forwards';
                 setTimeout(() => {
@@ -119,7 +132,7 @@
                         if (path) {
                             window.location.href = `https://example.com/${path}`;
                         } else {
-                            window.location.href = "https://example.com/home";
+                            document.getElementById('home').style.display = 'block';
                         }
                     }, 2000);
                 }, 1000);
