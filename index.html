@@ -12,14 +12,21 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            background: linear-gradient(45deg, #ff416c, #ff4b2b, #1fa2ff, #12d8fa, #a6ffcb);
-            background-size: 300% 300%;
+            background: linear-gradient(45deg, #ff416c, #ff4b2b, #1fa2ff, #12d8fa, #a6ffcb, #ff9a9e, #fad0c4);
+            background-size: 400% 400%;
             animation: gradientShift 10s infinite alternate;
+            opacity: 0;
+            animation: fadeIn 2s forwards, gradientShift 15s infinite alternate;
         }
 
         @keyframes gradientShift {
             0% { background-position: 0% 50%; }
             100% { background-position: 100% 50%; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .button-container {
@@ -40,6 +47,8 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             position: relative;
             overflow: hidden;
+            opacity: 0;
+            animation: fadeIn 2s forwards 0.5s;
         }
 
         .redirect-button:hover {
@@ -47,7 +56,7 @@
         }
 
         .redirect-button:active {
-            animation: shake 2s;
+            animation: shake 1s;
         }
 
         @keyframes shake {
@@ -57,14 +66,44 @@
             40%, 60% { transform: translateX(4px); }
         }
 
-        .particle {
+        .cracked {
             position: absolute;
-            width: 5px;
-            height: 5px;
-            background: white;
-            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            width: 100%;
+            height: 100%;
+            background: black;
             opacity: 0;
-            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+            animation: crackEffect 1s forwards;
+        }
+
+        @keyframes crackEffect {
+            from { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+        }
+
+        .loading-label {
+            position: absolute;
+            font-size: 24px;
+            color: white;
+            opacity: 0;
+            animation: fadeIn 1s forwards 2s;
+        }
+
+        .tearing {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            animation: tearEffect 1s forwards 3s;
+        }
+
+        @keyframes tearEffect {
+            from { transform: scaleY(1); }
+            to { transform: scaleY(0); }
         }
 
         @keyframes fadeOut {
@@ -76,37 +115,24 @@
     <div class="button-container">
         <button class="redirect-button" onclick="redirect()">Go</button>
     </div>
+    <div class="loading-label" id="loading-label">Loading the redirection link...</div>
+    <div class="tearing" id="tearing"></div>
 
     <script>
-        document.querySelector('.redirect-button').addEventListener('mousemove', function(e) {
-            const button = this;
-            const rect = button.getBoundingClientRect();
-            for (let i = 0; i < 5; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                document.body.appendChild(particle);
-                
-                particle.style.left = `${e.clientX}px`;
-                particle.style.top = `${e.clientY}px`;
-                particle.style.opacity = 1;
-                
-                const xMove = (Math.random() - 0.5) * 200;
-                const yMove = (Math.random() - 0.5) * 200;
-                
-                setTimeout(() => {
-                    particle.style.transform = `translate(${xMove}px, ${yMove}px) scale(0)`;
-                    particle.style.opacity = 0;
-                }, 10);
-                
-                setTimeout(() => particle.remove(), 500);
-            }
-        });
-
         function redirect() {
-            document.body.style.animation = 'fadeOut 2s forwards';
+            const button = document.querySelector('.redirect-button');
+            button.style.animation = 'shake 1s forwards';
             setTimeout(() => {
-                window.location.href = "https://example.com";
-            }, 2000);
+                button.style.display = 'none';
+                document.getElementById('tearing').style.animation = 'tearEffect 1s forwards';
+                document.getElementById('loading-label').style.animation = 'fadeIn 1s forwards';
+                setTimeout(() => {
+                    document.body.style.animation = 'fadeOut 2s forwards';
+                    setTimeout(() => {
+                        window.location.href = "https://example.com";
+                    }, 2000);
+                }, 1000);
+            }, 1000);
         }
     </script>
 </body>
