@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Redirect Button</title>
+  <title>Animated Redirect Button</title>
   <style>
-    /* Reset margin and padding; center content vertically and horizontally */
+    /* Apply a full-page background with a subtle animated gradient */
     body, html {
       margin: 0;
       padding: 0;
@@ -13,12 +13,22 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #f0f0f0; /* Light background for a modern look */
+      /* Initial gradient background */
+      background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fad0c4);
+      background-size: 600% 600%;
+      animation: backgroundAnimation 30s ease infinite;
     }
 
-    /* Style for the modern, minimal button */
+    /* Background gradient animation */
+    @keyframes backgroundAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Button styling with passive animation and modern design */
     .redirect-button {
-      background: #6200ea; /* Primary color (purple) */
+      background: #6200ea;  /* Primary color */
       color: #fff;
       border: none;
       border-radius: 8px;
@@ -28,21 +38,34 @@
       transition: transform 0.2s ease-in-out, background 0.3s ease-in-out;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       outline: none;
+      /* Passive glow pulse animation */
+      animation: glowPulse 3s ease-in-out infinite;
     }
 
-    /* Hover effect: change background and scale up slightly */
+    /* Glow pulse animation for the button */
+    @keyframes glowPulse {
+      0%, 100% {
+        box-shadow: 0 0 10px rgba(98, 0, 234, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 20px rgba(98, 0, 234, 0.8);
+      }
+    }
+
+    /* Enhanced hover effects: scaling, slight rotation, and intensified shadow */
     .redirect-button:hover {
       background: #7e3ff2;
-      transform: scale(1.05);
+      transform: scale(1.1) rotate(1deg);
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
     }
 
-    /* Active effect: scale down slightly to mimic a press */
+    /* Active (pressed) effect: a slight shrink and rotation in the opposite direction */
     .redirect-button:active {
-      transform: scale(0.95);
+      transform: scale(0.95) rotate(-1deg);
     }
 
     /* Focus effect: subtle pulse animation */
-    @keyframes pulse {
+    @keyframes focusPulse {
       0% {
         box-shadow: 0 0 0 0 rgba(98, 0, 234, 0.7);
       }
@@ -55,26 +78,53 @@
     }
     
     .redirect-button:focus {
-      animation: pulse 1.5s infinite;
+      animation: focusPulse 1.5s infinite;
+    }
+
+    /* Click animation: plays for 2 seconds before redirection */
+    @keyframes clickAnimation {
+      0% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.2) rotate(5deg);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+    }
+
+    .animate-click {
+      animation: clickAnimation 2s forwards;
     }
   </style>
 </head>
 <body>
-  <!-- Button that triggers redirection when clicked -->
-  <button class="redirect-button" onclick="redirect()">
+  <!-- Single animated button that triggers a redirection after a 2-second animation -->
+  <button class="redirect-button" id="redirectBtn">
     Click Me to Redirect
   </button>
 
   <script>
     /**
-     * redirect function:
-     * Redirects the user to a specified URL.
-     * WARNING: Ensure the URL is trustworthy to avoid open redirect vulnerabilities.
+     * Adds a click animation to the button and then redirects after 2 seconds.
+     * WARNING: Ensure that the target URL is trustworthy to avoid security vulnerabilities.
      */
-    function redirect() {
-      // Replace the URL below with your desired target.
-      window.location.href = "https://parsec.gg/g/2sa9Ik5opuKyuoeEEWuwTUjkuTa/Oru8mBqZ";
-    }
+    document.getElementById("redirectBtn").addEventListener("click", function() {
+      // Add the click animation class to start the 2-second animation
+      this.classList.add("animate-click");
+
+      // Disable the button to prevent multiple clicks
+      this.disabled = true;
+
+      // Redirect to the target URL after 2 seconds (2000ms)
+      setTimeout(function() {
+        window.location.href = "https://parsec.gg/g/2sa9Ik5opuKyuoeEEWuwTUjkuTa/Oru8mBqZ"; // Replace with your desired URL
+      }, 2000);
+    });
   </script>
 </body>
 </html>
