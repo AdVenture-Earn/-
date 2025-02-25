@@ -22,7 +22,6 @@
     }
 
     /* Animated Background with Multiple Layers */
-    /* Layer 1: Rotating blurred conic gradient */
     body::before {
       content: "";
       position: absolute;
@@ -35,7 +34,6 @@
       z-index: -2;
       filter: blur(60px);
     }
-    /* Layer 2: Shifting linear gradient overlay with blur */
     body::after {
       content: "";
       position: absolute;
@@ -49,12 +47,10 @@
       animation: gradientShift 10s ease-in-out infinite alternate;
       filter: blur(20px);
     }
-    /* Keyframes for the rotating background layer */
     @keyframes rotateBackground {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    /* Keyframes for the shifting gradient overlay */
     @keyframes gradientShift {
       0% { filter: hue-rotate(0deg); }
       100% { filter: hue-rotate(360deg); }
@@ -68,26 +64,27 @@
       border: none;
       padding: 20px 40px;
       font-size: 20px;
-      border-radius: 50px;  /* More rounded, pill-shaped design */
+      border-radius: 50px;  /* Pill-shaped design */
       cursor: pointer;
       outline: none;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-      overflow: hidden;
+      overflow: hidden; /* Ensure child elements are clipped to button's shape */
     }
-    /* Button Overlay for extra gradient effect on hover */
+    /* Updated pseudo-element to cover only the button's area */
     .redirect-button::before {
       content: "";
       position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
+      top: 0; 
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: linear-gradient(60deg, rgba(255,255,255,0.15), rgba(255,255,255,0));
       transform: rotate(0deg);
       transition: transform 0.5s;
+      z-index: -1; /* Place behind the button content */
     }
-    /* Hover Effects: Scale, slight rotation, and intensified shadow */
+    /* Enhanced Hover Effects */
     .redirect-button:hover {
       transform: scale(1.1) rotate(2deg);
       box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
@@ -95,11 +92,10 @@
     .redirect-button:hover::before {
       transform: rotate(360deg);
     }
-    /* Active (Pressed) Effect */
     .redirect-button:active {
       transform: scale(0.95) rotate(-2deg);
     }
-    /* Click Animation: Plays for 2 seconds before redirection */
+    /* Click Animation: Plays for 2 seconds before redirecting */
     @keyframes clickAnimation {
       0% {
         transform: scale(1) rotate(0deg);
@@ -127,17 +123,14 @@
 
   <script>
     /**
-     * On button click, play a 2-second animation before redirecting.
-     * SECURITY WARNING: Ensure the target URL is trusted to avoid open redirect vulnerabilities.
+     * Plays a 2-second animation on click, then redirects.
+     * SECURITY WARNING: Use a trusted URL to avoid open redirect vulnerabilities.
      */
     document.getElementById("redirectBtn").addEventListener("click", function() {
-      // Start the click animation
       this.classList.add("animate-click");
-      // Disable the button to prevent repeated clicks
       this.disabled = true;
-      // Redirect after 2 seconds (2000ms)
       setTimeout(function() {
-        window.location.href = "https://parsec.gg/g/2sa9Ik5opuKyuoeEEWuwTUjkuTa/Oru8mBqZ"; // Replace with your trusted URL
+        window.location.href = "https://www.example.com"; // Replace with your trusted URL
       }, 2000);
     });
   </script>
