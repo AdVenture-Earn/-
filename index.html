@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Animated Redirect Button</title>
+  <title>Advanced Animated Redirect</title>
   <style>
-    /* Base styles for full-screen layout */
+    /* Global Reset & Basic Styles */
     html, body {
       margin: 0;
       padding: 0;
@@ -14,45 +14,52 @@
       background: #000; /* Fallback background */
     }
 
-    /* Fullscreen canvas for animated gradient background */
+    /* Fullscreen Canvas for Animated Gradient Background */
     #bgCanvas {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: -1;
+      z-index: -2;
+      opacity: 0;
+      animation: fadeInCanvas 2s forwards;
+    }
+    @keyframes fadeInCanvas {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
-    /* Centering container for the button */
+    /* Main container for the button */
     .container {
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100%;
+      z-index: 1;
+      position: relative;
     }
 
-    /* Modern button style */
+    /* Modern Button with Enhanced Color, Shading, and Animation */
     #redirectButton {
       position: relative;
       padding: 20px 40px;
       font-size: 1.5rem;
       color: #fff;
-      background: rgba(0, 0, 0, 0.7);
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-      overflow: hidden; /* To contain the particles */
-      transition: transform 0.2s;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.2), inset 0 -3px 10px rgba(0,0,0,0.2);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
     }
-
-    /* Scale effect on hover */
     #redirectButton:hover {
-      transform: scale(1.05);
+      transform: scale(1.07);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.3), inset 0 -4px 12px rgba(0,0,0,0.3);
     }
 
-    /* Particle element style */
+    /* Particle Effect Style */
     .particle {
       position: absolute;
       width: 6px;
@@ -62,8 +69,6 @@
       pointer-events: none;
       opacity: 0.8;
     }
-
-    /* Keyframes for particle movement (from a start offset to the center) */
     @keyframes particleMove {
       from {
         transform: translate(var(--start-x), var(--start-y));
@@ -75,7 +80,7 @@
       }
     }
 
-    /* Keyframes for button shake animation */
+    /* Button Shake Animation */
     @keyframes shake {
       0% { transform: translate(0, 0) rotate(0deg); }
       10% { transform: translate(-5px, 0) rotate(-2deg); }
@@ -89,38 +94,67 @@
       90% { transform: translate(-5px, 0) rotate(-2deg); }
       100% { transform: translate(0, 0) rotate(0deg); }
     }
-
-    /* Applying shake animation */
     .shake {
       animation: shake 2s;
     }
 
-    /* Fade-out animation for the entire page */
+    /* Fade-out for the Main Container */
     @keyframes fadeOut {
       from { opacity: 1; }
       to { opacity: 0; }
     }
-
     .fade-out {
       animation: fadeOut 1.5s forwards;
+    }
+
+    /* Fade-in Animation for the Overlay */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .fade-in {
+      animation: fadeIn 1.5s forwards;
+    }
+
+    /* Redirect Overlay (Loading Screen) */
+    #redirectOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      opacity: 0;
+      z-index: 2;
+      display: none;
     }
   </style>
 </head>
 <body>
-  <!-- Canvas used for animated background -->
+  <!-- Animated Gradient Background -->
   <canvas id="bgCanvas"></canvas>
   
-  <!-- Centered container with the animated button -->
-  <div class="container">
+  <!-- Main Container with the Redirect Button -->
+  <div class="container" id="mainContainer">
     <button id="redirectButton">Redirect Me</button>
   </div>
-
+  
+  <!-- Redirect Overlay (Loading Screen) -->
+  <div id="redirectOverlay">
+    Loading...
+  </div>
+  
   <script>
     /********************************************************************
      * Security & Legal Notice:
      * This code is provided for educational and demonstration purposes only.
-     * Do not use this code to redirect users without consent or for deceptive practices.
-     * Always ensure that animations and redirects do not negatively affect user experience.
+     * Do not use this code to redirect users without their informed consent
+     * or for deceptive practices. Always ensure user experience and security.
      ********************************************************************/
 
     // Set the target URL for redirection (change as needed)
@@ -132,7 +166,7 @@
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
 
-    // Resize canvas to fit window
+    // Resize canvas to fit the window
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -140,16 +174,16 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Animate background with a shifting gradient based on time
+    // Animate the background with a continuously shifting gradient
     function animateBackground() {
-      const time = Date.now() * 0.002; // Adjust speed of hue change
+      const time = Date.now() * 0.002; // Speed factor for color shift
       const width = canvas.width;
       const height = canvas.height;
       
-      // Create a linear gradient that changes over time
+      // Create a linear gradient that shifts based on time
       const gradient = ctx.createLinearGradient(0, 0, width, height);
-      const color1 = 'hsl(' + (time % 360) + ', 50%, 50%)';
-      const color2 = 'hsl(' + ((time + 180) % 360) + ', 50%, 50%)';
+      const color1 = 'hsl(' + (time % 360) + ', 60%, 50%)';
+      const color2 = 'hsl(' + ((time + 180) % 360) + ', 60%, 50%)';
       gradient.addColorStop(0, color1);
       gradient.addColorStop(1, color2);
       
@@ -160,66 +194,68 @@
     animateBackground();
 
     // -------------------------------
-    // Particle Effect on Hover
+    // Particle Effect on Button Hover
     // -------------------------------
     const button = document.getElementById('redirectButton');
 
-    // Function to create particle elements dynamically
     function createParticles(e) {
       const rect = button.getBoundingClientRect();
-      const particlesCount = 20; // Number of particles per hover event
+      const particlesCount = 20; // Number of particles per event
       for (let i = 0; i < particlesCount; i++) {
         const particle = document.createElement('span');
         particle.classList.add('particle');
         
-        // Random angle and distance for starting position (outside the center)
+        // Random angle and distance for starting position
         const angle = Math.random() * Math.PI * 2;
-        const radius = 50 + Math.random() * 20; // 50-70px away from center
+        const radius = 50 + Math.random() * 20; // 50-70px from center
         const startX = Math.cos(angle) * radius;
         const startY = Math.sin(angle) * radius;
         
-        // Set custom CSS properties for the animation
+        // Set custom CSS properties for animation
         particle.style.setProperty('--start-x', startX + 'px');
         particle.style.setProperty('--start-y', startY + 'px');
         
-        // Position the particle at the center of the button
+        // Start the particle at the button's center
         particle.style.left = (rect.width / 2) + 'px';
         particle.style.top = (rect.height / 2) + 'px';
-        
-        // Apply the particle animation (duration and easing)
         particle.style.animation = 'particleMove 0.8s ease-out forwards';
         
-        // Append particle to the button element
         button.appendChild(particle);
-        
-        // Remove the particle after the animation ends to avoid DOM clutter
         particle.addEventListener('animationend', () => {
           particle.remove();
         });
       }
     }
-
-    // Trigger particle effect on mouse enter
     button.addEventListener('mouseenter', createParticles);
 
     // -------------------------------
-    // Button Click: Shake, Fade, and Redirect
+    // Advanced Redirection Flow
     // -------------------------------
+    const mainContainer = document.getElementById('mainContainer');
+    const redirectOverlay = document.getElementById('redirectOverlay');
+
     button.addEventListener('click', () => {
       // Disable the button to prevent multiple clicks
       button.disabled = true;
-      
-      // Add shake animation class
+      // Start shake animation on button
       button.classList.add('shake');
       
-      // After 2 seconds (duration of shake), fade out the page
+      // After shake (2s), fade out the main container
       setTimeout(() => {
-        document.body.classList.add('fade-out');
+        mainContainer.classList.add('fade-out');
         
-        // After the fade-out animation (1.5s), redirect to the target URL
+        // After container fade-out (1.5s), display and fade in the overlay
         setTimeout(() => {
-          window.location.href = targetUrl;
+          redirectOverlay.style.display = "flex";
+          redirectOverlay.classList.add('fade-in');
+          
+          // After the overlay fades in (1.5s), redirect to the target URL
+          setTimeout(() => {
+            window.location.href = targetUrl;
+          }, 1500);
+          
         }, 1500);
+        
       }, 2000);
     });
   </script>
