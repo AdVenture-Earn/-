@@ -1,211 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Advanced Animated Redirect</title>
-  <style>
-    /* Base styles */
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      height: 100%;
-      font-family: sans-serif;
-      background: #000;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Redirect</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: linear-gradient(45deg, #ff416c, #ff4b2b, #1fa2ff, #12d8fa, #a6ffcb);
+            background-size: 300% 300%;
+            animation: gradientShift 10s infinite alternate;
+        }
 
-    /* Background gradient canvas */
-    #bgCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      transition: opacity 2s ease-in-out; /* Fade in effect */
-      z-index: -1;
-    }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
 
-    /* Centering the button */
-    .container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+        .button-container {
+            position: relative;
+        }
 
-    /* Advanced Modern Button */
-    #redirectButton {
-      position: relative;
-      padding: 20px 50px;
-      font-size: 1.5rem;
-      color: white;
-      background: linear-gradient(135deg, #ff416c, #ff4b2b);
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 15px 30px rgba(255, 0, 80, 0.3);
-      transition: all 0.3s ease-in-out;
-      overflow: hidden;
-      font-weight: bold;
-    }
+        .redirect-button {
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
 
-    /* Glowing effect */
-    #redirectButton:hover {
-      box-shadow: 0 20px 40px rgba(255, 0, 80, 0.6);
-      transform: scale(1.07);
-    }
+        .redirect-button:hover {
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.5);
+        }
 
-    /* Particle effect */
-    .particle {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      background: white;
-      border-radius: 50%;
-      pointer-events: none;
-    }
+        .redirect-button:active {
+            animation: shake 2s;
+        }
 
-    @keyframes particleMove {
-      from { transform: translate(var(--start-x), var(--start-y)); opacity: 1; }
-      to { transform: translate(0, 0); opacity: 0; }
-    }
+        @keyframes shake {
+            10%, 90% { transform: translateX(-2px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-4px); }
+            40%, 60% { transform: translateX(4px); }
+        }
 
-    /* Button shake animation */
-    @keyframes shake {
-      0% { transform: translateX(0); }
-      10% { transform: translateX(-5px); }
-      20% { transform: translateX(5px); }
-      30% { transform: translateX(-5px); }
-      40% { transform: translateX(5px); }
-      50% { transform: translateX(-5px); }
-      60% { transform: translateX(5px); }
-      70% { transform: translateX(-5px); }
-      80% { transform: translateX(5px); }
-      90% { transform: translateX(-5px); }
-      100% { transform: translateX(0); }
-    }
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+        }
 
-    /* Full page fade transition */
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .fade-out { animation: fadeOut 1.5s forwards; }
-    .fade-in { animation: fadeIn 1.5s forwards; }
-
-    /* Fake redirect loading screen */
-    #fakeLoadingScreen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: black;
-      opacity: 0;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      font-size: 2rem;
-      color: white;
-      font-weight: bold;
-    }
-  </style>
+        @keyframes fadeOut {
+            to { opacity: 0; }
+        }
+    </style>
 </head>
 <body>
-  <canvas id="bgCanvas"></canvas>
+    <div class="button-container">
+        <button class="redirect-button" onclick="redirect()">Go</button>
+    </div>
 
-  <!-- Fake loading screen for smooth transition -->
-  <div id="fakeLoadingScreen">Loading...</div>
+    <script>
+        document.querySelector('.redirect-button').addEventListener('mousemove', function(e) {
+            const button = this;
+            const rect = button.getBoundingClientRect();
+            for (let i = 0; i < 5; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                document.body.appendChild(particle);
+                
+                particle.style.left = `${e.clientX}px`;
+                particle.style.top = `${e.clientY}px`;
+                particle.style.opacity = 1;
+                
+                const xMove = (Math.random() - 0.5) * 200;
+                const yMove = (Math.random() - 0.5) * 200;
+                
+                setTimeout(() => {
+                    particle.style.transform = `translate(${xMove}px, ${yMove}px) scale(0)`;
+                    particle.style.opacity = 0;
+                }, 10);
+                
+                setTimeout(() => particle.remove(), 500);
+            }
+        });
 
-  <!-- Button container -->
-  <div class="container">
-    <button id="redirectButton">Redirect Me</button>
-  </div>
-
-  <script>
-    const targetUrl = "https://example.com";
-    const canvas = document.getElementById("bgCanvas");
-    const ctx = canvas.getContext("2d");
-    const button = document.getElementById("redirectButton");
-    const fakeLoadingScreen = document.getElementById("fakeLoadingScreen");
-
-    // Resize canvas
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    // Background animation
-    function animateBackground() {
-      const time = Date.now() * 0.002;
-      const width = canvas.width;
-      const height = canvas.height;
-
-      const gradient = ctx.createLinearGradient(0, 0, width, height);
-      const color1 = `hsl(${(time % 360)}, 60%, 50%)`;
-      const color2 = `hsl(${((time + 180) % 360)}, 60%, 50%)`;
-      gradient.addColorStop(0, color1);
-      gradient.addColorStop(1, color2);
-
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
-
-      requestAnimationFrame(animateBackground);
-    }
-    animateBackground();
-
-    // Fade in background on load
-    window.onload = () => {
-      canvas.style.opacity = "1";
-    };
-
-    // Particle hover effect
-    button.addEventListener("mouseenter", () => {
-      for (let i = 0; i < 20; i++) {
-        const particle = document.createElement("span");
-        particle.classList.add("particle");
-
-        const angle = Math.random() * Math.PI * 2;
-        const radius = 60 + Math.random() * 20;
-        const startX = Math.cos(angle) * radius;
-        const startY = Math.sin(angle) * radius;
-
-        particle.style.setProperty("--start-x", `${startX}px`);
-        particle.style.setProperty("--start-y", `${startY}px`);
-        particle.style.animation = "particleMove 0.8s ease-out forwards";
-
-        button.appendChild(particle);
-        particle.addEventListener("animationend", () => particle.remove());
-      }
-    });
-
-    // Click event for smooth transition and redirect
-    button.addEventListener("click", () => {
-      button.disabled = true;
-      button.classList.add("shake");
-
-      setTimeout(() => {
-        document.body.classList.add("fade-out");
-
-        setTimeout(() => {
-          fakeLoadingScreen.style.display = "flex";
-          fakeLoadingScreen.classList.add("fade-in");
-
-          setTimeout(() => {
-            window.location.href = targetUrl;
-          }, 2000);
-        }, 1500);
-      }, 2000);
-    });
-  </script>
+        function redirect() {
+            document.body.style.animation = 'fadeOut 2s forwards';
+            setTimeout(() => {
+                window.location.href = "https://example.com";
+            }, 2000);
+        }
+    </script>
 </body>
 </html>
