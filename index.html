@@ -30,16 +30,12 @@
             to { opacity: 1; }
         }
 
-        .container {
+        .button-container, .home-container {
             text-align: center;
+            display: none;
         }
 
-        .button-container {
-            position: relative;
-            margin-top: 20px;
-        }
-
-        .redirect-button {
+        .redirect-button, .create-button, .search-button {
             padding: 15px 40px;
             font-size: 18px;
             font-weight: bold;
@@ -53,23 +49,11 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             position: relative;
             overflow: hidden;
-            opacity: 0;
-            animation: fadeIn 2s forwards 0.5s;
+            margin: 10px;
         }
 
-        .redirect-button:hover {
+        .redirect-button:hover, .create-button:hover, .search-button:hover {
             box-shadow: 0 6px 20px rgba(255, 255, 255, 0.5);
-        }
-
-        .redirect-button:active {
-            animation: shake 1s;
-        }
-
-        @keyframes shake {
-            10%, 90% { transform: translateX(-2px); }
-            20%, 80% { transform: translateX(2px); }
-            30%, 50%, 70% { transform: translateX(-4px); }
-            40%, 60% { transform: translateX(4px); }
         }
 
         .loading-label {
@@ -79,15 +63,20 @@
             opacity: 0;
         }
 
-        .search-container {
-            margin-top: 30px;
-            text-align: center;
+        .tearing {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            animation: tearEffect 1s forwards 3s;
+            display: none;
         }
 
-        .search-container input, .search-container button {
-            padding: 10px;
-            font-size: 16px;
-            margin: 5px;
+        @keyframes tearEffect {
+            from { transform: scaleY(1); }
+            to { transform: scaleY(0); }
         }
 
         @keyframes fadeOut {
@@ -96,48 +85,58 @@
     </style>
 </head>
 <body>
-    <div class="container" id="home">
-        <h1 style="color: white;">Welcome to the Redirect Platform</h1>
-        <div class="search-container">
-            <input type="text" id="search-box" placeholder="Enter redirect number...">
-            <button onclick="searchRedirect()">Go</button>
-        </div>
-        <div class="button-container">
-            <button class="redirect-button" onclick="redirect()">Go</button>
-        </div>
-        <div class="loading-label" id="loading-label">Loading the redirection link...</div>
+    <div class="home-container" id="home">
+        <h1>Welcome to the Redirection Platform</h1>
+        <button class="create-button" onclick="createLink()">Create Redirection Link</button>
+        <button class="search-button" onclick="searchLink()">Search Redirection Links</button>
     </div>
+    
+    <div class="button-container" id="redirect-section">
+        <button class="redirect-button" onclick="redirect()">Go</button>
+    </div>
+    
+    <div class="loading-label" id="loading-label">Loading the redirection link...</div>
+    <div class="tearing" id="tearing"></div>
 
     <script>
         document.getElementById('loading-label').style.display = 'none';
 
-        function searchRedirect() {
-            const input = document.getElementById('search-box').value;
-            if (input) {
-                window.location.href = `/${input}`;
+        function checkPath() {
+            const path = window.location.pathname.replace("/", "");
+            if (path) {
+                document.getElementById("home").style.display = "none";
+                document.getElementById("redirect-section").style.display = "block";
+            } else {
+                document.getElementById("home").style.display = "block";
             }
         }
-
+        
         function redirect() {
             const button = document.querySelector('.redirect-button');
             button.style.animation = 'shake 1s forwards';
             setTimeout(() => {
                 button.style.display = 'none';
+                document.getElementById('tearing').style.display = 'block';
                 document.getElementById('loading-label').style.display = 'block';
                 document.getElementById('loading-label').style.animation = 'fadeIn 1s forwards';
                 setTimeout(() => {
                     document.body.style.animation = 'fadeOut 2s forwards';
                     setTimeout(() => {
-                        const path = window.location.pathname.replace("/", "");
-                        if (path) {
-                            window.location.href = `https://example.com/${path}`;
-                        } else {
-                            document.getElementById('home').style.display = 'block';
-                        }
+                        window.location.href = `https://example.com/${path}`;
                     }, 2000);
                 }, 1000);
             }, 1000);
         }
+
+        function createLink() {
+            alert("Feature to create redirection links coming soon!");
+        }
+
+        function searchLink() {
+            alert("Feature to search redirection links coming soon!");
+        }
+        
+        checkPath();
     </script>
 </body>
 </html>
