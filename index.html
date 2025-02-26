@@ -17,6 +17,7 @@
       background: linear-gradient(45deg, #ff416c, #ff4b2b, #1fa2ff, #12d8fa, #a6ffcb, #ff9a9e, #fad0c4);
       background-size: 400% 400%;
       animation: gradientShift 15s infinite alternate, fadeIn 2s forwards;
+      transition: opacity 2s ease-in-out;
     }
     @keyframes gradientShift {
       0% { background-position: 0% 50%; }
@@ -36,9 +37,14 @@
       from { transform: translateY(20px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
-    .result-item {
-      opacity: 0;
-      animation: fadeIn 0.5s forwards;
+    /* A smoother shake animation for the redirect button */
+    @keyframes smoothShake {
+      0% { transform: translateX(0) rotate(0deg); }
+      20% { transform: translateX(-5px) rotate(-2deg); }
+      40% { transform: translateX(5px) rotate(2deg); }
+      60% { transform: translateX(-5px) rotate(-2deg); }
+      80% { transform: translateX(5px) rotate(2deg); }
+      100% { transform: translateX(0) rotate(0deg); }
     }
     /* Container styles */
     .container {
@@ -106,7 +112,7 @@
       text-align: left;
       font-size: 1rem;
     }
-    /* Redirect button and animation effects (for redirection page) */
+    /* Redirect button container & style */
     .button-container {
       position: relative;
     }
@@ -120,7 +126,7 @@
       border: none;
       border-radius: 50px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 1s ease-in-out;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       position: relative;
       overflow: hidden;
@@ -128,18 +134,17 @@
     .redirect-button:hover {
       box-shadow: 0 6px 20px rgba(255, 255, 255, 0.5);
     }
-    @keyframes shake {
-      10%, 90% { transform: translateX(-2px); }
-      20%, 80% { transform: translateX(2px); }
-      30%, 50%, 70% { transform: translateX(-4px); }
-      40%, 60% { transform: translateX(4px); }
+    /* When pressed, add the smoothShake animation */
+    .redirect-button.pressed {
+      animation: smoothShake 1s forwards;
     }
-    /* Loading label and tearing effect for redirection animations */
+    /* Loading label & tearing element for redirection sequence */
     .loading-label {
       position: absolute;
       font-size: 24px;
       color: white;
       opacity: 0;
+      transition: opacity 1s ease-in-out;
     }
     .tearing {
       position: absolute;
@@ -149,11 +154,11 @@
       height: 100%;
       background: black;
       display: none;
-      animation: tearEffect 1s forwards 3s;
+      transition: opacity 1s ease-in-out, transform 1s ease-in-out;
     }
     @keyframes tearEffect {
-      from { transform: scaleY(1); }
-      to { transform: scaleY(0); }
+      from { transform: scaleY(1); opacity: 1; }
+      to { transform: scaleY(0); opacity: 0; }
     }
   </style>
 </head>
@@ -275,7 +280,6 @@
           li.className = 'result-item';
           li.style.marginBottom = '10px';
           li.innerText = displayId + ': ' + link.destination + (link.detail ? (' - ' + link.detail) : '');
-          // Clicking a search result takes you to the redirection page
           li.style.cursor = 'pointer';
           li.onclick = function() {
             location.hash = '#redirect-' + link.id;
@@ -299,7 +303,6 @@
         location.hash = '#home';
         return;
       }
-      // Populate details (hidden by default, but revealed on scroll)
       const detailsDiv = document.getElementById('redirect-details');
       detailsDiv.innerHTML = '<p>Destination: ' + currentLink.destination + '</p>' +
                              (currentLink.detail ? '<p>Detail: ' + currentLink.detail + '</p>' : '');
@@ -316,18 +319,25 @@
       }
     });
 
-    // Redirection button animation sequence
+    // Redirection button animation sequence (smoother version)
     function redirect() {
       if (!currentLink) return;
       const button = document.querySelector('.redirect-button');
-      button.style.animation = 'shake 1s forwards';
+      // Add class to trigger smoothShake animation
+      button.classList.add('pressed');
       setTimeout(() => {
-        button.style.display = 'none';
-        document.getElementById('tearing').style.display = 'block';
-        document.getElementById('loading-label').style.display = 'block';
-        document.getElementById('loading-label').style.animation = 'fadeIn 1s forwards';
+        // Smoothly fade out the button
+        button.style.opacity = '0';
+        // Show tearing and loading elements with smooth transitions
+        const tearing = document.getElementById('tearing');
+        const loadingLabel = document.getElementById('loading-label');
+        tearing.style.display = 'block';
+        tearing.style.opacity = '1';
+        loadingLabel.style.display = 'block';
+        loadingLabel.style.opacity = '1';
         setTimeout(() => {
-          document.body.style.animation = 'fadeOut 2s forwards';
+          // Fade out the entire page smoothly before redirection
+          document.body.style.opacity = '0';
           setTimeout(() => {
             window.location.href = currentLink.destination;
           }, 2000);
