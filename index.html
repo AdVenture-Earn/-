@@ -152,7 +152,6 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       position: relative;
       overflow: hidden;
-      pointer-events: auto;
     }
     .redirect-button:hover {
       box-shadow: 0 6px 20px rgba(255, 255, 255, 0.5);
@@ -206,7 +205,7 @@
   <!-- Redirection Page Section -->
   <div id="redirect-page" class="container" style="display:none; position: relative; overflow-y: auto;">
     <div class="button-container">
-      <button class="redirect-button" id="goBtn" onclick="redirect()">Go</button>
+      <button class="redirect-button" id="goBtn">Go</button>
     </div>
     <div id="redirect-details">
       <!-- Destination details are populated here and become visible upon scrolling -->
@@ -329,6 +328,8 @@
       const detailsDiv = document.getElementById('redirect-details');
       detailsDiv.innerHTML = '<p>Destination: ' + currentLink.destination + '</p>' +
                              (currentLink.detail ? '<p>Detail: ' + currentLink.detail + '</p>' : '');
+      // (Re)bind the Go button click event to ensure it always fires
+      document.getElementById('goBtn').onclick = redirect;
     }
 
     // Listen for scroll events on the redirection page to show/hide details smoothly
