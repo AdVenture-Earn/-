@@ -40,19 +40,7 @@
       opacity: 0;
       animation: fadeIn 0.5s forwards;
     }
-    /* Overlay for fade-to-black effect */
-    #black-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: black;
-      opacity: 0;
-      display: none;
-      z-index: 1000;
-    }
-    /* Loader container (hidden until activated) */
+    /* Loader container for transition effect */
     #loader-container {
       position: fixed;
       top: 50%;
@@ -62,7 +50,7 @@
       display: none;
       z-index: 1001;
     }
-    /* Loader styling: a solid circle with gradient, spinning and pixelating */
+    /* Loader styling: a solid circle with a changing gradient, spinning and gradually pixelating */
     .loader {
       width: 80px;
       height: 80px;
@@ -89,6 +77,7 @@
       color: white;
       padding: 20px;
       position: relative;
+      transition: opacity 1s ease;
     }
     /* Home page title using bounceIn animation */
     #home h1 {
@@ -173,6 +162,14 @@
       30%, 50%, 70% { transform: translateX(-4px); }
       40%, 60% { transform: translateX(4px); }
     }
+    /* Redirection details: starts hidden and fades in on scroll */
+    #redirect-details {
+      margin-top: 50px;
+      color: white;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -210,14 +207,13 @@
     <div class="button-container">
       <button class="redirect-button" onclick="redirect()">Go</button>
     </div>
-    <div id="redirect-details" style="margin-top: 50px; color: white; display: none; text-align: center;">
-      <!-- Details will be populated here upon scroll -->
+    <div id="redirect-details">
+      <!-- Destination details are populated here and become visible upon scrolling -->
     </div>
     <button style="position:absolute; top:20px; right:20px;" onclick="location.hash='#home'">Home</button>
   </div>
 
-  <!-- Overlays for transition effects -->
-  <div id="black-overlay"></div>
+  <!-- Loader Container (initially hidden) -->
   <div id="loader-container">
     <div class="loader"></div>
   </div>
@@ -234,6 +230,8 @@
       const hash = window.location.hash;
       if (hash.startsWith('#redirect-')) {
         document.getElementById('redirect-page').style.display = 'flex';
+        // Reset opacity in case it was faded during a previous redirect
+        document.getElementById('redirect-page').style.opacity = 1;
         loadRedirectPage();
       } else if (hash === '#create') {
         document.getElementById('create').style.display = 'flex';
@@ -321,53 +319,49 @@
         location.hash = '#home';
         return;
       }
-      // Populate details (hidden by default, but revealed on scroll)
+      // Populate details (destination link and optional detail)
       const detailsDiv = document.getElementById('redirect-details');
       detailsDiv.innerHTML = '<p>Destination: ' + currentLink.destination + '</p>' +
                              (currentLink.detail ? '<p>Detail: ' + currentLink.detail + '</p>' : '');
     }
 
-    // Listen for scroll events on the redirection page to show/hide details
+    // Listen for scroll events on the redirection page to show/hide details smoothly
     window.addEventListener('scroll', function() {
       if (window.location.hash.startsWith('#redirect-')) {
+        const details = document.getElementById('redirect-details');
         if (window.scrollY > 100) {
-          document.getElementById('redirect-details').style.display = 'block';
+          details.style.opacity = 1;
         } else {
-          document.getElementById('redirect-details').style.display = 'none';
+          details.style.opacity = 0;
         }
       }
     });
 
-    // Redirection button animation sequence with smooth fade-to-black and loader transition
+    // Redirection button animation sequence with smooth fade transition and loader
     function redirect() {
       if (!currentLink) return;
       const button = document.querySelector('.redirect-button');
       // Start shake animation for 1 second
       button.style.animation = 'shake 1s forwards';
       setTimeout(() => {
-        button.style.display = 'none';
-        // Fade to black
-        const blackOverlay = document.getElementById('black-overlay');
-        blackOverlay.style.transition = 'opacity 1.5s ease';
-        blackOverlay.style.display = 'block';
-        blackOverlay.style.opacity = 1; // fade to black over 1.5s
-        
-        // After fade-to-black completes, hold black for 1 second
+        // Fade out the entire redirection page
+        const redirectPage = document.getElementById('redirect-page');
+        redirectPage.style.transition = 'opacity 1s ease';
+        redirectPage.style.opacity = 0;
+        // Fade in the loader container
+        const loaderContainer = document.getElementById('loader-container');
+        loaderContainer.style.display = 'block';
+        loaderContainer.style.transition = 'opacity 1s ease';
+        loaderContainer.style.opacity = 1;
+        // After 5 seconds, fade out the loader and then redirect
         setTimeout(() => {
-          // Fade out black overlay and fade in loader container
-          blackOverlay.style.transition = 'opacity 1s ease';
-          blackOverlay.style.opacity = 0;
-          const loaderContainer = document.getElementById('loader-container');
           loaderContainer.style.transition = 'opacity 1s ease';
-          loaderContainer.style.display = 'block';
-          loaderContainer.style.opacity = 1;
-          // The loader's pixelation (5s animation) is already triggered by its CSS animation
-          // After 5 seconds, redirect to the destination
+          loaderContainer.style.opacity = 0;
           setTimeout(() => {
             window.location.href = currentLink.destination;
-          }, 5000);
-        }, 1000); // hold black for 1 second after fade completes
-      }, 1000); // after shake animation
+          }, 1000);
+        }, 5000);
+      }, 1000);
     }
   </script>
 </body>
