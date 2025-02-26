@@ -40,31 +40,43 @@
       opacity: 0;
       animation: fadeIn 0.5s forwards;
     }
-    /* Pixelate overlay styling */
-    .pixelate-overlay {
-      position: absolute;
+    /* Overlay for fade-to-black effect */
+    #black-overlay {
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       background: black;
-      display: none;
       opacity: 0;
+      display: none;
       z-index: 1000;
     }
-    @keyframes pixelateEffect {
-      0% {
-        opacity: 0;
-        filter: none;
-      }
-      60% {
-        opacity: 1;
-        filter: blur(0px) contrast(100%);
-      }
-      100% {
-        opacity: 1;
-        filter: blur(8px) contrast(150%);
-      }
+    /* Loader container (hidden until activated) */
+    #loader-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      display: none;
+      z-index: 1001;
+    }
+    /* Loader styling: a solid circle with gradient, spinning and pixelating */
+    .loader {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, #ff416c, #ff4b2b, #1fa2ff, #12d8fa, #a6ffcb, #ff9a9e, #fad0c4, #ff416c);
+      animation: spin 2s linear infinite, pixelateLoader 5s forwards;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes pixelateLoader {
+      0% { filter: blur(0px) contrast(100%); }
+      100% { filter: blur(8px) contrast(150%); }
     }
     /* Container styles */
     .container {
@@ -78,7 +90,7 @@
       padding: 20px;
       position: relative;
     }
-    /* Home page title using the new font and bounceIn animation */
+    /* Home page title using bounceIn animation */
     #home h1 {
       font-size: 2.5rem;
       margin-bottom: 30px;
@@ -195,8 +207,6 @@
 
   <!-- Redirection Page Section -->
   <div id="redirect-page" class="container" style="display:none; position: relative; overflow-y: auto;">
-    <!-- Pixelate overlay covers the screen when activated -->
-    <div id="pixelate-overlay" class="pixelate-overlay"></div>
     <div class="button-container">
       <button class="redirect-button" onclick="redirect()">Go</button>
     </div>
@@ -204,6 +214,12 @@
       <!-- Details will be populated here upon scroll -->
     </div>
     <button style="position:absolute; top:20px; right:20px;" onclick="location.hash='#home'">Home</button>
+  </div>
+
+  <!-- Overlays for transition effects -->
+  <div id="black-overlay"></div>
+  <div id="loader-container">
+    <div class="loader"></div>
   </div>
 
   <script>
@@ -322,21 +338,36 @@
       }
     });
 
-    // Redirection button animation sequence with smoother pixelation effect
+    // Redirection button animation sequence with smooth fade-to-black and loader transition
     function redirect() {
       if (!currentLink) return;
       const button = document.querySelector('.redirect-button');
+      // Start shake animation for 1 second
       button.style.animation = 'shake 1s forwards';
       setTimeout(() => {
         button.style.display = 'none';
-        const overlay = document.getElementById('pixelate-overlay');
-        overlay.style.display = 'block';
-        overlay.style.animation = 'pixelateEffect 1.5s forwards';
-        // After the pixelation effect, redirect to the destination URL
+        // Fade to black
+        const blackOverlay = document.getElementById('black-overlay');
+        blackOverlay.style.transition = 'opacity 1.5s ease';
+        blackOverlay.style.display = 'block';
+        blackOverlay.style.opacity = 1; // fade to black over 1.5s
+        
+        // After fade-to-black completes, hold black for 1 second
         setTimeout(() => {
-          window.location.href = currentLink.destination;
-        }, 2500);
-      }, 1000);
+          // Fade out black overlay and fade in loader container
+          blackOverlay.style.transition = 'opacity 1s ease';
+          blackOverlay.style.opacity = 0;
+          const loaderContainer = document.getElementById('loader-container');
+          loaderContainer.style.transition = 'opacity 1s ease';
+          loaderContainer.style.display = 'block';
+          loaderContainer.style.opacity = 1;
+          // The loader's pixelation (5s animation) is already triggered by its CSS animation
+          // After 5 seconds, redirect to the destination
+          setTimeout(() => {
+            window.location.href = currentLink.destination;
+          }, 5000);
+        }, 1000); // hold black for 1 second after fade completes
+      }, 1000); // after shake animation
     }
   </script>
 </body>
