@@ -152,6 +152,7 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       position: relative;
       overflow: hidden;
+      pointer-events: auto;
     }
     .redirect-button:hover {
       box-shadow: 0 6px 20px rgba(255, 255, 255, 0.5);
@@ -205,7 +206,7 @@
   <!-- Redirection Page Section -->
   <div id="redirect-page" class="container" style="display:none; position: relative; overflow-y: auto;">
     <div class="button-container">
-      <button class="redirect-button" onclick="redirect()">Go</button>
+      <button class="redirect-button" id="goBtn" onclick="redirect()">Go</button>
     </div>
     <div id="redirect-details">
       <!-- Destination details are populated here and become visible upon scrolling -->
@@ -219,6 +220,9 @@
   </div>
 
   <script>
+    // Flag to prevent multiple activations
+    let redirectStarted = false;
+    
     // Navigation: show/hide sections based on URL hash
     function navigate() {
       // Hide all containers
@@ -242,6 +246,8 @@
         // Default to home
         document.getElementById('home').style.display = 'flex';
       }
+      // Reset redirect flag when navigating away
+      redirectStarted = false;
     }
     window.onhashchange = navigate;
     navigate();
@@ -339,8 +345,10 @@
 
     // Redirection button animation sequence with smooth fade transition and loader
     function redirect() {
-      if (!currentLink) return;
-      const button = document.querySelector('.redirect-button');
+      if (!currentLink || redirectStarted) return;
+      redirectStarted = true;  // Prevent further clicks
+      
+      const button = document.getElementById('goBtn');
       // Start shake animation for 1 second
       button.style.animation = 'shake 1s forwards';
       setTimeout(() => {
