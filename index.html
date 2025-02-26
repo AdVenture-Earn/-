@@ -222,6 +222,11 @@
     // Flag to prevent multiple activations
     let redirectStarted = false;
     
+    // Reset redirect flag on pageshow (helps when clicking back)
+    window.addEventListener('pageshow', function() {
+      redirectStarted = false;
+    });
+
     // Navigation: show/hide sections based on URL hash
     function navigate() {
       // Hide all containers
