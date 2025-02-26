@@ -17,7 +17,6 @@
       background: linear-gradient(45deg, #ff416c, #ff4b2b, #1fa2ff, #12d8fa, #a6ffcb, #ff9a9e, #fad0c4);
       background-size: 400% 400%;
       animation: gradientShift 15s infinite alternate, fadeIn 2s forwards;
-      transition: opacity 2s ease-in-out;
     }
     @keyframes gradientShift {
       0% { background-position: 0% 50%; }
@@ -37,14 +36,35 @@
       from { transform: translateY(20px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
-    /* A smoother shake animation for the redirect button */
-    @keyframes smoothShake {
-      0% { transform: translateX(0) rotate(0deg); }
-      20% { transform: translateX(-5px) rotate(-2deg); }
-      40% { transform: translateX(5px) rotate(2deg); }
-      60% { transform: translateX(-5px) rotate(-2deg); }
-      80% { transform: translateX(5px) rotate(2deg); }
-      100% { transform: translateX(0) rotate(0deg); }
+    .result-item {
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+    }
+    /* Pixelate overlay styling */
+    .pixelate-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      display: none;
+      opacity: 0;
+      z-index: 1000;
+    }
+    @keyframes pixelateEffect {
+      0% {
+        opacity: 0;
+        filter: none;
+      }
+      60% {
+        opacity: 1;
+        filter: blur(0px) contrast(100%);
+      }
+      100% {
+        opacity: 1;
+        filter: blur(8px) contrast(150%);
+      }
     }
     /* Container styles */
     .container {
@@ -56,6 +76,7 @@
       text-align: center;
       color: white;
       padding: 20px;
+      position: relative;
     }
     /* Home page title using the new font and bounceIn animation */
     #home h1 {
@@ -112,7 +133,7 @@
       text-align: left;
       font-size: 1rem;
     }
-    /* Redirect button container & style */
+    /* Redirect button and its animation effects (for redirection page) */
     .button-container {
       position: relative;
     }
@@ -126,7 +147,7 @@
       border: none;
       border-radius: 50px;
       cursor: pointer;
-      transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 1s ease-in-out;
+      transition: all 0.3s ease;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       position: relative;
       overflow: hidden;
@@ -134,31 +155,11 @@
     .redirect-button:hover {
       box-shadow: 0 6px 20px rgba(255, 255, 255, 0.5);
     }
-    /* When pressed, add the smoothShake animation */
-    .redirect-button.pressed {
-      animation: smoothShake 1s forwards;
-    }
-    /* Loading label & tearing element for redirection sequence */
-    .loading-label {
-      position: absolute;
-      font-size: 24px;
-      color: white;
-      opacity: 0;
-      transition: opacity 1s ease-in-out;
-    }
-    .tearing {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: black;
-      display: none;
-      transition: opacity 1s ease-in-out, transform 1s ease-in-out;
-    }
-    @keyframes tearEffect {
-      from { transform: scaleY(1); opacity: 1; }
-      to { transform: scaleY(0); opacity: 0; }
+    @keyframes shake {
+      10%, 90% { transform: translateX(-2px); }
+      20%, 80% { transform: translateX(2px); }
+      30%, 50%, 70% { transform: translateX(-4px); }
+      40%, 60% { transform: translateX(4px); }
     }
   </style>
 </head>
@@ -194,11 +195,11 @@
 
   <!-- Redirection Page Section -->
   <div id="redirect-page" class="container" style="display:none; position: relative; overflow-y: auto;">
+    <!-- Pixelate overlay covers the screen when activated -->
+    <div id="pixelate-overlay" class="pixelate-overlay"></div>
     <div class="button-container">
       <button class="redirect-button" onclick="redirect()">Go</button>
     </div>
-    <div class="loading-label" id="loading-label">Loading the redirection link...</div>
-    <div class="tearing" id="tearing"></div>
     <div id="redirect-details" style="margin-top: 50px; color: white; display: none; text-align: center;">
       <!-- Details will be populated here upon scroll -->
     </div>
@@ -280,6 +281,7 @@
           li.className = 'result-item';
           li.style.marginBottom = '10px';
           li.innerText = displayId + ': ' + link.destination + (link.detail ? (' - ' + link.detail) : '');
+          // Clicking a search result takes you to the redirection page
           li.style.cursor = 'pointer';
           li.onclick = function() {
             location.hash = '#redirect-' + link.id;
@@ -303,6 +305,7 @@
         location.hash = '#home';
         return;
       }
+      // Populate details (hidden by default, but revealed on scroll)
       const detailsDiv = document.getElementById('redirect-details');
       detailsDiv.innerHTML = '<p>Destination: ' + currentLink.destination + '</p>' +
                              (currentLink.detail ? '<p>Detail: ' + currentLink.detail + '</p>' : '');
@@ -319,29 +322,20 @@
       }
     });
 
-    // Redirection button animation sequence (smoother version)
+    // Redirection button animation sequence with smoother pixelation effect
     function redirect() {
       if (!currentLink) return;
       const button = document.querySelector('.redirect-button');
-      // Add class to trigger smoothShake animation
-      button.classList.add('pressed');
+      button.style.animation = 'shake 1s forwards';
       setTimeout(() => {
-        // Smoothly fade out the button
-        button.style.opacity = '0';
-        // Show tearing and loading elements with smooth transitions
-        const tearing = document.getElementById('tearing');
-        const loadingLabel = document.getElementById('loading-label');
-        tearing.style.display = 'block';
-        tearing.style.opacity = '1';
-        loadingLabel.style.display = 'block';
-        loadingLabel.style.opacity = '1';
+        button.style.display = 'none';
+        const overlay = document.getElementById('pixelate-overlay');
+        overlay.style.display = 'block';
+        overlay.style.animation = 'pixelateEffect 1.5s forwards';
+        // After the pixelation effect, redirect to the destination URL
         setTimeout(() => {
-          // Fade out the entire page smoothly before redirection
-          document.body.style.opacity = '0';
-          setTimeout(() => {
-            window.location.href = currentLink.destination;
-          }, 2000);
-        }, 1000);
+          window.location.href = currentLink.destination;
+        }, 2500);
       }, 1000);
     }
   </script>
