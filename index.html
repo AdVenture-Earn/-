@@ -3,15 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Download Folder</title>
+    <title>Infinite Markdown Editor</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #1e1e2e;
+            color: #eee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        textarea {
+            width: 80vw;
+            height: 90vh;
+            background: #2e2e3e;
+            color: #fff;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            outline: none;
+            resize: none;
+            overflow-y: hidden;
+            transition: background 0.3s;
+        }
+        textarea:focus {
+            background: #3a3a4a;
+        }
+    </style>
 </head>
 <body>
-    <button onclick="downloadFolder()">Download Crochat</button>
+    <textarea id="editor" placeholder="Start writing in Markdown..."></textarea>
 
     <script>
-        function downloadFolder() {
-            window.location.href = 'Crochat.zip'; // Make sure the file is zipped and placed in the same directory
-        }
+        const editor = document.getElementById('editor');
+        
+        // Load saved content
+        editor.value = localStorage.getItem('markdownContent') || "";
+
+        // Auto-save content
+        editor.addEventListener('input', () => {
+            localStorage.setItem('markdownContent', editor.value);
+        });
+
+        // Infinite scroll effect
+        editor.addEventListener('scroll', () => {
+            if (editor.scrollTop + editor.clientHeight >= editor.scrollHeight - 20) {
+                editor.value += '\n\n';
+                editor.scrollTop = editor.scrollHeight;
+            }
+        });
     </script>
 </body>
 </html>
